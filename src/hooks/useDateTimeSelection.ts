@@ -51,7 +51,7 @@ export const useDateTimeSelection = (
         return;
       }
       
-      // Automatically select the first available date if there is one
+      // Only auto-select if we have schedules and no date is already selected
       if (schedules.length > 0 && onSelectDate) {
         console.log('Auto-selecting first date:', schedules[0].date);
         onSelectDate(schedules[0].date);
@@ -62,7 +62,7 @@ export const useDateTimeSelection = (
           onSelectTime(schedules[0].times[0]);
         }
       } else {
-        console.log('No schedules available to auto-select.');
+        console.log('No schedules available to auto-select or selections already made.');
       }
     } catch (error) {
       console.error('Erro ao carregar horários:', error);

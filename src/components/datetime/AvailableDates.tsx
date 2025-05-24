@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { AvailableSchedule } from '@/types/feegow';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +22,7 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
   const formatDisplayDate = (dateString: string): string => {
     try {
       let date;
-      // Check if date is in dd-mm-yyyy format
+      // Check if date is in dd-mm-yyyy or yyyy-mm-dd format
       if (dateString.includes('-') && dateString.split('-').length === 3) {
         const parts = dateString.split('-');
         
@@ -40,6 +41,13 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
       return dateString;
     }
   };
+
+  // Debug logs to help troubleshoot
+  console.log('Available dates component rendering with:', {
+    schedulesCount: availableSchedules.length,
+    selectedDate,
+    firstSchedule: availableSchedules.length > 0 ? availableSchedules[0] : null
+  });
 
   return (
     <Card className="w-full">

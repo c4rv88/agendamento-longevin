@@ -106,6 +106,12 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     );
   }
 
+  console.log('Rendering DateTimeSelector with:', {
+    availableSchedules: availableSchedules.length, 
+    selectedDate,
+    timesForDate: selectedDate ? getAvailableTimesForDate(selectedDate).length : 0
+  });
+
   return (
     <div className="space-y-6">
       <AvailableDates 

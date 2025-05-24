@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,6 +51,14 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
     }
     return time;
   };
+
+  // Debug logs
+  console.log('Available times component rendering with:', {
+    timesCount: times.length,
+    selectedTime,
+    selectedDate,
+    times
+  });
 
   if (!selectedDate || times.length === 0) {
     return (
