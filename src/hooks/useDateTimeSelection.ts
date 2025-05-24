@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { AvailableSchedule } from '@/types/feegow';
 import { FeegowApiService } from '@/services/api';
 import { toast } from 'sonner';
@@ -16,6 +16,9 @@ export const useDateTimeSelection = (
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  
+  // Use refs to track if we've already auto-selected date/time
+  const hasAutoSelectedRef = useRef(false);
 
   const fetchAvailableSchedules = useCallback(async () => {
     if (!professionalId) {
@@ -28,12 +31,6 @@ export const useDateTimeSelection = (
     try {
       setLoading(true);
       setError(null);
-      console.log('Fetching schedules with params:', { 
-        profissional_id: professionalId, 
-        unidade_id: unityId || 0,
-        especialidade_id: specialtyId || 0,
-        convenio_id: insuranceId || 0
-      });
       
       const schedules = await FeegowApiService.getAvailableSchedules(
         professionalId,
@@ -42,7 +39,7 @@ export const useDateTimeSelection = (
         insuranceId || 0
       );
       
-      console.log(`Fetched ${schedules.length} available schedules for professional #${professionalId}`);
+      // Set state only if component is still mounted
       setAvailableSchedules(schedules);
       
       if (schedules.length === 0) {
@@ -51,14 +48,13 @@ export const useDateTimeSelection = (
         return;
       }
       
-      // Only auto-select if we have schedules and no date is already selected
-      if (schedules.length > 0 && onSelectDate) {
-        console.log('Auto-selecting first date:', schedules[0].date);
+      // Only auto-select if we have schedules, no date is already selected, and we haven't auto-selected yet
+      if (schedules.length > 0 && onSelectDate && !hasAutoSelectedRef.current) {
+        hasAutoSelectedRef.current = true;
         onSelectDate(schedules[0].date);
         
         // And automatically select the first available time if there is one
         if (schedules[0].times.length > 0 && onSelectTime) {
-          console.log('Auto-selecting first time:', schedules[0].times[0]);
           onSelectTime(schedules[0].times[0]);
         }
       }
@@ -73,24 +69,28 @@ export const useDateTimeSelection = (
 
   // Retry function for UI
   const retry = useCallback(() => {
+    hasAutoSelectedRef.current = false; // Reset auto-selection on retry
     setRetryCount(prev => prev + 1);
   }, []);
 
   useEffect(() => {
+    hasAutoSelectedRef.current = false; // Reset when dependencies change
     fetchAvailableSchedules();
-  }, [fetchAvailableSchedules]);
+  }, [fetchAvailableSchedules, retryCount]);
 
   // Memoize this function to prevent unnecessary recreations
   const getAvailableTimesForDate = useCallback((date: string): string[] => {
+    if (!availableSchedules || !date) return [];
     const schedule = availableSchedules.find(s => s.date === date);
     return schedule ? schedule.times : [];
   }, [availableSchedules]);
 
-  return {
+  // Memoize the entire return value to prevent unnecessary recreations
+  return useMemo(() => ({
     availableSchedules,
     loading,
     error,
     getAvailableTimesForDate,
     retry
-  };
+  }), [availableSchedules, loading, error, getAvailableTimesForDate, retry]);
 };

@@ -1,5 +1,4 @@
-
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format, parse } from 'date-fns';
@@ -48,17 +47,17 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
   }, [selectedDate]);
 
   // Function to format time for display (remove seconds)
-  const formatTime = (time: string): string => {
+  const formatTime = useCallback((time: string): string => {
     if (time.includes(':')) {
       const [hours, minutes] = time.split(':');
       return `${hours}:${minutes}`;
     }
     return time;
-  };
+  }, []);
 
   // Get closest 4 times - sorted by time of day
   const getClosestTimes = useMemo(() => {
-    if (!times.length) return [];
+    if (!times || times.length === 0) return [];
     
     // Sort times chronologically
     const sortedTimes = [...times].sort((a, b) => {
@@ -77,6 +76,11 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
 
   // Group times by morning, afternoon and evening - using useMemo to prevent recalculation
   const groupedTimes = useMemo(() => {
+    // Skip processing if no times available
+    if (!times || times.length === 0) {
+      return { morning: [], afternoon: [], evening: [] };
+    }
+    
     const timesToShow = showAllTimes ? times : getClosestTimes;
     
     return {
@@ -95,16 +99,17 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
     };
   }, [times, showAllTimes, getClosestTimes]);
 
-  // Debug logs
-  console.log('Available times component rendering with:', {
-    timesCount: times.length,
-    closestTimesCount: getClosestTimes.length,
-    selectedTime,
-    selectedDate,
-    showAllTimes
-  });
+  // Handler for time selection with useCallback to prevent recreating function
+  const handleSelectTime = useCallback((time: string) => {
+    onSelectTime(time);
+  }, [onSelectTime]);
 
-  if (!selectedDate || times.length === 0) {
+  // Handler for toggling time display with useCallback
+  const toggleShowAllTimes = useCallback(() => {
+    setShowAllTimes(prev => !prev);
+  }, []);
+
+  if (!selectedDate || !times || times.length === 0) {
     return (
       <Card className="w-full">
         <CardHeader>
@@ -126,6 +131,33 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
     );
   }
 
+  // Render time button - extracted to reduce repetition
+  const renderTimeButton = (time: string, period: string) => (
+    <Button
+      key={`${period}-${time}`}
+      variant={selectedTime === time ? "default" : "outline"}
+      size="sm"
+      onClick={() => handleSelectTime(time)}
+      className="text-sm w-full"
+    >
+      {formatTime(time)}
+    </Button>
+  );
+
+  // Render a time period section
+  const renderTimePeriod = (title: string, times: string[]) => {
+    if (times.length === 0) return null;
+    
+    return (
+      <div className="space-y-2">
+        <h4 className="text-sm font-medium text-muted-foreground">{title}</h4>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+          {times.map(time => renderTimeButton(time, title.toLowerCase()))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -139,71 +171,20 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
       <CardContent>
         <div className="space-y-6">
           {/* Morning times */}
-          {groupedTimes.morning.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-muted-foreground">Manhã</h4>
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                {groupedTimes.morning.map((time) => (
-                  <Button
-                    key={`morning-${time}`}
-                    variant={selectedTime === time ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => onSelectTime(time)}
-                    className="text-sm w-full"
-                  >
-                    {formatTime(time)}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
+          {renderTimePeriod('Manhã', groupedTimes.morning)}
 
           {/* Afternoon times */}
-          {groupedTimes.afternoon.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-muted-foreground">Tarde</h4>
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                {groupedTimes.afternoon.map((time) => (
-                  <Button
-                    key={`afternoon-${time}`}
-                    variant={selectedTime === time ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => onSelectTime(time)}
-                    className="text-sm w-full"
-                  >
-                    {formatTime(time)}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
+          {renderTimePeriod('Tarde', groupedTimes.afternoon)}
 
           {/* Evening times */}
-          {groupedTimes.evening.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-muted-foreground">Noite</h4>
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                {groupedTimes.evening.map((time) => (
-                  <Button
-                    key={`evening-${time}`}
-                    variant={selectedTime === time ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => onSelectTime(time)}
-                    className="text-sm w-full"
-                  >
-                    {formatTime(time)}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
+          {renderTimePeriod('Noite', groupedTimes.evening)}
           
           {/* Button to show all times or less times */}
           {times.length > 4 && (
             <div className="pt-2 flex justify-center">
               <Button 
                 variant="outline"
-                onClick={() => setShowAllTimes(!showAllTimes)}
+                onClick={toggleShowAllTimes}
                 className="text-sm w-full max-w-xs flex items-center gap-2"
               >
                 {showAllTimes ? "Mostrar apenas próximos horários" : "Ver mais opções de horários"}

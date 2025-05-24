@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useDateTimeSelection } from '@/hooks/useDateTimeSelection';
 import { DateTimeStatus } from '@/components/datetime/DateTimeStatus';
 import { AvailableDates } from '@/components/datetime/AvailableDates';
@@ -43,9 +43,19 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     onSelectTime
   );
 
+  // Use useCallback for handlers to prevent unnecessary recreation
+  const handleSelectDate = useCallback((date: string) => {
+    onSelectDate(date);
+  }, [onSelectDate]);
+
+  const handleSelectTime = useCallback((time: string) => {
+    onSelectTime(time);
+  }, [onSelectTime]);
+
   // Use useMemo to prevent unnecessary calculations of available times
   const availableTimes = useMemo(() => {
-    return selectedDate ? getAvailableTimesForDate(selectedDate) : [];
+    if (!selectedDate) return [];
+    return getAvailableTimesForDate(selectedDate);
   }, [selectedDate, getAvailableTimesForDate]);
 
   if (loading) {
@@ -61,7 +71,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     );
   }
 
-  if (availableSchedules.length === 0) {
+  if (!availableSchedules || availableSchedules.length === 0) {
     return (
       <Card className="w-full">
         <CardHeader>
@@ -91,7 +101,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
       <AvailableDates 
         availableSchedules={availableSchedules}
         selectedDate={selectedDate}
-        onSelectDate={onSelectDate}
+        onSelectDate={handleSelectDate}
       />
 
       {selectedDate && (
@@ -99,7 +109,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
           times={availableTimes}
           selectedTime={selectedTime}
           selectedDate={selectedDate}
-          onSelectTime={onSelectTime}
+          onSelectTime={handleSelectTime}
         />
       )}
     </div>
