@@ -1,16 +1,10 @@
 
 import React, { useState } from 'react';
 import { useAppointmentFlow } from '@/hooks/useAppointmentFlow';
-import { UnitySelector } from './UnitySelector';
-import { SpecialtySelector } from './SpecialtySelector';
-import { ProfessionalSelector } from './ProfessionalSelector';
-import { InsuranceSelector } from './InsuranceSelector';
-import { DateTimeSelector } from './DateTimeSelector';
-import { PatientForm } from './PatientForm';
-import { AppointmentSummary } from './AppointmentSummary';
-import { ProgressIndicator } from './ProgressIndicator';
-import { Button } from '@/components/ui/button';
-import { ArrowUp, ArrowDown } from 'lucide-react';
+import { ProgressIndicator } from '@/components/ProgressIndicator';
+import { AppointmentHeader } from '@/components/appointment/AppointmentHeader';
+import { AppointmentStepContent } from '@/components/appointment/AppointmentStepContent';
+import { AppointmentNavigation } from '@/components/appointment/AppointmentNavigation';
 
 export const AppointmentScheduler: React.FC = () => {
   const { state, updateState, nextStep, prevStep, resetFlow } = useAppointmentFlow();
@@ -36,155 +30,32 @@ export const AppointmentScheduler: React.FC = () => {
     }
   };
 
-  const renderCurrentStep = () => {
-    switch (state.currentStep) {
-      case 1: // Unidade
-        return (
-          <UnitySelector
-            selectedUnity={state.selectedUnity}
-            onSelect={(unity) => {
-              // Clear related selections when changing unity
-              updateState({ 
-                selectedUnity: unity,
-                selectedSpecialty: null,
-                selectedProfessional: null,
-                selectedInsurance: null
-              });
-            }}
-          />
-        );
-      case 2: // Especialidade
-        return (
-          <SpecialtySelector
-            selectedSpecialty={state.selectedSpecialty}
-            unityId={state.selectedUnity?.unity_id}
-            onSelect={(specialty) => {
-              // Clear professionals when selecting a new specialty
-              updateState({ 
-                selectedSpecialty: specialty,
-                selectedProfessional: null,
-                selectedInsurance: null
-              });
-            }}
-          />
-        );
-      case 3: // Profissional
-        return (
-          <ProfessionalSelector
-            selectedProfessional={state.selectedProfessional}
-            specialtyId={state.selectedSpecialty?.specialty_id}
-            unityId={state.selectedUnity?.unity_id}
-            onSelect={(professional) => {
-              // Clear insurance when selecting a new professional
-              updateState({ 
-                selectedProfessional: professional,
-                selectedInsurance: null
-              });
-            }}
-          />
-        );
-      case 4: // Convênio
-        return (
-          <InsuranceSelector
-            selectedInsurance={state.selectedInsurance}
-            professionalId={state.selectedProfessional?.professional_id}
-            onSelect={(insurance) => updateState({ selectedInsurance: insurance })}
-          />
-        );
-      case 5: // Data/Hora
-        return (
-          <DateTimeSelector
-            selectedDate={state.selectedDate}
-            selectedTime={state.selectedTime}
-            professionalId={state.selectedProfessional?.professional_id!}
-            unityId={state.selectedUnity?.unity_id}
-            specialtyId={state.selectedSpecialty?.specialty_id}
-            onSelectDate={(date) => updateState({ selectedDate: date })}
-            onSelectTime={(time) => updateState({ selectedTime: time })}
-          />
-        );
-      case 6: // Paciente
-        return (
-          <PatientForm
-            patient={state.patient}
-            onPatientUpdate={(patient) => updateState({ patient })}
-          />
-        );
-      case 7: // Confirmação
-        return <AppointmentSummary appointmentData={state} onConfirm={resetFlow} />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       {/* Header com Logo */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {logoUrl && (
-                <img src={logoUrl} alt="Logo da Clínica" className="h-12 w-auto object-contain" />
-              )}
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Agendamento Online
-                </h1>
-                <p className="text-sm text-gray-600">Sistema Feegow</p>
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <input
-                type="url"
-                placeholder="URL do logotipo da clínica"
-                value={logoUrl}
-                onChange={(e) => setLogoUrl(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <AppointmentHeader logoUrl={logoUrl} setLogoUrl={setLogoUrl} />
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <ProgressIndicator currentStep={state.currentStep} totalSteps={7} />
           
           <div className="mt-8">
-            {renderCurrentStep()}
+            <AppointmentStepContent 
+              currentStep={state.currentStep}
+              state={state}
+              updateState={updateState}
+              resetFlow={resetFlow}
+            />
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8">
-            <Button
-              variant="outline"
-              onClick={handlePrev}
-              disabled={state.currentStep === 1}
-              className="flex items-center gap-2"
-            >
-              <ArrowUp className="w-4 h-4" />
-              Voltar
-            </Button>
-            
-            {state.currentStep < 7 ? (
-              <Button
-                onClick={handleNext}
-                disabled={!canProceed()}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
-                Próximo
-                <ArrowDown className="w-4 h-4" />
-              </Button>
-            ) : (
-              <Button
-                onClick={resetFlow}
-                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-              >
-                Novo Agendamento
-              </Button>
-            )}
-          </div>
+          <AppointmentNavigation 
+            currentStep={state.currentStep}
+            canProceed={canProceed()}
+            onNext={handleNext}
+            onPrev={handlePrev}
+            onReset={resetFlow}
+          />
 
           {/* Campo para adicionar logo no mobile */}
           <div className="md:hidden mt-6">

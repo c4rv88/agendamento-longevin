@@ -7,8 +7,8 @@ export const useDateTimeSelection = (
   professionalId: number,
   unityId?: number,
   specialtyId?: number,
-  onSelectDate: (date: string) => void,
-  onSelectTime: (time: string) => void
+  onSelectDate?: (date: string) => void,
+  onSelectTime?: (time: string) => void
 ) => {
   const [availableSchedules, setAvailableSchedules] = useState<AvailableSchedule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,11 +35,11 @@ export const useDateTimeSelection = (
         setAvailableSchedules(schedules);
         
         // Automatically select the first available date if there is one
-        if (schedules.length > 0) {
+        if (schedules.length > 0 && onSelectDate) {
           onSelectDate(schedules[0].date);
           
           // And automatically select the first available time if there is one
-          if (schedules[0].times.length > 0) {
+          if (schedules[0].times.length > 0 && onSelectTime) {
             onSelectTime(schedules[0].times[0]);
           }
         }
