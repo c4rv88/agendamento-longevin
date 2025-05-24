@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Calendar, MapPin, User, CreditCard, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface AppointmentSummaryProps {
@@ -21,6 +21,31 @@ export const AppointmentSummary: React.FC<AppointmentSummaryProps> = ({
   const [confirming, setConfirming] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const { toast } = useToast();
+
+  // Function to safely format the date
+  const formatSelectedDate = (dateString: string): string => {
+    try {
+      // Check if date is in dd-mm-yyyy format (from API)
+      if (dateString && dateString.includes('-') && dateString.split('-').length === 3) {
+        const parts = dateString.split('-');
+        
+        // If the first part is 4 characters (year), it's in yyyy-MM-dd format
+        if (parts[0].length === 4) {
+          const date = parse(dateString, 'yyyy-MM-dd', new Date());
+          return format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+        } else {
+          // It's in dd-MM-yyyy format
+          const date = parse(dateString, 'dd-MM-yyyy', new Date());
+          return format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+        }
+      }
+      // Fallback for empty or invalid dates
+      return dateString || 'Data não selecionada';
+    } catch (error) {
+      console.error('Error formatting date:', error, dateString);
+      return dateString || 'Data não selecionada';
+    }
+  };
 
   const handleConfirm = async () => {
     setConfirming(true);
@@ -145,7 +170,7 @@ export const AppointmentSummary: React.FC<AppointmentSummaryProps> = ({
               <div>
                 <div className="font-semibold">Data</div>
                 <div className="text-sm text-gray-600">
-                  {format(new Date(appointmentData.selectedDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                  {formatSelectedDate(appointmentData.selectedDate)}
                 </div>
               </div>
             </div>
