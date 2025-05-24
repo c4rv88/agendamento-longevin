@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react';
+
+import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format, parse } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Clock } from 'lucide-react';
+import { Clock, ChevronDown } from 'lucide-react';
 
 interface AvailableTimesProps {
   times: string[];
@@ -18,6 +19,8 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
   selectedDate,
   onSelectTime
 }) => {
+  const [showAllTimes, setShowAllTimes] = useState(false);
+  
   // Format date for display - using useMemo to prevent recalculation
   const formattedDate = useMemo(() => {
     try {
@@ -53,29 +56,52 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
     return time;
   };
 
+  // Get closest 4 times - sorted by time of day
+  const getClosestTimes = useMemo(() => {
+    if (!times.length) return [];
+    
+    // Sort times chronologically
+    const sortedTimes = [...times].sort((a, b) => {
+      const timeA = a.split(':').map(Number);
+      const timeB = b.split(':').map(Number);
+      
+      if (timeA[0] !== timeB[0]) {
+        return timeA[0] - timeB[0]; // Compare hours
+      }
+      return timeA[1] - timeB[1]; // Compare minutes if hours are equal
+    });
+    
+    // Return first 4 times
+    return sortedTimes.slice(0, 4);
+  }, [times]);
+
   // Group times by morning, afternoon and evening - using useMemo to prevent recalculation
-  const groupedTimes = useMemo(() => ({
-    morning: times.filter(time => {
-      const hour = parseInt(time.split(':')[0], 10);
-      return hour >= 6 && hour < 12;
-    }),
-    afternoon: times.filter(time => {
-      const hour = parseInt(time.split(':')[0], 10);
-      return hour >= 12 && hour < 18;
-    }),
-    evening: times.filter(time => {
-      const hour = parseInt(time.split(':')[0], 10);
-      return hour >= 18 || hour < 6;
-    })
-  }), [times]);
+  const groupedTimes = useMemo(() => {
+    const timesToShow = showAllTimes ? times : getClosestTimes;
+    
+    return {
+      morning: timesToShow.filter(time => {
+        const hour = parseInt(time.split(':')[0], 10);
+        return hour >= 6 && hour < 12;
+      }),
+      afternoon: timesToShow.filter(time => {
+        const hour = parseInt(time.split(':')[0], 10);
+        return hour >= 12 && hour < 18;
+      }),
+      evening: timesToShow.filter(time => {
+        const hour = parseInt(time.split(':')[0], 10);
+        return hour >= 18 || hour < 6;
+      })
+    };
+  }, [times, showAllTimes, getClosestTimes]);
 
   // Debug logs
   console.log('Available times component rendering with:', {
     timesCount: times.length,
+    closestTimesCount: getClosestTimes.length,
     selectedTime,
     selectedDate,
-    times,
-    groupedTimes
+    showAllTimes
   });
 
   if (!selectedDate || times.length === 0) {
@@ -105,7 +131,9 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Clock className="w-5 h-5" />
-          Horários para {formattedDate}
+          {showAllTimes 
+            ? `Horários para ${formattedDate}`
+            : `Próximos horários para ${formattedDate}`}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -167,6 +195,20 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
                   </Button>
                 ))}
               </div>
+            </div>
+          )}
+          
+          {/* Button to show all times or less times */}
+          {times.length > 4 && (
+            <div className="pt-2 flex justify-center">
+              <Button 
+                variant="outline"
+                onClick={() => setShowAllTimes(!showAllTimes)}
+                className="text-sm w-full max-w-xs flex items-center gap-2"
+              >
+                {showAllTimes ? "Mostrar apenas próximos horários" : "Ver mais opções de horários"}
+                <ChevronDown className={`w-4 h-4 transition-transform ${showAllTimes ? 'rotate-180' : ''}`} />
+              </Button>
             </div>
           )}
         </div>
