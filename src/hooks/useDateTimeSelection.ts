@@ -26,7 +26,7 @@ export const useDateTimeSelection = (
       try {
         setLoading(true);
         setError(null);
-        console.log('Fetching schedules with profissionalId:', professionalId, 'unidadeId:', unityId, 'especialidadeId:', specialtyId, 'convenioId:', insuranceId);
+        console.log('Fetching schedules with profissional_id:', professionalId, 'unidade_id:', unityId, 'especialidade_id:', specialtyId, 'convenio_id:', insuranceId);
         
         const schedules = await FeegowApiService.getAvailableSchedules(
           professionalId,

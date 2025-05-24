@@ -4,13 +4,13 @@ import { API_BASE_URL, apiHeaders } from './apiConfig';
 
 export const ScheduleService = {
   getAvailableSchedules: async (
-    profissionalId: number, 
-    unidadeId?: number, 
-    especialidadeId?: number,
-    convenioId?: number
+    profissional_id: number, 
+    unidade_id?: number, 
+    especialidade_id?: number,
+    convenio_id?: number
   ): Promise<AvailableSchedule[]> => {
     try {
-      console.log('Fetching available schedules with filters:', { profissionalId, unidadeId, especialidadeId, convenioId });
+      console.log('Fetching available schedules with filters:', { profissional_id, unidade_id, especialidade_id, convenio_id });
       
       // Format date as dd-mm-YYYY (dois dias após o dia atual)
       const today = new Date();
@@ -23,18 +23,18 @@ export const ScheduleService = {
       const endDateStr = formatDate(endDate);
       
       // Build the URL with the required and optional parameters
-      let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${profissionalId}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
+      let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${profissional_id}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
       
-      if (unidadeId && unidadeId > 0) {
-        url += `&unidade_id=${unidadeId}`;
+      if (unidade_id && unidade_id > 0) {
+        url += `&unidade_id=${unidade_id}`;
       }
       
-      if (especialidadeId && especialidadeId > 0) {
-        url += `&especialidade_id=${especialidadeId}`;
+      if (especialidade_id && especialidade_id > 0) {
+        url += `&especialidade_id=${especialidade_id}`;
       }
       
-      if (convenioId && convenioId > 0) {
-        url += `&convenio_id=${convenioId}`;
+      if (convenio_id && convenio_id > 0) {
+        url += `&convenio_id=${convenio_id}`;
       }
       
       console.log('Schedule request URL:', url);
@@ -61,14 +61,14 @@ export const ScheduleService = {
           const professionalData = content.profissional_id[professionalDataKey];
           
           if (professionalData && professionalData.local_id) {
-            // Get local_id data - either for specific unidadeId or first available
+            // Get local_id data - either for specific unidade_id or first available
             const localDataKeys = Object.keys(professionalData.local_id);
             let localData = null;
             
-            if (unidadeId && professionalData.local_id[unidadeId]) {
-              localData = professionalData.local_id[unidadeId];
+            if (unidade_id && professionalData.local_id[unidade_id]) {
+              localData = professionalData.local_id[unidade_id];
             } else if (localDataKeys.length > 0) {
-              // Use the first available local_id if no specific unidadeId is requested
+              // Use the first available local_id if no specific unidade_id is requested
               localData = professionalData.local_id[localDataKeys[0]];
             }
             
@@ -94,7 +94,7 @@ export const ScheduleService = {
               schedules.push({
                 date: dateItem.date,
                 times: dateItem.horarios,
-                professional_id: profissionalId
+                professional_id: profissional_id
               });
             }
           });
@@ -109,13 +109,13 @@ export const ScheduleService = {
     }
   },
   
-  getAvailableSchedule: async (profissionalId: number, date: string): Promise<AvailableSchedule | null> => {
+  getAvailableSchedule: async (profissional_id: number, date: string): Promise<AvailableSchedule | null> => {
     try {
       // Convert date to dd-mm-YYYY if needed
       const formattedDate = date.includes('-') && date.split('-').length === 3 ? 
         formatDateFromISO(date) : date;
       
-      const url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${profissionalId}&date=${formattedDate}&tipo=p&procedimento_id=1`;
+      const url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${profissional_id}&date=${formattedDate}&tipo=p&procedimento_id=1`;
       console.log('Single day schedule request URL:', url);
       
       const response = await fetch(url, {
