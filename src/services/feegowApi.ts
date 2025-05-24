@@ -1,3 +1,4 @@
+
 import { Unity, Specialty, Professional, Insurance, AvailableSchedule, Patient, ApiResponse } from '@/types/feegow';
 
 const API_BASE_URL = 'https://api.feegow.com/v1';
@@ -63,12 +64,35 @@ export class FeegowApiService {
 
   static async getSpecialties(): Promise<Specialty[]> {
     try {
+      console.log('Calling Feegow API for specialties');
       const response = await fetch(`${API_BASE_URL}/api/specialties/list`, {
         method: 'GET',
         headers: apiHeaders,
       });
+      
       const data = await response.json();
-      return data.success ? data.data : [];
+      console.log('API response for specialties:', data);
+      
+      if (!data.success) {
+        console.error('API returned error:', data);
+        return [];
+      }
+      
+      // Transform the API response structure into our Specialty[] format
+      const specialties: Specialty[] = [];
+      
+      if (data.content) {
+        data.content.forEach((specialty: any) => {
+          specialties.push({
+            specialty_id: parseInt(specialty.especialidade_id),
+            specialty_name: specialty.nome,
+            specialty_description: specialty.codigo_tiss || ''
+          });
+        });
+      }
+      
+      console.log('Transformed specialties:', specialties);
+      return specialties;
     } catch (error) {
       console.error('Erro ao buscar especialidades:', error);
       return [];

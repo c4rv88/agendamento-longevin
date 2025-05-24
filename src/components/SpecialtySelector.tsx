@@ -14,14 +14,18 @@ interface SpecialtySelectorProps {
 export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ selectedSpecialty, onSelect }) => {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSpecialties = async () => {
       try {
+        console.log("Fetching specialties...");
         const data = await FeegowApiService.getSpecialties();
+        console.log("Specialties fetched:", data);
         setSpecialties(data);
       } catch (error) {
         console.error('Erro ao carregar especialidades:', error);
+        setError('Falha ao carregar especialidades. Por favor, tente novamente.');
       } finally {
         setLoading(false);
       }
@@ -50,6 +54,31 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ selectedSp
     );
   }
 
+  if (error) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="w-5 h-5" />
+            Selecione a Especialidade
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center">
+            <p className="text-red-500">{error}</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="mt-4"
+              variant="outline"
+            >
+              Tentar Novamente
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -60,23 +89,27 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ selectedSp
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {specialties.map((specialty) => (
-            <Button
-              key={specialty.specialty_id}
-              variant={selectedSpecialty?.specialty_id === specialty.specialty_id ? "default" : "outline"}
-              className="p-4 h-auto justify-start"
-              onClick={() => onSelect(specialty)}
-            >
-              <div className="text-left">
-                <div className="font-semibold">{specialty.specialty_name}</div>
-                {specialty.specialty_description && (
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {specialty.specialty_description}
-                  </div>
-                )}
-              </div>
-            </Button>
-          ))}
+          {specialties.length === 0 ? (
+            <p className="text-center text-gray-500 py-4 col-span-2">Nenhuma especialidade encontrada</p>
+          ) : (
+            specialties.map((specialty) => (
+              <Button
+                key={specialty.specialty_id}
+                variant={selectedSpecialty?.specialty_id === specialty.specialty_id ? "default" : "outline"}
+                className="p-4 h-auto justify-start"
+                onClick={() => onSelect(specialty)}
+              >
+                <div className="text-left">
+                  <div className="font-semibold">{specialty.specialty_name}</div>
+                  {specialty.specialty_description && (
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {specialty.specialty_description}
+                    </div>
+                  )}
+                </div>
+              </Button>
+            ))
+          )}
         </div>
       </CardContent>
     </Card>
