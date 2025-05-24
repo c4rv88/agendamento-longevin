@@ -30,19 +30,19 @@ export const useDateTimeSelection = (
         setError(null);
         console.log('Fetching schedules with params:', { 
           profissional_id: professionalId, 
-          unidade_id: unityId || 0,  // enviar 0 se não for definido
-          especialidade_id: specialtyId || 0, // enviar 0 se não for definido
-          convenio_id: insuranceId || 0 // enviar 0 se não for definido
+          unidade_id: unityId || 0,
+          especialidade_id: specialtyId || 0,
+          convenio_id: insuranceId || 0
         });
         
         const schedules = await FeegowApiService.getAvailableSchedules(
           professionalId,
-          unityId || 0,  // enviar 0 se não for definido
-          specialtyId || 0, // enviar 0 se não for definido
-          insuranceId || 0 // enviar 0 se não for definido
+          unityId || 0,
+          specialtyId || 0,
+          insuranceId || 0
         );
         
-        console.log('Fetched available schedules:', schedules);
+        console.log(`Fetched ${schedules.length} available schedules for professional #${professionalId}`);
         setAvailableSchedules(schedules);
         
         if (schedules.length === 0) {
@@ -78,6 +78,11 @@ export const useDateTimeSelection = (
 
   const getAvailableTimesForDate = (date: string): string[] => {
     const schedule = availableSchedules.find(s => s.date === date);
+    if (schedule) {
+      console.log(`Found ${schedule.times.length} times for date ${date}`);
+    } else {
+      console.log(`No times found for date ${date}`);
+    }
     return schedule ? schedule.times : [];
   };
 

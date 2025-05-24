@@ -18,22 +18,38 @@ export const AvailableSchedulesService = {
     convenio_id: number = 0
   ): Promise<AvailableSchedule[]> => {
     try {
-      console.log('Fetching available schedules with filters:', { profissional_id, unidade_id, especialidade_id, convenio_id });
+      console.log('Fetching available schedules with filters:', { 
+        profissional_id, 
+        unidade_id, 
+        especialidade_id, 
+        convenio_id 
+      });
+      
+      if (!profissional_id) {
+        console.error('Error: missing professional ID');
+        return [];
+      }
       
       // Get date range (starting 2 days from today, ending 60 days later)
       const { startDate, endDateStr } = getDateRange(2, 60);
       
-      console.log('Date range:', { startDate, endDateStr });
+      console.log('Date range for schedule search:', { startDate, endDateStr });
+      
+      // Ensure all parameters are numbers and sanitize
+      const sanitizedProfessionalId = Number(profissional_id);
+      const sanitizedUnityId = Number(unidade_id || 0);
+      const sanitizedSpecialtyId = Number(especialidade_id || 0);
+      const sanitizedInsuranceId = Number(convenio_id || 0);
       
       // Build the URL with the required and optional parameters
-      let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${profissional_id}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
+      let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${sanitizedProfessionalId}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
       
-      // Adicionando os parâmetros mesmo quando são zero para manter consistência
-      url += `&unidade_id=${unidade_id}`;
-      url += `&especialidade_id=${especialidade_id}`;
-      url += `&convenio_id=${convenio_id}`;
+      // Add optional parameters
+      url += `&unidade_id=${sanitizedUnityId}`;
+      url += `&especialidade_id=${sanitizedSpecialtyId}`;
+      url += `&convenio_id=${sanitizedInsuranceId}`;
       
-      console.log('Schedule request URL:', url);
+      console.log('Schedule API request URL:', url);
       
       const response = await fetch(url, {
         method: 'GET',
@@ -48,11 +64,11 @@ export const AvailableSchedulesService = {
         console.log('Using mock data because API returned error');
         const today = new Date();
         today.setDate(today.getDate() + 2); // Add 2 days to current date
-        return generateMockScheduleData(profissional_id, today);
+        return generateMockScheduleData(sanitizedProfessionalId, today);
       }
       
       // Process the API response
-      const schedules = processScheduleData(data, profissional_id, unidade_id);
+      const schedules = processScheduleData(data, sanitizedProfessionalId, sanitizedUnityId);
       
       console.log('Available schedules processed:', schedules);
       return schedules;

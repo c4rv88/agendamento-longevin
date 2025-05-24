@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Patient } from '@/types/feegow';
 import { FeegowApiService } from '@/services/api';
@@ -8,6 +7,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
+// Helper function to mask personal data for privacy
+const maskData = {
+  email: (email: string): string => {
+    if (!email || email.length === 0) return '';
+    const [username, domain] = email.split('@');
+    if (!domain) return email;
+    const maskedUsername = username.slice(0, 2) + '*'.repeat(username.length > 3 ? username.length - 3 : 1) + (username.length > 2 ? username.slice(-1) : '');
+    return `${maskedUsername}@${domain}`;
+  },
+  phone: (phone: string): string => {
+    if (!phone || phone.length < 8) return phone;
+    return phone.slice(0, 4) + '*'.repeat(phone.length - 7) + phone.slice(-3);
+  }
+};
 
 interface PatientFormProps {
   patient: Patient | null;
@@ -28,6 +42,14 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
       patient_address: '',
     }
   );
+  // Store original data for submission purposes
+  const [originalData, setOriginalData] = useState<{
+    patient_email: string;
+    patient_phone: string;
+  }>({
+    patient_email: '',
+    patient_phone: '',
+  });
   const { toast } = useToast();
 
   const handleSearch = async () => {
@@ -55,8 +77,29 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
       );
 
       if (foundPatient) {
-        setFormData(foundPatient);
-        onPatientUpdate(foundPatient);
+        // Store original sensitive data
+        setOriginalData({
+          patient_email: foundPatient.patient_email || '',
+          patient_phone: foundPatient.patient_phone || '',
+        });
+
+        // Create masked version for display
+        const maskedPatient = {
+          ...foundPatient,
+          patient_email: maskData.email(foundPatient.patient_email || ''),
+          patient_phone: maskData.phone(foundPatient.patient_phone || ''),
+          // Remove address for privacy
+          patient_address: '',
+        };
+
+        setFormData(maskedPatient);
+        // Keep original data in what we pass to the parent
+        onPatientUpdate({
+          ...foundPatient,
+          // Still remove address as requested
+          patient_address: '',
+        });
+        
         toast({
           title: "Paciente encontrado",
           description: `Dados de ${foundPatient.patient_name} carregados`,
@@ -86,7 +129,27 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
   const handleInputChange = (field: keyof Patient, value: string) => {
     const updatedData = { ...formData, [field]: value };
     setFormData(updatedData);
-    onPatientUpdate(updatedData);
+    
+    // If updating email or phone and we have original values, keep them for submission
+    if ((field === 'patient_email' || field === 'patient_phone') && originalData[field]) {
+      // User is changing the masked field, override original data
+      setOriginalData(prev => ({
+        ...prev,
+        [field]: value,
+      }));
+      onPatientUpdate({
+        ...updatedData,
+        [field]: value,
+      });
+    } else {
+      // For other fields or when originals don't exist
+      onPatientUpdate({
+        ...updatedData,
+        // Always restore original email/phone if they exist
+        patient_email: originalData.patient_email || updatedData.patient_email,
+        patient_phone: originalData.patient_phone || updatedData.patient_phone,
+      });
+    }
   };
 
   const formatCpf = (value: string) => {
@@ -209,19 +272,12 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
                 onChange={(e) => handleInputChange('patient_birth', e.target.value)}
               />
             </div>
-            <div>
-              <Label htmlFor="address">Endereço</Label>
-              <Input
-                id="address"
-                placeholder="Endereço completo"
-                value={formData.patient_address || ''}
-                onChange={(e) => handleInputChange('patient_address', e.target.value)}
-              />
-            </div>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            * Campos obrigatórios
           </div>
         </CardContent>
       </Card>
     </div>
   );
 };
-

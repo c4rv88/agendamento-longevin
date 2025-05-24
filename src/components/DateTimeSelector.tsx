@@ -22,9 +22,9 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   selectedDate,
   selectedTime,
   professionalId,
-  unityId,
-  specialtyId,
-  insuranceId,
+  unityId = 0,
+  specialtyId = 0,
+  insuranceId = 0,
   onSelectDate,
   onSelectTime,
 }) => {
@@ -44,13 +44,17 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
 
   useEffect(() => {
     console.log('DateTimeSelector rendered with:', {
-      availableSchedules,
+      professionalId,
+      unityId,
+      specialtyId,
+      insuranceId,
+      availableSchedules: availableSchedules.length,
       loading,
       error,
       selectedDate,
       selectedTime
     });
-  }, [availableSchedules, loading, error, selectedDate, selectedTime]);
+  }, [availableSchedules, loading, error, selectedDate, selectedTime, professionalId, unityId, specialtyId, insuranceId]);
 
   if (loading) {
     return <DateTimeStatus loading />;
@@ -79,6 +83,10 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
             <p className="text-amber-500">
               Não foram encontrados horários disponíveis para este profissional.
               Tente selecionar outro convênio ou profissional.
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              Parâmetros de busca: Profissional #{professionalId}, Unidade #{unityId}, 
+              Especialidade #{specialtyId}, Convênio #{insuranceId}
             </p>
           </div>
         </CardContent>
