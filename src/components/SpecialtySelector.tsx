@@ -109,11 +109,6 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
               >
                 <div className="text-left">
                   <div className="font-semibold">{specialty.specialty_name}</div>
-                  {specialty.specialty_description && (
-                    <div className="text-sm text-muted-foreground mt-1">
-                      {specialty.specialty_description}
-                    </div>
-                  )}
                 </div>
               </Button>
             ))

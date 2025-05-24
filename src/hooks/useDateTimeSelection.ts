@@ -7,6 +7,7 @@ export const useDateTimeSelection = (
   professionalId: number,
   unityId?: number,
   specialtyId?: number,
+  insuranceId?: number,
   onSelectDate?: (date: string) => void,
   onSelectTime?: (time: string) => void
 ) => {
@@ -25,12 +26,13 @@ export const useDateTimeSelection = (
       try {
         setLoading(true);
         setError(null);
-        console.log('Fetching schedules with professionalId:', professionalId);
+        console.log('Fetching schedules with professionalId:', professionalId, 'unityId:', unityId, 'specialtyId:', specialtyId, 'insuranceId:', insuranceId);
         
         const schedules = await FeegowApiService.getAvailableSchedules(
           professionalId,
           unityId,
-          specialtyId
+          specialtyId,
+          insuranceId
         );
         
         console.log('Fetched available schedules:', schedules);
@@ -58,7 +60,7 @@ export const useDateTimeSelection = (
     };
 
     fetchAvailableSchedules();
-  }, [professionalId, unityId, specialtyId]);
+  }, [professionalId, unityId, specialtyId, insuranceId]);
 
   const getAvailableTimesForDate = (date: string): string[] => {
     const schedule = availableSchedules.find(s => s.date === date);

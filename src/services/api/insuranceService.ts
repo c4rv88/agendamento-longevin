@@ -7,7 +7,7 @@ export const InsuranceService = {
     try {
       console.log('Fetching insurances for professional ID:', professionalId);
       
-      const url = `${API_BASE_URL}/api/professional/insurance?professional_id=${professionalId}`;
+      const url = `${API_BASE_URL}/api/professional/insurance?profissional_id=${professionalId}`;
       console.log('Insurance request URL:', url);
       
       const response = await fetch(url, {
