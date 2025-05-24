@@ -18,11 +18,6 @@ export const InsuranceService = {
       const data = await response.json();
       console.log('API response for insurances:', data);
       
-      if (!data.success) {
-        console.error('API returned error:', data);
-        return [{ insurance_id: 0, insurance_name: 'Particular', professional_id: professionalId }];
-      }
-      
       const insurances: Insurance[] = [];
       
       // Always add "Particular" as the first option
@@ -32,18 +27,33 @@ export const InsuranceService = {
         professional_id: professionalId
       });
       
-      // Add the insurance plans returned by the API
-      if (data.content && Array.isArray(data.content)) {
+      // Check if data has the expected structure
+      if (data.success && data.content && Array.isArray(data.content)) {
+        // Map the API response to our Insurance type
         data.content.forEach((ins: any) => {
           // Avoid duplicating "Particular"
-          if (parseInt(ins.convenio_id) !== 0 && ins.nome_convenio.toLowerCase() !== 'particular') {
+          if (parseInt(ins.convenio_id) !== 0 && ins.nome.toLowerCase() !== 'particular') {
             insurances.push({
               insurance_id: parseInt(ins.convenio_id),
-              insurance_name: ins.nome_convenio,
+              insurance_name: ins.nome,
               professional_id: professionalId
             });
           }
         });
+      } else if (Array.isArray(data) && data[0]?.success && data[0]?.content) {
+        // Handle alternative response format - array with nested content
+        const contentArray = data[0].content;
+        if (Array.isArray(contentArray)) {
+          contentArray.forEach((ins: any) => {
+            if (parseInt(ins.convenio_id) !== 0 && ins.nome.toLowerCase() !== 'particular') {
+              insurances.push({
+                insurance_id: parseInt(ins.convenio_id),
+                insurance_name: ins.nome,
+                professional_id: professionalId
+              });
+            }
+          });
+        }
       }
       
       console.log('Transformed insurances:', insurances);

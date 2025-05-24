@@ -29,6 +29,7 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
         setLoading(true);
         setError(null);
         const data = await FeegowApiService.getInsurances(professionalId);
+        console.log('Fetched insurances:', data);
         setInsurances(data);
       } catch (error) {
         console.error('Erro ao carregar convênios:', error);
