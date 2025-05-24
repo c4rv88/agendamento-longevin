@@ -8,10 +8,17 @@ import { MapPin } from 'lucide-react';
 
 interface UnitySelectorProps {
   selectedUnity: Unity | null;
+  professionalId?: number;
+  specialtyId?: number;
   onSelect: (unity: Unity) => void;
 }
 
-export const UnitySelector: React.FC<UnitySelectorProps> = ({ selectedUnity, onSelect }) => {
+export const UnitySelector: React.FC<UnitySelectorProps> = ({ 
+  selectedUnity, 
+  professionalId, 
+  specialtyId, 
+  onSelect 
+}) => {
   const [unities, setUnities] = useState<Unity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,8 +26,8 @@ export const UnitySelector: React.FC<UnitySelectorProps> = ({ selectedUnity, onS
   useEffect(() => {
     const fetchUnities = async () => {
       try {
-        console.log("Fetching unities...");
-        const data = await FeegowApiService.getUnities();
+        console.log("Fetching unities with filters:", { professionalId, specialtyId });
+        const data = await FeegowApiService.getUnities(professionalId, specialtyId);
         console.log("Unities fetched:", data);
         setUnities(data);
       } catch (error) {
@@ -32,7 +39,7 @@ export const UnitySelector: React.FC<UnitySelectorProps> = ({ selectedUnity, onS
     };
 
     fetchUnities();
-  }, []);
+  }, [professionalId, specialtyId]);
 
   if (loading) {
     return (
