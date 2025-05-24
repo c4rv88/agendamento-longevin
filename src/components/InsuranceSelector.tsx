@@ -114,18 +114,7 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          <Button
-            variant={selectedInsurance?.insurance_id === 0 ? "default" : "outline"}
-            className="w-full p-4 h-auto justify-start"
-            onClick={() => onSelect({ insurance_id: 0, insurance_name: 'Particular', professional_id: professionalId! })}
-          >
-            <div className="text-left">
-              <div className="font-semibold">Particular</div>
-              <div className="text-sm text-muted-foreground">Pagamento direto</div>
-            </div>
-          </Button>
-          
-          {insurances.filter(insurance => insurance.insurance_id !== 0).map((insurance) => (
+          {insurances.map((insurance) => (
             <Button
               key={insurance.insurance_id}
               variant={selectedInsurance?.insurance_id === insurance.insurance_id ? "default" : "outline"}
@@ -134,6 +123,9 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
             >
               <div className="text-left">
                 <div className="font-semibold">{insurance.insurance_name}</div>
+                {insurance.insurance_id === 0 && (
+                  <div className="text-sm text-muted-foreground">Pagamento direto</div>
+                )}
               </div>
             </Button>
           ))}
