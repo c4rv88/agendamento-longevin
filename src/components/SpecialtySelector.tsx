@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Specialty } from '@/types/feegow';
 import { FeegowApiService } from '@/services/api';
@@ -9,11 +8,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface SpecialtySelectorProps {
   selectedSpecialty: Specialty | null;
+  unityId?: number;
   onSelect: (specialty: Specialty) => void;
 }
 
 export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ 
   selectedSpecialty, 
+  unityId,
   onSelect 
 }) => {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
@@ -23,10 +24,10 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
   useEffect(() => {
     const fetchSpecialties = async () => {
       try {
-        console.log("Fetching all specialties");
+        console.log("Fetching specialties with unityId:", unityId);
         setLoading(true);
         setError(null);
-        const data = await FeegowApiService.getSpecialties();
+        const data = await FeegowApiService.getSpecialties(unityId);
         console.log("Specialties fetched:", data);
         setSpecialties(data);
       } catch (error) {
@@ -38,7 +39,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
     };
 
     fetchSpecialties();
-  }, []);
+  }, [unityId]);
 
   if (loading) {
     return (

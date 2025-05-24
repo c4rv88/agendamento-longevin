@@ -25,7 +25,7 @@ export const AppointmentService = {
           procedimento_id: 2, // ID for consultation
           data: formattedData.date,
           hora: formattedData.time,
-          convenio_id: formattedData.insurance_id || null,
+          convenio_id: formattedData.insurance_id || 0,
           celular: formattedData.patient.patient_phone?.replace(/\D/g, '')
         }),
       });

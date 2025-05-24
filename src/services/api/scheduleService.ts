@@ -21,6 +21,7 @@ export const ScheduleService = {
       endDate.setMonth(today.getMonth() + 3);
       const endDateStr = formatDate(endDate);
       
+      // Build the URL with the required and optional parameters
       let url = `${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&tipo=A&data_start=${startDate}&data_end=${endDateStr}`;
       
       if (unityId) {

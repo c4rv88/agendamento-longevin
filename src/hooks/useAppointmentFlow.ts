@@ -22,7 +22,7 @@ export const useAppointmentFlow = () => {
     selectedDate: '',
     selectedTime: '',
     patient: null,
-    currentStep: 1,
+    currentStep: 1, // Starting with Unidades as step 1
   });
 
   const updateState = useCallback((updates: Partial<AppointmentState>) => {
@@ -46,7 +46,7 @@ export const useAppointmentFlow = () => {
       selectedDate: '',
       selectedTime: '',
       patient: null,
-      currentStep: 1,
+      currentStep: 1, // Reset to first step (Unidades)
     });
   }, []);
 

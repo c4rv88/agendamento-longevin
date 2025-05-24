@@ -26,56 +26,64 @@ export const AppointmentScheduler: React.FC = () => {
 
   const canProceed = () => {
     switch (state.currentStep) {
-      case 1: return !!state.selectedSpecialty;
-      case 2: return !!state.selectedProfessional;
-      case 3: return !!state.selectedUnity;
-      case 4: return !!state.selectedInsurance;
-      case 5: return !!state.selectedDate && !!state.selectedTime;
-      case 6: return !!state.patient;
+      case 1: return !!state.selectedUnity; // Unidade
+      case 2: return !!state.selectedSpecialty; // Especialidade
+      case 3: return !!state.selectedProfessional; // Profissional  
+      case 4: return !!state.selectedInsurance; // Convênio
+      case 5: return !!state.selectedDate && !!state.selectedTime; // Data/Hora
+      case 6: return !!state.patient; // Paciente
       default: return false;
     }
   };
 
   const renderCurrentStep = () => {
     switch (state.currentStep) {
-      case 1:
+      case 1: // Unidade
+        return (
+          <UnitySelector
+            selectedUnity={state.selectedUnity}
+            onSelect={(unity) => {
+              // Clear related selections when changing unity
+              updateState({ 
+                selectedUnity: unity,
+                selectedSpecialty: null,
+                selectedProfessional: null,
+                selectedInsurance: null
+              });
+            }}
+          />
+        );
+      case 2: // Especialidade
         return (
           <SpecialtySelector
             selectedSpecialty={state.selectedSpecialty}
+            unityId={state.selectedUnity?.unity_id}
             onSelect={(specialty) => {
               // Clear professionals when selecting a new specialty
               updateState({ 
                 selectedSpecialty: specialty,
                 selectedProfessional: null,
-                selectedUnity: null 
+                selectedInsurance: null
               });
             }}
           />
         );
-      case 2:
+      case 3: // Profissional
         return (
           <ProfessionalSelector
             selectedProfessional={state.selectedProfessional}
             specialtyId={state.selectedSpecialty?.specialty_id}
+            unityId={state.selectedUnity?.unity_id}
             onSelect={(professional) => {
-              // Clear unity when selecting a new professional
+              // Clear insurance when selecting a new professional
               updateState({ 
                 selectedProfessional: professional,
-                selectedUnity: null 
+                selectedInsurance: null
               });
             }}
           />
         );
-      case 3:
-        return (
-          <UnitySelector
-            selectedUnity={state.selectedUnity}
-            professionalId={state.selectedProfessional?.professional_id}
-            specialtyId={state.selectedSpecialty?.specialty_id}
-            onSelect={(unity) => updateState({ selectedUnity: unity })}
-          />
-        );
-      case 4:
+      case 4: // Convênio
         return (
           <InsuranceSelector
             selectedInsurance={state.selectedInsurance}
@@ -83,7 +91,7 @@ export const AppointmentScheduler: React.FC = () => {
             onSelect={(insurance) => updateState({ selectedInsurance: insurance })}
           />
         );
-      case 5:
+      case 5: // Data/Hora
         return (
           <DateTimeSelector
             selectedDate={state.selectedDate}
@@ -95,14 +103,14 @@ export const AppointmentScheduler: React.FC = () => {
             onSelectTime={(time) => updateState({ selectedTime: time })}
           />
         );
-      case 6:
+      case 6: // Paciente
         return (
           <PatientForm
             patient={state.patient}
             onPatientUpdate={(patient) => updateState({ patient })}
           />
         );
-      case 7:
+      case 7: // Confirmação
         return <AppointmentSummary appointmentData={state} onConfirm={resetFlow} />;
       default:
         return null;

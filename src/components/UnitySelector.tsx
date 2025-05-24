@@ -27,7 +27,7 @@ export const UnitySelector: React.FC<UnitySelectorProps> = ({
     const fetchUnities = async () => {
       try {
         console.log("Fetching unities with filters:", { professionalId, specialtyId });
-        const data = await FeegowApiService.getUnities(professionalId, specialtyId);
+        const data = await FeegowApiService.getUnities();
         console.log("Unities fetched:", data);
         setUnities(data);
       } catch (error) {

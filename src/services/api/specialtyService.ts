@@ -3,11 +3,16 @@ import { Specialty } from '@/types/feegow';
 import { API_BASE_URL, apiHeaders } from './apiConfig';
 
 export const SpecialtyService = {
-  getSpecialties: async (): Promise<Specialty[]> => {
+  getSpecialties: async (unityId?: number): Promise<Specialty[]> => {
     try {
-      console.log('Calling Feegow API for all specialties');
+      console.log('Calling Feegow API for specialties with unityId:', unityId);
       
-      const url = `${API_BASE_URL}/api/specialties/list`;
+      let url = `${API_BASE_URL}/api/specialties/list`;
+      
+      // Add query parameters if provided
+      if (unityId) {
+        url += `?unidade_id=${unityId}`;
+      }
       
       const response = await fetch(url, {
         method: 'GET',

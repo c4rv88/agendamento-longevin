@@ -7,9 +7,7 @@ export const ACCESS_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmZW
 export const apiHeaders = {
   'Content-Type': 'application/json',
   'x-access-token': ACCESS_TOKEN,
-  'Host': 'api.feegow.com/v1'
 };
 
 // List of allowed unit names - these should match exactly what's in the API response
 export const ALLOWED_UNITS = ['ISV - Papicu', 'ISV - Meireles', 'ISV - Oliveira Paiva'];
-
