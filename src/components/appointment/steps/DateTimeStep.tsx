@@ -22,6 +22,15 @@ export const DateTimeStep: React.FC<DateTimeStepProps> = ({
   insuranceId,
   updateState,
 }) => {
+  console.log('DateTimeStep rendering with props:', {
+    professionalId,
+    unityId,
+    specialtyId,
+    insuranceId,
+    selectedDate,
+    selectedTime
+  });
+
   return (
     <DateTimeSelector
       selectedDate={selectedDate}

@@ -13,9 +13,9 @@ export const AvailableSchedulesService = {
    */
   getAvailableSchedules: async (
     profissional_id: number, 
-    unidade_id?: number, 
-    especialidade_id?: number,
-    convenio_id?: number
+    unidade_id: number = 0, 
+    especialidade_id: number = 0,
+    convenio_id: number = 0
   ): Promise<AvailableSchedule[]> => {
     try {
       console.log('Fetching available schedules with filters:', { profissional_id, unidade_id, especialidade_id, convenio_id });
@@ -28,20 +28,10 @@ export const AvailableSchedulesService = {
       // Build the URL with the required and optional parameters
       let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${profissional_id}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
       
-      // Only add unidade_id if it's provided and greater than 0
-      if (unidade_id && unidade_id > 0) {
-        url += `&unidade_id=${unidade_id}`;
-      }
-      
-      // Only add especialidade_id if it's provided and greater than 0
-      if (especialidade_id && especialidade_id > 0) {
-        url += `&especialidade_id=${especialidade_id}`;
-      }
-      
-      // Only add convenio_id if it's provided and greater than 0
-      if (convenio_id && convenio_id > 0) {
-        url += `&convenio_id=${convenio_id}`;
-      }
+      // Adicionando os parâmetros mesmo quando são zero para manter consistência
+      url += `&unidade_id=${unidade_id}`;
+      url += `&especialidade_id=${especialidade_id}`;
+      url += `&convenio_id=${convenio_id}`;
       
       console.log('Schedule request URL:', url);
       
@@ -54,7 +44,7 @@ export const AvailableSchedulesService = {
       console.log('API response for available schedules:', data);
       
       // Mock data for testing when API returns error
-      if (!data.success && process.env.NODE_ENV !== 'production') {
+      if (!data.success) {
         console.log('Using mock data because API returned error');
         const today = new Date();
         today.setDate(today.getDate() + 2); // Add 2 days to current date

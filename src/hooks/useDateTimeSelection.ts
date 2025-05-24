@@ -19,6 +19,7 @@ export const useDateTimeSelection = (
   useEffect(() => {
     const fetchAvailableSchedules = async () => {
       if (!professionalId) {
+        console.log('Nenhum profissional selecionado, não buscando horários');
         setLoading(false);
         setError('Por favor, selecione um profissional primeiro.');
         return;
@@ -27,13 +28,18 @@ export const useDateTimeSelection = (
       try {
         setLoading(true);
         setError(null);
-        console.log('Fetching schedules with profissional_id:', professionalId, 'unidade_id:', unityId, 'especialidade_id:', specialtyId, 'convenio_id:', insuranceId);
+        console.log('Fetching schedules with params:', { 
+          profissional_id: professionalId, 
+          unidade_id: unityId || 0,  // enviar 0 se não for definido
+          especialidade_id: specialtyId || 0, // enviar 0 se não for definido
+          convenio_id: insuranceId || 0 // enviar 0 se não for definido
+        });
         
         const schedules = await FeegowApiService.getAvailableSchedules(
           professionalId,
-          unityId,
-          specialtyId,
-          insuranceId
+          unityId || 0,  // enviar 0 se não for definido
+          specialtyId || 0, // enviar 0 se não for definido
+          insuranceId || 0 // enviar 0 se não for definido
         );
         
         console.log('Fetched available schedules:', schedules);

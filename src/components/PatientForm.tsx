@@ -42,9 +42,16 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
 
     setSearching(true);
     try {
+      // Garantir que o CPF esteja sendo enviado apenas com números
+      const cleanCpf = searchCpf.replace(/\D/g, '');
+      const cleanPhone = searchPhone.replace(/\D/g, '');
+      
+      console.log('Buscando paciente com CPF limpo:', cleanCpf);
+      console.log('Buscando paciente com telefone limpo:', cleanPhone);
+      
       const foundPatient = await FeegowApiService.searchPatient(
-        searchCpf.replace(/\D/g, ''),
-        searchPhone.replace(/\D/g, '')
+        cleanCpf,
+        cleanPhone
       );
 
       if (foundPatient) {
@@ -61,8 +68,8 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
         });
         setFormData(prev => ({
           ...prev,
-          patient_cpf: searchCpf.replace(/\D/g, ''),
-          patient_phone: searchPhone.replace(/\D/g, ''),
+          patient_cpf: cleanCpf,
+          patient_phone: cleanPhone,
         }));
       }
     } catch (error) {
@@ -105,7 +112,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search className="w-5 h-5" />
-            Buscar Paciente Existente
+            Já sou paciente
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -217,3 +224,4 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
     </div>
   );
 };
+
