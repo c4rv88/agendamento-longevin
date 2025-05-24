@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
-import { FeegowApiService } from '@/services/feegowApi';
+import { FeegowApiService } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Calendar, MapPin, User, CreditCard, Clock } from 'lucide-react';
