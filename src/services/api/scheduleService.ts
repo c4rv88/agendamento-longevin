@@ -23,7 +23,7 @@ export const ScheduleService = {
       const endDateStr = formatDate(endDate);
       
       // Build the URL with the required and optional parameters
-      let url = `${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
+      let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${professionalId}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
       
       if (unityId) {
         url += `&unidade_id=${unityId}`;
@@ -115,7 +115,7 @@ export const ScheduleService = {
       const formattedDate = date.includes('-') && date.split('-').length === 3 ? 
         formatDateFromISO(date) : date;
       
-      const url = `${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&date=${formattedDate}&tipo=p&procedimento_id=1`;
+      const url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${professionalId}&date=${formattedDate}&tipo=p&procedimento_id=1`;
       console.log('Single day schedule request URL:', url);
       
       const response = await fetch(url, {
