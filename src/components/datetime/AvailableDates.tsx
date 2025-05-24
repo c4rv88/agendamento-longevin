@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AvailableSchedule } from '@/types/feegow';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,23 +20,23 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
   // Function to format date for display
   const formatDisplayDate = (dateString: string): string => {
     try {
+      let date;
       // Check if date is in dd-mm-yyyy format
       if (dateString.includes('-') && dateString.split('-').length === 3) {
-        const [day, month, year] = dateString.split('-');
-        // Parse in dd-mm-yyyy format
-        if (day.length === 2) {
-          const date = parse(dateString, 'dd-MM-yyyy', new Date());
-          return format(date, "dd 'de' MMMM", { locale: ptBR });
-        } 
-        // Parse in yyyy-mm-dd format
-        else {
-          const date = parse(dateString, 'yyyy-MM-dd', new Date());
-          return format(date, "dd 'de' MMMM", { locale: ptBR });
+        const parts = dateString.split('-');
+        
+        // If the first part is 4 characters (year), it's in yyyy-MM-dd format
+        if (parts[0].length === 4) {
+          date = parse(dateString, 'yyyy-MM-dd', new Date());
+        } else {
+          // Otherwise it's in dd-MM-yyyy format
+          date = parse(dateString, 'dd-MM-yyyy', new Date());
         }
+        return format(date, "EEE, dd 'de' MMMM", { locale: ptBR });
       }
       return dateString;
     } catch (error) {
-      console.error('Error formatting date:', error);
+      console.error('Error formatting date:', error, dateString);
       return dateString;
     }
   };
@@ -51,7 +50,7 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {availableSchedules.map((schedule) => (
             <Button
               key={schedule.date}

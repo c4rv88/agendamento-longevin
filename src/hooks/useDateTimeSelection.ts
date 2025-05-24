@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { AvailableSchedule } from '@/types/feegow';
 import { FeegowApiService } from '@/services/api';
+import { toast } from 'sonner';
 
 export const useDateTimeSelection = (
   professionalId: number,
@@ -38,6 +39,12 @@ export const useDateTimeSelection = (
         console.log('Fetched available schedules:', schedules);
         setAvailableSchedules(schedules);
         
+        if (schedules.length === 0) {
+          toast.warning('Não foram encontrados horários disponíveis para este profissional');
+          setError('Nenhum horário disponível para este profissional.');
+          return;
+        }
+        
         // Automatically select the first available date if there is one
         if (schedules.length > 0 && onSelectDate) {
           console.log('Auto-selecting first date:', schedules[0].date);
@@ -54,13 +61,14 @@ export const useDateTimeSelection = (
       } catch (error) {
         console.error('Erro ao carregar horários:', error);
         setError('Falha ao carregar horários disponíveis. Por favor, tente novamente.');
+        toast.error('Falha ao carregar horários disponíveis');
       } finally {
         setLoading(false);
       }
     };
 
     fetchAvailableSchedules();
-  }, [professionalId, unityId, specialtyId, insuranceId]);
+  }, [professionalId, unityId, specialtyId, insuranceId, onSelectDate, onSelectTime]);
 
   const getAvailableTimesForDate = (date: string): string[] => {
     const schedule = availableSchedules.find(s => s.date === date);

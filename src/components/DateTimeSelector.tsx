@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDateTimeSelection } from '@/hooks/useDateTimeSelection';
 import { DateTimeStatus } from '@/components/datetime/DateTimeStatus';
 import { AvailableDates } from '@/components/datetime/AvailableDates';
 import { AvailableTimes } from '@/components/datetime/AvailableTimes';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { CalendarCheck } from 'lucide-react';
 
 interface DateTimeSelectorProps {
   selectedDate: string;
@@ -40,6 +42,16 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     onSelectTime
   );
 
+  useEffect(() => {
+    console.log('DateTimeSelector rendered with:', {
+      availableSchedules,
+      loading,
+      error,
+      selectedDate,
+      selectedTime
+    });
+  }, [availableSchedules, loading, error, selectedDate, selectedTime]);
+
   if (loading) {
     return <DateTimeStatus loading />;
   }
@@ -55,10 +67,22 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
 
   if (availableSchedules.length === 0) {
     return (
-      <DateTimeStatus 
-        showNoData 
-        noDataMessage="Nenhuma data disponível para este profissional." 
-      />
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarCheck className="w-5 h-5" />
+            Próximas Datas Disponíveis
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center">
+            <p className="text-amber-500">
+              Não foram encontrados horários disponíveis para este profissional.
+              Tente selecionar outro convênio ou profissional.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
