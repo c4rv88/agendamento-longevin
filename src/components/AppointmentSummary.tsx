@@ -4,27 +4,26 @@ import { AppointmentState } from '@/hooks/useAppointmentFlow';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar } from 'lucide-react';
-import { useAppointmentConfirmation } from '@/hooks/useAppointmentConfirmation';
 import { ConfirmationSuccess } from './appointment/summary/ConfirmationSuccess';
 import { AppointmentSummaryDetails } from './appointment/summary/AppointmentSummaryDetails';
 
 interface AppointmentSummaryProps {
   appointmentData: AppointmentState;
   onConfirm: () => void;
+  loading?: boolean;
+  success?: boolean;
+  onReset?: () => void;
 }
 
 export const AppointmentSummary: React.FC<AppointmentSummaryProps> = ({ 
   appointmentData, 
-  onConfirm 
+  onConfirm,
+  loading = false,
+  success = false,
+  onReset
 }) => {
-  const { confirming, confirmed, handleConfirmAppointment } = useAppointmentConfirmation();
-
-  const handleConfirm = () => {
-    handleConfirmAppointment(appointmentData);
-  };
-
-  if (confirmed) {
-    return <ConfirmationSuccess onConfirm={onConfirm} />;
+  if (success) {
+    return <ConfirmationSuccess onConfirm={onReset || onConfirm} />;
   }
 
   return (
@@ -40,12 +39,12 @@ export const AppointmentSummary: React.FC<AppointmentSummaryProps> = ({
 
         <div className="pt-6 border-t">
           <Button
-            onClick={handleConfirm}
-            disabled={confirming}
+            onClick={onConfirm}
+            disabled={loading}
             className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
             size="lg"
           >
-            {confirming ? 'Confirmando...' : 'Confirmar Agendamento'}
+            {loading ? 'Confirmando...' : 'Confirmar Agendamento'}
           </Button>
         </div>
       </CardContent>
