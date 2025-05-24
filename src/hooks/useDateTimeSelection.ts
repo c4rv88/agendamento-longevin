@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { AvailableSchedule } from '@/types/feegow';
 import { FeegowApiService } from '@/services/api';
 import { toast } from 'sonner';
@@ -61,8 +61,6 @@ export const useDateTimeSelection = (
           console.log('Auto-selecting first time:', schedules[0].times[0]);
           onSelectTime(schedules[0].times[0]);
         }
-      } else {
-        console.log('No schedules available to auto-select or selections already made.');
       }
     } catch (error) {
       console.error('Erro ao carregar horários:', error);
@@ -71,7 +69,7 @@ export const useDateTimeSelection = (
     } finally {
       setLoading(false);
     }
-  }, [professionalId, unityId, specialtyId, insuranceId, onSelectDate, onSelectTime, retryCount]);
+  }, [professionalId, unityId, specialtyId, insuranceId, onSelectDate, onSelectTime]);
 
   // Retry function for UI
   const retry = useCallback(() => {
@@ -82,15 +80,11 @@ export const useDateTimeSelection = (
     fetchAvailableSchedules();
   }, [fetchAvailableSchedules]);
 
-  const getAvailableTimesForDate = (date: string): string[] => {
+  // Memoize this function to prevent unnecessary recreations
+  const getAvailableTimesForDate = useCallback((date: string): string[] => {
     const schedule = availableSchedules.find(s => s.date === date);
-    if (schedule) {
-      console.log(`Found ${schedule.times.length} times for date ${date}`);
-    } else {
-      console.log(`No times found for date ${date}`);
-    }
     return schedule ? schedule.times : [];
-  };
+  }, [availableSchedules]);
 
   return {
     availableSchedules,

@@ -1,12 +1,11 @@
 
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useDateTimeSelection } from '@/hooks/useDateTimeSelection';
 import { DateTimeStatus } from '@/components/datetime/DateTimeStatus';
 import { AvailableDates } from '@/components/datetime/AvailableDates';
 import { AvailableTimes } from '@/components/datetime/AvailableTimes';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { CalendarCheck } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface DateTimeSelectorProps {
   selectedDate: string;
@@ -44,29 +43,10 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     onSelectTime
   );
 
-  useEffect(() => {
-    console.log('DateTimeSelector rendered with:', {
-      professionalId,
-      unityId,
-      specialtyId,
-      insuranceId,
-      availableSchedules: availableSchedules.length,
-      loading,
-      error,
-      selectedDate,
-      selectedTime
-    });
-    
-    if (error) {
-      // Show API error in development only
-      if (process.env.NODE_ENV === 'development') {
-        toast.error(`Erro na API: ${error}`, { 
-          duration: 5000,
-          description: "Usando dados simulados enquanto a API está indisponível" 
-        });
-      }
-    }
-  }, [availableSchedules, loading, error, selectedDate, selectedTime, professionalId, unityId, specialtyId, insuranceId]);
+  // Use useMemo to prevent unnecessary calculations of available times
+  const availableTimes = useMemo(() => {
+    return selectedDate ? getAvailableTimesForDate(selectedDate) : [];
+  }, [selectedDate, getAvailableTimesForDate]);
 
   if (loading) {
     return <DateTimeStatus loading />;
@@ -106,12 +86,6 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     );
   }
 
-  console.log('Rendering DateTimeSelector with:', {
-    availableSchedules: availableSchedules.length, 
-    selectedDate,
-    timesForDate: selectedDate ? getAvailableTimesForDate(selectedDate).length : 0
-  });
-
   return (
     <div className="space-y-6">
       <AvailableDates 
@@ -122,7 +96,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
 
       {selectedDate && (
         <AvailableTimes
-          times={getAvailableTimesForDate(selectedDate)}
+          times={availableTimes}
           selectedTime={selectedTime}
           selectedDate={selectedDate}
           onSelectTime={onSelectTime}

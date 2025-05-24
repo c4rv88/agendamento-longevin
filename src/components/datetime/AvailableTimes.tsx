@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format, parse } from 'date-fns';
@@ -19,29 +18,31 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
   selectedDate,
   onSelectTime
 }) => {
-  // Function to format date for display
-  const formatDisplayDate = (dateString: string): string => {
+  // Format date for display - using useMemo to prevent recalculation
+  const formattedDate = useMemo(() => {
     try {
+      if (!selectedDate) return '';
+      
       let date;
       // Check if date is in dd-mm-yyyy or yyyy-mm-dd format
-      if (dateString.includes('-') && dateString.split('-').length === 3) {
-        const parts = dateString.split('-');
+      if (selectedDate.includes('-') && selectedDate.split('-').length === 3) {
+        const parts = selectedDate.split('-');
         
         // If the first part is 4 characters (year), it's in yyyy-MM-dd format
         if (parts[0].length === 4) {
-          date = parse(dateString, 'yyyy-MM-dd', new Date());
+          date = parse(selectedDate, 'yyyy-MM-dd', new Date());
         } else {
           // Otherwise it's in dd-MM-yyyy format
-          date = parse(dateString, 'dd-MM-yyyy', new Date());
+          date = parse(selectedDate, 'dd-MM-yyyy', new Date());
         }
         return format(date, "EEEE, dd 'de' MMMM", { locale: ptBR });
       }
-      return dateString;
+      return selectedDate;
     } catch (error) {
-      console.error('Error formatting date:', error, dateString);
-      return dateString;
+      console.error('Error formatting date:', error, selectedDate);
+      return selectedDate;
     }
-  };
+  }, [selectedDate]);
 
   // Function to format time for display (remove seconds)
   const formatTime = (time: string): string => {
@@ -52,8 +53,8 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
     return time;
   };
 
-  // Group times by morning, afternoon and evening
-  const groupedTimes = {
+  // Group times by morning, afternoon and evening - using useMemo to prevent recalculation
+  const groupedTimes = useMemo(() => ({
     morning: times.filter(time => {
       const hour = parseInt(time.split(':')[0], 10);
       return hour >= 6 && hour < 12;
@@ -66,7 +67,7 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
       const hour = parseInt(time.split(':')[0], 10);
       return hour >= 18 || hour < 6;
     })
-  };
+  }), [times]);
 
   // Debug logs
   console.log('Available times component rendering with:', {
@@ -104,7 +105,7 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Clock className="w-5 h-5" />
-          Horários para {formatDisplayDate(selectedDate)}
+          Horários para {formattedDate}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -116,11 +117,11 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                 {groupedTimes.morning.map((time) => (
                   <Button
-                    key={time}
+                    key={`morning-${time}`}
                     variant={selectedTime === time ? "default" : "outline"}
                     size="sm"
                     onClick={() => onSelectTime(time)}
-                    className="text-sm"
+                    className="text-sm w-full"
                   >
                     {formatTime(time)}
                   </Button>
@@ -136,11 +137,11 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                 {groupedTimes.afternoon.map((time) => (
                   <Button
-                    key={time}
+                    key={`afternoon-${time}`}
                     variant={selectedTime === time ? "default" : "outline"}
                     size="sm"
                     onClick={() => onSelectTime(time)}
-                    className="text-sm"
+                    className="text-sm w-full"
                   >
                     {formatTime(time)}
                   </Button>
@@ -156,11 +157,11 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                 {groupedTimes.evening.map((time) => (
                   <Button
-                    key={time}
+                    key={`evening-${time}`}
                     variant={selectedTime === time ? "default" : "outline"}
                     size="sm"
                     onClick={() => onSelectTime(time)}
-                    className="text-sm"
+                    className="text-sm w-full"
                   >
                     {formatTime(time)}
                   </Button>
