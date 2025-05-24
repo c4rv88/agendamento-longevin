@@ -7,7 +7,7 @@ export const InsuranceService = {
     try {
       console.log('Fetching insurances for professional ID:', professionalId);
       
-      const url = `${API_BASE_URL}/api/professional/insurance?profissional_id=${professionalId}`;
+      const url = `${API_BASE_URL}/api/professional/insurance?professional_id=${professionalId}`;
       console.log('Insurance request URL:', url);
       
       const response = await fetch(url, {
@@ -35,7 +35,7 @@ export const InsuranceService = {
       // Add the insurance plans returned by the API
       if (data.content && Array.isArray(data.content)) {
         data.content.forEach((ins: any) => {
-          // Evitar duplicação de "Particular"
+          // Avoid duplicating "Particular"
           if (parseInt(ins.convenio_id) !== 0 && ins.nome_convenio.toLowerCase() !== 'particular') {
             insurances.push({
               insurance_id: parseInt(ins.convenio_id),

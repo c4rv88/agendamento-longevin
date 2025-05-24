@@ -58,7 +58,7 @@ export const useDateTimeSelection = (
     };
 
     fetchAvailableSchedules();
-  }, [professionalId, unityId, specialtyId, onSelectDate, onSelectTime]);
+  }, [professionalId, unityId, specialtyId]);
 
   const getAvailableTimesForDate = (date: string): string[] => {
     const schedule = availableSchedules.find(s => s.date === date);

@@ -11,9 +11,8 @@ export const ScheduleService = {
     try {
       console.log('Fetching available schedules with filters:', { professionalId, unityId, specialtyId });
       
-      // Format date as dd-mm-YYYY (2 days from now)
+      // Format date as dd-mm-YYYY (today)
       const today = new Date();
-      today.setDate(today.getDate());
       const startDate = formatDate(today);
       
       // Format date as dd-mm-YYYY (3 months from now)
@@ -25,11 +24,11 @@ export const ScheduleService = {
       let url = `${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&tipo=A&data_start=${startDate}&data_end=${endDateStr}`;
       
       if (unityId) {
-        url += `&unidade_id=${unityId}`;
+        url += `&unity_id=${unityId}`;
       }
       
       if (specialtyId) {
-        url += `&especialidade_id=${specialtyId}`;
+        url += `&specialty_id=${specialtyId}`;
       }
       
       console.log('Schedule request URL:', url);
@@ -76,7 +75,7 @@ export const ScheduleService = {
       const formattedDate = date.includes('-') && date.split('-').length === 3 ? 
         formatDateFromISO(date) : date;
       
-      const url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${professionalId}&date=${formattedDate}&tipo=A`;
+      const url = `${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&date=${formattedDate}&tipo=A`;
       console.log('Single day schedule request URL:', url);
       
       const response = await fetch(url, {
