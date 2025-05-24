@@ -13,9 +13,17 @@ export const PatientService = {
         method: 'GET',
         headers: apiHeaders,
       });
+      
       const data = await response.json();
       console.log('Patient search response:', data);
-      return data.success && data.data.length > 0 ? data.data[0] : null;
+      
+      // Check for 409 error which means patient not found
+      if (!data.success && data.content === "Paciente não encontrado") {
+        console.log('Patient not found with the provided CPF/phone');
+        return null;
+      }
+      
+      return data.success && data.data && data.data.length > 0 ? data.data[0] : null;
     } catch (error) {
       console.error('Erro ao buscar paciente:', error);
       return null;

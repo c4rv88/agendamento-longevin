@@ -22,10 +22,11 @@ export const AppointmentService = {
           paciente_id: formattedData.patient.patient_id,
           profissional_id: formattedData.professional_id,
           especialidade_id: formattedData.specialty_id,
-          procedimento_id: 2, // ID for consultation
+          procedimento_id: 1, // ID for consultation
           data: formattedData.date,
           hora: formattedData.time,
           convenio_id: formattedData.insurance_id || 0,
+          valor: '0.00', // Adding the value parameter as requested
           celular: formattedData.patient.patient_phone?.replace(/\D/g, '')
         }),
       });

@@ -9,5 +9,12 @@ export const apiHeaders = {
   'x-access-token': ACCESS_TOKEN,
 };
 
+// Unit IDs as specified in the requirements
+export const UNIT_IDS = {
+  'ISV - Papicu': 32,
+  'ISV - Meireles': 44,
+  'ISV - Oliveira Paiva': 45
+};
+
 // List of allowed unit names - these should match exactly what's in the API response
 export const ALLOWED_UNITS = ['ISV - Papicu', 'ISV - Meireles', 'ISV - Oliveira Paiva'];

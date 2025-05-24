@@ -17,13 +17,13 @@ export const ScheduleService = {
       today.setDate(today.getDate() + 2); // Add 2 days to current date
       const startDate = formatDate(today);
       
-      // Format date as dd-mm-YYYY (90 days after start date)
+      // Format date as dd-mm-YYYY (30 days after start date)
       const endDate = new Date(today);
-      endDate.setDate(today.getDate() + 90);
+      endDate.setDate(today.getDate() + 30);
       const endDateStr = formatDate(endDate);
       
       // Build the URL with the required and optional parameters
-      let url = `${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&tipo=p&procedimento_id=2&data_start=${startDate}&data_end=${endDateStr}`;
+      let url = `${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
       
       if (unityId) {
         url += `&unidade_id=${unityId}`;
@@ -81,7 +81,7 @@ export const ScheduleService = {
       const formattedDate = date.includes('-') && date.split('-').length === 3 ? 
         formatDateFromISO(date) : date;
       
-      const url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${professionalId}&date=${formattedDate}&tipo=p&procedimento_id=2`;
+      const url = `${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&date=${formattedDate}&tipo=p&procedimento_id=1`;
       console.log('Single day schedule request URL:', url);
       
       const response = await fetch(url, {
