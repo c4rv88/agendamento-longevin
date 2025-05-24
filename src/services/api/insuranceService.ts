@@ -20,7 +20,7 @@ export const InsuranceService = {
       
       if (!data.success) {
         console.error('API returned error:', data);
-        return [];
+        return [{ insurance_id: 0, insurance_name: 'Particular', professional_id: professionalId }];
       }
       
       const insurances: Insurance[] = [];
@@ -35,11 +35,14 @@ export const InsuranceService = {
       // Add the insurance plans returned by the API
       if (data.content && Array.isArray(data.content)) {
         data.content.forEach((ins: any) => {
-          insurances.push({
-            insurance_id: parseInt(ins.convenio_id),
-            insurance_name: ins.nome_convenio,
-            professional_id: professionalId
-          });
+          // Evitar duplicação de "Particular"
+          if (parseInt(ins.convenio_id) !== 0 && ins.nome_convenio.toLowerCase() !== 'particular') {
+            insurances.push({
+              insurance_id: parseInt(ins.convenio_id),
+              insurance_name: ins.nome_convenio,
+              professional_id: professionalId
+            });
+          }
         });
       }
       

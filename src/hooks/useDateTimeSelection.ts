@@ -25,6 +25,7 @@ export const useDateTimeSelection = (
       try {
         setLoading(true);
         setError(null);
+        console.log('Fetching schedules with professionalId:', professionalId);
         
         const schedules = await FeegowApiService.getAvailableSchedules(
           professionalId,
@@ -32,16 +33,21 @@ export const useDateTimeSelection = (
           specialtyId
         );
         
+        console.log('Fetched available schedules:', schedules);
         setAvailableSchedules(schedules);
         
         // Automatically select the first available date if there is one
         if (schedules.length > 0 && onSelectDate) {
+          console.log('Auto-selecting first date:', schedules[0].date);
           onSelectDate(schedules[0].date);
           
           // And automatically select the first available time if there is one
           if (schedules[0].times.length > 0 && onSelectTime) {
+            console.log('Auto-selecting first time:', schedules[0].times[0]);
             onSelectTime(schedules[0].times[0]);
           }
+        } else {
+          console.log('No schedules available to auto-select.');
         }
       } catch (error) {
         console.error('Erro ao carregar horários:', error);

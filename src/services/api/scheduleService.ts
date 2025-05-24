@@ -13,7 +13,7 @@ export const ScheduleService = {
       
       // Format date as dd-mm-YYYY (2 days from now)
       const today = new Date();
-      today.setDate(today.getDate() + 2);
+      today.setDate(today.getDate());
       const startDate = formatDate(today);
       
       // Format date as dd-mm-YYYY (3 months from now)
@@ -62,7 +62,7 @@ export const ScheduleService = {
         });
       }
       
-      console.log('Available schedules:', schedules);
+      console.log('Available schedules processed:', schedules);
       return schedules;
     } catch (error) {
       console.error('Erro ao buscar horários disponíveis:', error);

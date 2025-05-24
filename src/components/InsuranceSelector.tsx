@@ -19,6 +19,7 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
 }) => {
   const [insurances, setInsurances] = useState<Insurance[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchInsurances = async () => {
@@ -26,10 +27,12 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
       
       try {
         setLoading(true);
+        setError(null);
         const data = await FeegowApiService.getInsurances(professionalId);
         setInsurances(data);
       } catch (error) {
         console.error('Erro ao carregar convênios:', error);
+        setError('Falha ao carregar convênios. Por favor, tente novamente.');
       } finally {
         setLoading(false);
       }
@@ -58,6 +61,49 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
     );
   }
 
+  if (error) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            Selecione o Convênio
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center">
+            <p className="text-red-500">{error}</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="mt-4"
+              variant="outline"
+            >
+              Tentar Novamente
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (insurances.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            Selecione o Convênio
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center">
+            <p className="text-gray-500">Nenhum convênio disponível para este profissional.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -69,7 +115,7 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
       <CardContent>
         <div className="space-y-3">
           <Button
-            variant={!selectedInsurance ? "default" : "outline"}
+            variant={selectedInsurance?.insurance_id === 0 ? "default" : "outline"}
             className="w-full p-4 h-auto justify-start"
             onClick={() => onSelect({ insurance_id: 0, insurance_name: 'Particular', professional_id: professionalId! })}
           >
@@ -79,7 +125,7 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
             </div>
           </Button>
           
-          {insurances.map((insurance) => (
+          {insurances.filter(insurance => insurance.insurance_id !== 0).map((insurance) => (
             <Button
               key={insurance.insurance_id}
               variant={selectedInsurance?.insurance_id === insurance.insurance_id ? "default" : "outline"}

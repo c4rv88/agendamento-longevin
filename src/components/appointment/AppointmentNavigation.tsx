@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, ArrowDown } from 'lucide-react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
 interface AppointmentNavigationProps {
   currentStep: number;
@@ -26,7 +26,7 @@ export const AppointmentNavigation: React.FC<AppointmentNavigationProps> = ({
         disabled={currentStep === 1}
         className="flex items-center gap-2"
       >
-        <ArrowUp className="w-4 h-4" />
+        <ChevronUp className="w-4 h-4" />
         Voltar
       </Button>
       
@@ -37,7 +37,7 @@ export const AppointmentNavigation: React.FC<AppointmentNavigationProps> = ({
           className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
         >
           Próximo
-          <ArrowDown className="w-4 h-4" />
+          <ChevronDown className="w-4 h-4" />
         </Button>
       ) : (
         <Button

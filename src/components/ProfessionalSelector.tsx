@@ -132,11 +132,6 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
             >
               <div className="text-left">
                 <div className="font-semibold">{professional.professional_name}</div>
-                {professional.professional_email && (
-                  <div className="text-sm text-muted-foreground">
-                    {professional.professional_email}
-                  </div>
-                )}
               </div>
             </Button>
           ))}

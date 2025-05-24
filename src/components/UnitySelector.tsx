@@ -108,8 +108,9 @@ export const UnitySelector: React.FC<UnitySelectorProps> = ({
               >
                 <div className="text-left">
                   <div className="font-semibold">{unity.unity_name}</div>
-                  <div className="text-sm text-muted-foreground">{unity.unity_address}</div>
-                  <div className="text-sm text-muted-foreground">{unity.unity_phone}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {formatAddress(unity.unity_address)}
+                  </div>
                 </div>
               </Button>
             ))
@@ -117,5 +118,26 @@ export const UnitySelector: React.FC<UnitySelectorProps> = ({
         </div>
       </CardContent>
     </Card>
+  );
+};
+
+// Função para formatar o endereço em duas linhas
+const formatAddress = (address: string): React.ReactNode => {
+  const middlePoint = Math.ceil(address.length / 2);
+  let splitIndex = address.lastIndexOf(' ', middlePoint);
+  
+  if (splitIndex === -1 || Math.abs(splitIndex - middlePoint) > 15) {
+    // Se não encontrar um espaço adequado ou se o ponto de divisão estiver muito longe do meio
+    splitIndex = middlePoint;
+  }
+  
+  const firstLine = address.substring(0, splitIndex);
+  const secondLine = address.substring(splitIndex).trim();
+  
+  return (
+    <>
+      <div>{firstLine}</div>
+      <div>{secondLine}</div>
+    </>
   );
 };
