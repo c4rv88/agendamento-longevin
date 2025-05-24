@@ -1,13 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
-import { FeegowApiService } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Calendar, MapPin, User, CreditCard, Clock } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { format, parse } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { Calendar } from 'lucide-react';
+import { useAppointmentConfirmation } from '@/hooks/useAppointmentConfirmation';
+import { ConfirmationSuccess } from './appointment/summary/ConfirmationSuccess';
+import { AppointmentSummaryDetails } from './appointment/summary/AppointmentSummaryDetails';
 
 interface AppointmentSummaryProps {
   appointmentData: AppointmentState;
@@ -18,98 +17,14 @@ export const AppointmentSummary: React.FC<AppointmentSummaryProps> = ({
   appointmentData, 
   onConfirm 
 }) => {
-  const [confirming, setConfirming] = useState(false);
-  const [confirmed, setConfirmed] = useState(false);
-  const { toast } = useToast();
+  const { confirming, confirmed, handleConfirmAppointment } = useAppointmentConfirmation();
 
-  // Function to safely format the date
-  const formatSelectedDate = (dateString: string): string => {
-    try {
-      // Check if date is in dd-mm-yyyy format (from API)
-      if (dateString && dateString.includes('-') && dateString.split('-').length === 3) {
-        const parts = dateString.split('-');
-        
-        // If the first part is 4 characters (year), it's in yyyy-MM-dd format
-        if (parts[0].length === 4) {
-          const date = parse(dateString, 'yyyy-MM-dd', new Date());
-          return format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
-        } else {
-          // It's in dd-MM-yyyy format
-          const date = parse(dateString, 'dd-MM-yyyy', new Date());
-          return format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
-        }
-      }
-      // Fallback for empty or invalid dates
-      return dateString || 'Data não selecionada';
-    } catch (error) {
-      console.error('Error formatting date:', error, dateString);
-      return dateString || 'Data não selecionada';
-    }
-  };
-
-  const handleConfirm = async () => {
-    setConfirming(true);
-    try {
-      // Se o paciente não tem ID, criar primeiro
-      let patientData = appointmentData.patient;
-      if (!patientData?.patient_id) {
-        patientData = await FeegowApiService.createPatient(appointmentData.patient!);
-        if (!patientData) {
-          throw new Error('Erro ao criar paciente');
-        }
-      }
-
-      // Criar agendamento
-      const appointmentPayload = {
-        unity_id: appointmentData.selectedUnity?.unity_id,
-        specialty_id: appointmentData.selectedSpecialty?.specialty_id,
-        professional_id: appointmentData.selectedProfessional?.professional_id,
-        insurance_id: appointmentData.selectedInsurance?.insurance_id,
-        date: appointmentData.selectedDate,
-        time: appointmentData.selectedTime,
-        patient_id: patientData.patient_id,
-        notes: 'Agendamento via sistema online',
-      };
-
-      const success = await FeegowApiService.createAppointment(appointmentPayload);
-      
-      if (success) {
-        setConfirmed(true);
-        toast({
-          title: "Agendamento confirmado!",
-          description: "Seu agendamento foi realizado com sucesso.",
-        });
-      } else {
-        throw new Error('Erro ao criar agendamento');
-      }
-    } catch (error) {
-      toast({
-        title: "Erro no agendamento",
-        description: "Ocorreu um erro ao confirmar o agendamento. Tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setConfirming(false);
-    }
+  const handleConfirm = () => {
+    handleConfirmAppointment(appointmentData);
   };
 
   if (confirmed) {
-    return (
-      <Card className="w-full">
-        <CardContent className="text-center py-12">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-green-600 mb-2">
-            Agendamento Confirmado!
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Seu agendamento foi realizado com sucesso. Você receberá uma confirmação em breve.
-          </p>
-          <Button onClick={onConfirm} className="bg-gradient-to-r from-green-600 to-blue-600">
-            Fazer Novo Agendamento
-          </Button>
-        </CardContent>
-      </Card>
-    );
+    return <ConfirmationSuccess onConfirm={onConfirm} />;
   }
 
   return (
@@ -121,84 +36,7 @@ export const AppointmentSummary: React.FC<AppointmentSummaryProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-blue-500" />
-              <div>
-                <div className="font-semibold">Unidade</div>
-                <div className="text-sm text-gray-600">
-                  {appointmentData.selectedUnity?.unity_name}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <User className="w-5 h-5 text-purple-500" />
-              <div>
-                <div className="font-semibold">Especialidade</div>
-                <div className="text-sm text-gray-600">
-                  {appointmentData.selectedSpecialty?.specialty_name}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <User className="w-5 h-5 text-green-500" />
-              <div>
-                <div className="font-semibold">Profissional</div>
-                <div className="text-sm text-gray-600">
-                  {appointmentData.selectedProfessional?.professional_name}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <CreditCard className="w-5 h-5 text-orange-500" />
-              <div>
-                <div className="font-semibold">Convênio</div>
-                <div className="text-sm text-gray-600">
-                  {appointmentData.selectedInsurance?.insurance_name}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Calendar className="w-5 h-5 text-blue-500" />
-              <div>
-                <div className="font-semibold">Data</div>
-                <div className="text-sm text-gray-600">
-                  {formatSelectedDate(appointmentData.selectedDate)}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-purple-500" />
-              <div>
-                <div className="font-semibold">Horário</div>
-                <div className="text-sm text-gray-600">
-                  {appointmentData.selectedTime}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <User className="w-5 h-5 text-green-500" />
-              <div>
-                <div className="font-semibold">Paciente</div>
-                <div className="text-sm text-gray-600">
-                  {appointmentData.patient?.patient_name}
-                </div>
-                <div className="text-sm text-gray-600">
-                  {appointmentData.patient?.patient_phone}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AppointmentSummaryDetails appointmentData={appointmentData} />
 
         <div className="pt-6 border-t">
           <Button
