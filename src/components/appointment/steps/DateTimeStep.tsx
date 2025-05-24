@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
 import { DateTimeSelector } from '@/components/DateTimeSelector';
+import { toast } from 'sonner';
 
 interface DateTimeStepProps {
   selectedDate: string;
@@ -22,7 +23,7 @@ export const DateTimeStep: React.FC<DateTimeStepProps> = ({
   insuranceId,
   updateState,
 }) => {
-  // Add additional logging to track the exact data being passed
+  // Log API related errors for debugging
   useEffect(() => {
     console.log('DateTimeStep rendering with params:', {
       professionalId,
@@ -32,6 +33,16 @@ export const DateTimeStep: React.FC<DateTimeStepProps> = ({
       selectedDate,
       selectedTime
     });
+
+    // Display toast for API errors only in development
+    if (process.env.NODE_ENV === 'development') {
+      if (professionalId && unityId === 0 && specialtyId && insuranceId) {
+        toast.info('Consultando disponibilidade do médico', {
+          description: `Prof #${professionalId}, Esp #${specialtyId}, Conv #${insuranceId}`,
+          duration: 3000,
+        });
+      }
+    }
   }, [professionalId, unityId, specialtyId, insuranceId, selectedDate, selectedTime]);
 
   return (

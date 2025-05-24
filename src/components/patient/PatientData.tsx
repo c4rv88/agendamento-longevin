@@ -19,6 +19,21 @@ export const PatientData: React.FC<PatientDataProps> = ({
   onInputChange,
   errors 
 }) => {
+  // Phone validation helper
+  const validatePhoneInput = (value: string) => {
+    const numbersOnly = value.replace(/\D/g, '');
+    if (numbersOnly.length > 11) {
+      return numbersOnly.substring(0, 11);
+    }
+    return numbersOnly;
+  };
+  
+  // Email validation helper
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    onInputChange('patient_email', value);
+  };
+  
   return (
     <Card className="w-full">
       <CardHeader>
@@ -63,14 +78,20 @@ export const PatientData: React.FC<PatientDataProps> = ({
             )}
           </div>
           <div>
-            <Label htmlFor="email">E-mail</Label>
+            <Label htmlFor="email" className={errors.patient_email ? "text-destructive" : ""}>
+              E-mail
+            </Label>
             <Input
               id="email"
               type="email"
               placeholder="email@exemplo.com"
               value={formData.patient_email || ''}
-              onChange={(e) => onInputChange('patient_email', e.target.value)}
+              onChange={handleEmailChange}
+              className={errors.patient_email ? "border-destructive" : ""}
             />
+            {errors.patient_email && (
+              <p className="text-xs text-destructive mt-1">{errors.patient_email}</p>
+            )}
           </div>
           <div>
             <Label htmlFor="phone" className={errors.patient_phone ? "text-destructive" : ""}>
@@ -80,7 +101,7 @@ export const PatientData: React.FC<PatientDataProps> = ({
               id="phone"
               placeholder="(00) 00000-0000"
               value={formatPhone(formData.patient_phone)}
-              onChange={(e) => onInputChange('patient_phone', e.target.value.replace(/\D/g, ''))}
+              onChange={(e) => onInputChange('patient_phone', validatePhoneInput(e.target.value))}
               maxLength={15}
               required
               className={errors.patient_phone ? "border-destructive" : ""}

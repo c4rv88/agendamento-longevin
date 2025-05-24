@@ -1,4 +1,3 @@
-
 /**
  * Formats a string as a CPF (Brazilian ID)
  * @param value String to format
@@ -39,11 +38,24 @@ export const maskEmail = (email: string): string => {
 };
 
 /**
- * Masks a phone number for privacy protection
+ * Masks a phone number for privacy protection by blurring middle digits
  * @param phone Phone number to mask
- * @returns Masked phone number (e.g. (11) 9****-4321)
+ * @returns Blurred phone number (e.g. (11) 9••••-4321)
  */
 export const maskPhone = (phone: string): string => {
   if (!phone || phone.length < 8) return phone;
-  return phone.slice(0, 4) + '*'.repeat(phone.length - 7) + phone.slice(-3);
+  
+  // Extract phone parts to keep area code, blur middle digits, keep last 4 digits
+  const formattedPhone = formatPhone(phone);
+  
+  // Get the area code and first digit
+  const areaCodeAndFirst = formattedPhone.substring(0, 5);
+  
+  // Get the last 4 digits
+  const lastDigits = formattedPhone.slice(-5);
+  
+  // Create middle blurred part - count middle characters and replace with bullet symbol
+  const middlePart = '•'.repeat(Math.max(0, formattedPhone.length - areaCodeAndFirst.length - lastDigits.length));
+  
+  return `${areaCodeAndFirst}${middlePart}${lastDigits}`;
 };

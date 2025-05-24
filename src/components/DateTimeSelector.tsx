@@ -6,6 +6,7 @@ import { AvailableDates } from '@/components/datetime/AvailableDates';
 import { AvailableTimes } from '@/components/datetime/AvailableTimes';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { CalendarCheck } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface DateTimeSelectorProps {
   selectedDate: string;
@@ -32,7 +33,8 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     availableSchedules, 
     loading, 
     error, 
-    getAvailableTimesForDate 
+    getAvailableTimesForDate,
+    retry
   } = useDateTimeSelection(
     professionalId,
     unityId,
@@ -54,6 +56,16 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
       selectedDate,
       selectedTime
     });
+    
+    if (error) {
+      // Show API error in development only
+      if (process.env.NODE_ENV === 'development') {
+        toast.error(`Erro na API: ${error}`, { 
+          duration: 5000,
+          description: "Usando dados simulados enquanto a API está indisponível" 
+        });
+      }
+    }
   }, [availableSchedules, loading, error, selectedDate, selectedTime, professionalId, unityId, specialtyId, insuranceId]);
 
   if (loading) {
@@ -64,7 +76,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     return (
       <DateTimeStatus 
         error={error} 
-        onRetry={() => window.location.reload()} 
+        onRetry={retry}
       />
     );
   }
