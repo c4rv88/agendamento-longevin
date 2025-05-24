@@ -11,6 +11,7 @@ interface DateTimeSelectorProps {
   professionalId: number;
   unityId?: number;
   specialtyId?: number;
+  insuranceId?: number;
   onSelectDate: (date: string) => void;
   onSelectTime: (time: string) => void;
 }
@@ -21,6 +22,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   professionalId,
   unityId,
   specialtyId,
+  insuranceId,
   onSelectDate,
   onSelectTime,
 }) => {
@@ -33,6 +35,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     professionalId,
     unityId,
     specialtyId,
+    insuranceId,
     onSelectDate,
     onSelectTime
   );
