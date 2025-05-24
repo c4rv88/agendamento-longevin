@@ -27,7 +27,7 @@ export const formatDateFromISO = (isoDate: string): string => {
  * @param rangeDays Number of days for the range
  * @returns Object with formatted startDate and endDate
  */
-export const getDateRange = (daysAhead: number = 2, rangeDays: number = 60) => {
+export const getDateRange = (daysAhead: number = 2, rangeDays: number = 30) => {
   const today = new Date();
   today.setDate(today.getDate() + daysAhead);
   const startDate = formatDate(today);

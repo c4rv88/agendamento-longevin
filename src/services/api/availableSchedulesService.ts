@@ -30,8 +30,8 @@ export const AvailableSchedulesService = {
         return [];
       }
       
-      // Get date range (starting 2 days from today, ending 60 days later)
-      const { startDate, endDateStr } = getDateRange(2, 60);
+      // Get date range (starting 2 days from today, ending 30 days later)
+      const { startDate, endDateStr } = getDateRange(2, 30);
       
       console.log('Date range for schedule search:', { startDate, endDateStr });
       
