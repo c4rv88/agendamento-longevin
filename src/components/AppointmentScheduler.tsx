@@ -42,14 +42,28 @@ export const AppointmentScheduler: React.FC = () => {
         return (
           <UnitySelector
             selectedUnity={state.selectedUnity}
-            onSelect={(unity) => updateState({ selectedUnity: unity })}
+            onSelect={(unity) => {
+              // Clear specialties and professionals when selecting a new unit
+              updateState({ 
+                selectedUnity: unity, 
+                selectedSpecialty: null,
+                selectedProfessional: null 
+              });
+            }}
           />
         );
       case 2:
         return (
           <SpecialtySelector
             selectedSpecialty={state.selectedSpecialty}
-            onSelect={(specialty) => updateState({ selectedSpecialty: specialty })}
+            unityId={state.selectedUnity?.unity_id}
+            onSelect={(specialty) => {
+              // Clear professional when selecting a new specialty
+              updateState({ 
+                selectedSpecialty: specialty,
+                selectedProfessional: null 
+              });
+            }}
           />
         );
       case 3:

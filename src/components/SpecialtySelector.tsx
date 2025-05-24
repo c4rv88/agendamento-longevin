@@ -5,22 +5,36 @@ import { FeegowApiService } from '@/services/feegowApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface SpecialtySelectorProps {
   selectedSpecialty: Specialty | null;
+  unityId?: number;
   onSelect: (specialty: Specialty) => void;
 }
 
-export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ selectedSpecialty, onSelect }) => {
+export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ 
+  selectedSpecialty, 
+  unityId, 
+  onSelect 
+}) => {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSpecialties = async () => {
+      if (!unityId) {
+        setLoading(false);
+        setError('Por favor, selecione uma unidade primeiro.');
+        return;
+      }
+    
       try {
-        console.log("Fetching specialties...");
-        const data = await FeegowApiService.getSpecialties();
+        console.log("Fetching specialties for unity ID:", unityId);
+        setLoading(true);
+        setError(null);
+        const data = await FeegowApiService.getSpecialties(unityId);
         console.log("Specialties fetched:", data);
         setSpecialties(data);
       } catch (error) {
@@ -32,7 +46,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ selectedSp
     };
 
     fetchSpecialties();
-  }, []);
+  }, [unityId]);
 
   if (loading) {
     return (
@@ -46,7 +60,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ selectedSp
         <CardContent>
           <div className="space-y-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded-lg animate-pulse" />
+              <Skeleton key={i} className="h-16 rounded-lg" />
             ))}
           </div>
         </CardContent>
@@ -90,7 +104,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ selectedSp
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {specialties.length === 0 ? (
-            <p className="text-center text-gray-500 py-4 col-span-2">Nenhuma especialidade encontrada</p>
+            <p className="text-center text-gray-500 py-4 col-span-2">Nenhuma especialidade encontrada para esta unidade</p>
           ) : (
             specialties.map((specialty) => (
               <Button

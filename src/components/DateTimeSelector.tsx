@@ -1,12 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
+import { AvailableSchedule } from '@/types/feegow';
 import { FeegowApiService } from '@/services/feegowApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { CalendarCheck } from 'lucide-react';
-import { format, addDays, isSameDay } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DateTimeSelectorProps {
   selectedDate: string;
@@ -23,35 +24,113 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   onSelectDate,
   onSelectTime,
 }) => {
-  const [availableTimes, setAvailableTimes] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedDateObj, setSelectedDateObj] = useState<Date | undefined>(
-    selectedDate ? new Date(selectedDate) : undefined
-  );
+  const [availableSchedules, setAvailableSchedules] = useState<AvailableSchedule[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleDateSelect = async (date: Date | undefined) => {
-    if (!date) return;
-    
-    setSelectedDateObj(date);
-    const dateString = format(date, 'yyyy-MM-dd');
-    onSelectDate(dateString);
-    onSelectTime(''); // Reset selected time
-    
-    setLoading(true);
-    try {
-      const schedule = await FeegowApiService.getAvailableSchedule(professionalId, dateString);
-      setAvailableTimes(schedule?.times || []);
-    } catch (error) {
-      console.error('Erro ao carregar horários:', error);
-      setAvailableTimes([]);
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    const fetchAvailableSchedules = async () => {
+      if (!professionalId) {
+        setLoading(false);
+        setError('Por favor, selecione um profissional primeiro.');
+        return;
+      }
+      
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const schedules = await FeegowApiService.getAvailableSchedules(professionalId);
+        setAvailableSchedules(schedules);
+        
+        // Automatically select the first available date if there is one
+        if (schedules.length > 0) {
+          onSelectDate(schedules[0].date);
+          
+          // And automatically select the first available time if there is one
+          if (schedules[0].times.length > 0) {
+            onSelectTime(schedules[0].times[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar horários:', error);
+        setError('Falha ao carregar horários disponíveis. Por favor, tente novamente.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAvailableSchedules();
+  }, [professionalId, onSelectDate, onSelectTime]);
+
+  const getAvailableTimesForDate = (date: string): string[] => {
+    const schedule = availableSchedules.find(s => s.date === date);
+    return schedule ? schedule.times : [];
   };
 
-  // Generate next 30 days for calendar
-  const today = new Date();
-  const maxDate = addDays(today, 30);
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarCheck className="w-5 h-5" />
+            Próximas Datas Disponíveis
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Skeleton className="h-16 rounded-md" />
+            <Skeleton className="h-12 rounded-md" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarCheck className="w-5 h-5" />
+            Próximas Datas Disponíveis
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center">
+            <p className="text-red-500">{error}</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="mt-4"
+              variant="outline"
+            >
+              Tentar Novamente
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (availableSchedules.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarCheck className="w-5 h-5" />
+            Próximas Datas Disponíveis
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center">
+            <p className="text-gray-500">
+              Nenhuma data disponível para este profissional.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -59,18 +138,29 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CalendarCheck className="w-5 h-5" />
-            Selecione a Data
+            Próximas Datas Disponíveis
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex justify-center">
-          <Calendar
-            mode="single"
-            selected={selectedDateObj}
-            onSelect={handleDateSelect}
-            disabled={(date) => date < today || date > maxDate}
-            locale={ptBR}
-            className="rounded-md border"
-          />
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {availableSchedules.map((schedule) => (
+              <Button
+                key={schedule.date}
+                variant={selectedDate === schedule.date ? "default" : "outline"}
+                className="p-3 h-auto justify-start"
+                onClick={() => onSelectDate(schedule.date)}
+              >
+                <div className="text-left">
+                  <div className="font-semibold">
+                    {format(new Date(schedule.date), "dd 'de' MMMM", { locale: ptBR })}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {schedule.times.length} horários disponíveis
+                  </div>
+                </div>
+              </Button>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
@@ -82,31 +172,19 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="h-10 bg-gray-200 rounded animate-pulse" />
-                ))}
-              </div>
-            ) : availableTimes.length > 0 ? (
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-                {availableTimes.map((time) => (
-                  <Button
-                    key={time}
-                    variant={selectedTime === time ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => onSelectTime(time)}
-                    className="text-sm"
-                  >
-                    {time}
-                  </Button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-gray-500 py-4">
-                Nenhum horário disponível para esta data
-              </p>
-            )}
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+              {getAvailableTimesForDate(selectedDate).map((time) => (
+                <Button
+                  key={time}
+                  variant={selectedTime === time ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onSelectTime(time)}
+                  className="text-sm"
+                >
+                  {time}
+                </Button>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}
