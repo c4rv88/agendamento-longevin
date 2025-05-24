@@ -42,7 +42,8 @@ export const AvailableSchedulesService = {
       const sanitizedInsuranceId = Number(convenio_id || 0);
       
       // Build the URL with the required and optional parameters
-      let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${sanitizedProfessionalId}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
+      // Changed tipo=p to tipo=P (uppercase)
+      let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${sanitizedProfessionalId}&tipo=P&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
       
       // Add optional parameters
       url += `&unidade_id=${sanitizedUnityId}`;

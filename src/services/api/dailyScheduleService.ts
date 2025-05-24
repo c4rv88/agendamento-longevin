@@ -21,7 +21,8 @@ export const DailyScheduleService = {
       const formattedDate = date.includes('-') && date.split('-').length === 3 ? 
         formatDateFromISO(date) : date;
       
-      const url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${profissional_id}&date=${formattedDate}&tipo=p&procedimento_id=1`;
+      // Changed tipo=p to tipo=P (uppercase)
+      const url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${profissional_id}&date=${formattedDate}&tipo=P&procedimento_id=1`;
       console.log('Single day schedule request URL:', url);
       
       const response = await fetch(url, {
