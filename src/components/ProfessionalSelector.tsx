@@ -5,6 +5,7 @@ import { FeegowApiService } from '@/services/feegowApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ProfessionalSelectorProps {
   selectedProfessional: Professional | null;
@@ -61,7 +62,7 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
         <CardContent>
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded-lg animate-pulse" />
+              <Skeleton key={i} className="h-16 rounded-lg" />
             ))}
           </div>
         </CardContent>
