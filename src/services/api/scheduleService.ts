@@ -55,16 +55,50 @@ export const ScheduleService = {
       // Transform the API response structure to get the available dates and times
       const schedules: AvailableSchedule[] = [];
       
-      if (data.content && Array.isArray(data.content)) {
-        data.content.forEach((dateItem: any) => {
-          if (dateItem.date && dateItem.horarios && dateItem.horarios.length > 0) {
-            schedules.push({
-              date: dateItem.date,
-              times: dateItem.horarios,
-              professional_id: professionalId
-            });
+      // Handle the new JSON structure
+      if (Array.isArray(data) && data[0]?.success) {
+        const content = data[0].content;
+        const professionalData = content?.profissional_id?.[professionalId];
+        
+        if (professionalData) {
+          const localData = professionalData.local_id || {};
+          
+          // Find the correct local_id data
+          let datesAndTimes = {};
+          if (unityId && localData[unityId]) {
+            datesAndTimes = localData[unityId];
+          } else {
+            // If no specific unity is selected, use the first one
+            const firstLocalId = Object.keys(localData)[0];
+            if (firstLocalId) {
+              datesAndTimes = localData[firstLocalId];
+            }
           }
-        });
+          
+          // Transform dates and times into our format
+          Object.entries(datesAndTimes).forEach(([date, times]) => {
+            if (Array.isArray(times) && times.length > 0) {
+              schedules.push({
+                date: date,
+                times: times as string[],
+                professional_id: professionalId
+              });
+            }
+          });
+        }
+      } else if (data.success && data.content) {
+        // Handle the original JSON structure we were expecting before
+        if (data.content && Array.isArray(data.content)) {
+          data.content.forEach((dateItem: any) => {
+            if (dateItem.date && dateItem.horarios && dateItem.horarios.length > 0) {
+              schedules.push({
+                date: dateItem.date,
+                times: dateItem.horarios,
+                professional_id: professionalId
+              });
+            }
+          });
+        }
       }
       
       console.log('Available schedules processed:', schedules);

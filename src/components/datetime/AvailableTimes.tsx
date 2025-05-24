@@ -21,17 +21,18 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
   // Function to format date for display
   const formatDisplayDate = (dateString: string): string => {
     try {
-      // Check if date is in dd-mm-yyyy format
+      // Check if date is in yyyy-MM-dd format (API format)
       if (dateString.includes('-') && dateString.split('-').length === 3) {
-        const [day, month, year] = dateString.split('-');
-        // Parse in dd-mm-yyyy format
-        if (day.length === 2) {
-          const date = parse(dateString, 'dd-MM-yyyy', new Date());
+        const parts = dateString.split('-');
+        
+        // If the first part is 4 characters (year), it's in yyyy-MM-dd format
+        if (parts[0].length === 4) {
+          const date = parse(dateString, 'yyyy-MM-dd', new Date());
           return format(date, "dd 'de' MMMM", { locale: ptBR });
         } 
         // Parse in yyyy-mm-dd format
         else {
-          const date = parse(dateString, 'yyyy-MM-dd', new Date());
+          const date = parse(dateString, 'dd-MM-yyyy', new Date());
           return format(date, "dd 'de' MMMM", { locale: ptBR });
         }
       }
@@ -40,6 +41,15 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
       console.error('Error formatting date:', error);
       return dateString;
     }
+  };
+
+  // Function to format time for display (remove seconds)
+  const formatTime = (time: string): string => {
+    if (time.includes(':')) {
+      const [hours, minutes] = time.split(':');
+      return `${hours}:${minutes}`;
+    }
+    return time;
   };
 
   if (!selectedDate) return null;
@@ -61,7 +71,7 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
               onClick={() => onSelectTime(time)}
               className="text-sm"
             >
-              {time}
+              {formatTime(time)}
             </Button>
           ))}
         </div>
