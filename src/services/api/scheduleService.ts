@@ -7,11 +7,17 @@ export const ScheduleService = {
     try {
       console.log('Fetching available schedules for professional ID:', professionalId);
       
-      // Get current date in YYYY-MM-DD format
+      // Get date 2 days from now in YYYY-MM-DD format
       const today = new Date();
-      const formattedDate = today.toISOString().split('T')[0];
+      today.setDate(today.getDate() + 2);
+      const startDate = today.toISOString().split('T')[0];
       
-      const url = `${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&date=${formattedDate}`;
+      // Get date 30 days from the start date
+      const endDate = new Date();
+      endDate.setDate(today.getDate() + 30);
+      const endDateStr = endDate.toISOString().split('T')[0];
+      
+      const url = `${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&tipo=A&data_start=${startDate}&data_end=${endDateStr}`;
       
       console.log('Request URL:', url);
       
@@ -53,7 +59,7 @@ export const ScheduleService = {
   
   getAvailableSchedule: async (professionalId: number, date: string): Promise<AvailableSchedule | null> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&date=${date}`, {
+      const response = await fetch(`${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&date=${date}&tipo=A`, {
         method: 'GET',
         headers: apiHeaders,
       });

@@ -9,13 +9,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface SpecialtySelectorProps {
   selectedSpecialty: Specialty | null;
-  unityId?: number;
   onSelect: (specialty: Specialty) => void;
 }
 
 export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({ 
   selectedSpecialty, 
-  unityId, 
   onSelect 
 }) => {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
@@ -24,17 +22,11 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
 
   useEffect(() => {
     const fetchSpecialties = async () => {
-      if (!unityId) {
-        setLoading(false);
-        setError('Por favor, selecione uma unidade primeiro.');
-        return;
-      }
-    
       try {
-        console.log("Fetching specialties for unity ID:", unityId);
+        console.log("Fetching all specialties");
         setLoading(true);
         setError(null);
-        const data = await FeegowApiService.getSpecialties(unityId);
+        const data = await FeegowApiService.getSpecialties();
         console.log("Specialties fetched:", data);
         setSpecialties(data);
       } catch (error) {
@@ -46,7 +38,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
     };
 
     fetchSpecialties();
-  }, [unityId]);
+  }, []);
 
   if (loading) {
     return (
@@ -104,7 +96,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {specialties.length === 0 ? (
-            <p className="text-center text-gray-500 py-4 col-span-2">Nenhuma especialidade encontrada para esta unidade</p>
+            <p className="text-center text-gray-500 py-4 col-span-2">Nenhuma especialidade encontrada</p>
           ) : (
             specialties.map((specialty) => (
               <Button

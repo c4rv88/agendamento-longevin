@@ -3,9 +3,9 @@ import { useState, useCallback } from 'react';
 import { Unity, Specialty, Professional, Insurance, Patient } from '@/types/feegow';
 
 export interface AppointmentState {
-  selectedUnity: Unity | null;
   selectedSpecialty: Specialty | null;
   selectedProfessional: Professional | null;
+  selectedUnity: Unity | null;
   selectedInsurance: Insurance | null;
   selectedDate: string;
   selectedTime: string;
@@ -15,9 +15,9 @@ export interface AppointmentState {
 
 export const useAppointmentFlow = () => {
   const [state, setState] = useState<AppointmentState>({
-    selectedUnity: null,
     selectedSpecialty: null,
     selectedProfessional: null,
+    selectedUnity: null,
     selectedInsurance: null,
     selectedDate: '',
     selectedTime: '',
@@ -39,9 +39,9 @@ export const useAppointmentFlow = () => {
 
   const resetFlow = useCallback(() => {
     setState({
-      selectedUnity: null,
       selectedSpecialty: null,
       selectedProfessional: null,
+      selectedUnity: null,
       selectedInsurance: null,
       selectedDate: '',
       selectedTime: '',

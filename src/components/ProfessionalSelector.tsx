@@ -9,14 +9,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface ProfessionalSelectorProps {
   selectedProfessional: Professional | null;
-  unityId?: number;
   specialtyId?: number;
   onSelect: (professional: Professional) => void;
 }
 
 export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({ 
   selectedProfessional, 
-  unityId, 
   specialtyId, 
   onSelect 
 }) => {
@@ -26,17 +24,17 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
 
   useEffect(() => {
     const fetchProfessionals = async () => {
-      if (!unityId || !specialtyId) {
+      if (!specialtyId) {
         setLoading(false);
-        setError('Por favor, selecione unidade e especialidade primeiro.');
+        setError('Por favor, selecione uma especialidade primeiro.');
         return;
       }
       
       try {
-        console.log('Fetching professionals with:', { unityId, specialtyId });
+        console.log('Fetching professionals with specialty ID:', specialtyId);
         setLoading(true);
         setError(null);
-        const data = await FeegowApiService.getProfessionals(unityId, specialtyId);
+        const data = await FeegowApiService.getProfessionals(specialtyId);
         console.log('Professionals fetched:', data);
         setProfessionals(data);
       } catch (error) {
@@ -48,7 +46,7 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
     };
 
     fetchProfessionals();
-  }, [unityId, specialtyId]);
+  }, [specialtyId]);
 
   if (loading) {
     return (
@@ -106,7 +104,7 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
         </CardHeader>
         <CardContent>
           <div className="p-4 text-center">
-            <p className="text-gray-500">Nenhum profissional encontrado para esta especialidade nesta unidade.</p>
+            <p className="text-gray-500">Nenhum profissional encontrado para esta especialidade.</p>
           </div>
         </CardContent>
       </Card>

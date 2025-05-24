@@ -3,9 +3,12 @@ import { Unity } from '@/types/feegow';
 import { API_BASE_URL, apiHeaders, ALLOWED_UNITS } from './apiConfig';
 
 export const UnityService = {
-  getUnities: async (): Promise<Unity[]> => {
+  getUnities: async (professionalId?: number, specialtyId?: number): Promise<Unity[]> => {
     try {
-      console.log('Calling Feegow API for unities');
+      console.log('Calling Feegow API for unities with filters:', { professionalId, specialtyId });
+      
+      // We'll still need to fetch all units and then filter them,
+      // since the API doesn't provide filtering by professional and specialty
       const response = await fetch(`${API_BASE_URL}/api/company/list-unity`, {
         method: 'GET',
         headers: apiHeaders,

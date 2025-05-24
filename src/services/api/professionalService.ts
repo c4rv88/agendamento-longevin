@@ -3,14 +3,13 @@ import { Professional } from '@/types/feegow';
 import { API_BASE_URL, apiHeaders } from './apiConfig';
 
 export const ProfessionalService = {
-  getProfessionals: async (unityId?: number, specialtyId?: number): Promise<Professional[]> => {
+  getProfessionals: async (specialtyId?: number): Promise<Professional[]> => {
     try {
-      console.log('Calling Feegow API for professionals with params:', { unityId, specialtyId });
+      console.log('Calling Feegow API for professionals with specialty:', specialtyId);
       
       let url = `${API_BASE_URL}/api/professional/list`;
       const params = new URLSearchParams();
       
-      if (unityId) params.append('unity_id', unityId.toString());
       if (specialtyId) params.append('specialty_id', specialtyId.toString());
       
       if (params.toString()) {
@@ -41,8 +40,7 @@ export const ProfessionalService = {
             professional_id: parseInt(prof.profissional_id),
             professional_name: prof.nome,
             professional_email: prof.email || '',
-            specialty_id: specialtyId,
-            unity_id: unityId
+            specialty_id: specialtyId
           });
         });
       }

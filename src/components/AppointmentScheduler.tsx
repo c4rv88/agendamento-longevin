@@ -26,9 +26,9 @@ export const AppointmentScheduler: React.FC = () => {
 
   const canProceed = () => {
     switch (state.currentStep) {
-      case 1: return !!state.selectedUnity;
-      case 2: return !!state.selectedSpecialty;
-      case 3: return !!state.selectedProfessional;
+      case 1: return !!state.selectedSpecialty;
+      case 2: return !!state.selectedProfessional;
+      case 3: return !!state.selectedUnity;
       case 4: return !!state.selectedInsurance;
       case 5: return !!state.selectedDate && !!state.selectedTime;
       case 6: return !!state.patient;
@@ -40,39 +40,39 @@ export const AppointmentScheduler: React.FC = () => {
     switch (state.currentStep) {
       case 1:
         return (
-          <UnitySelector
-            selectedUnity={state.selectedUnity}
-            onSelect={(unity) => {
-              // Clear specialties and professionals when selecting a new unit
+          <SpecialtySelector
+            selectedSpecialty={state.selectedSpecialty}
+            onSelect={(specialty) => {
+              // Clear professionals when selecting a new specialty
               updateState({ 
-                selectedUnity: unity, 
-                selectedSpecialty: null,
-                selectedProfessional: null 
+                selectedSpecialty: specialty,
+                selectedProfessional: null,
+                selectedUnity: null 
               });
             }}
           />
         );
       case 2:
         return (
-          <SpecialtySelector
-            selectedSpecialty={state.selectedSpecialty}
-            unityId={state.selectedUnity?.unity_id}
-            onSelect={(specialty) => {
-              // Clear professional when selecting a new specialty
+          <ProfessionalSelector
+            selectedProfessional={state.selectedProfessional}
+            specialtyId={state.selectedSpecialty?.specialty_id}
+            onSelect={(professional) => {
+              // Clear unity when selecting a new professional
               updateState({ 
-                selectedSpecialty: specialty,
-                selectedProfessional: null 
+                selectedProfessional: professional,
+                selectedUnity: null 
               });
             }}
           />
         );
       case 3:
         return (
-          <ProfessionalSelector
-            selectedProfessional={state.selectedProfessional}
-            unityId={state.selectedUnity?.unity_id}
+          <UnitySelector
+            selectedUnity={state.selectedUnity}
+            professionalId={state.selectedProfessional?.professional_id}
             specialtyId={state.selectedSpecialty?.specialty_id}
-            onSelect={(professional) => updateState({ selectedProfessional: professional })}
+            onSelect={(unity) => updateState({ selectedUnity: unity })}
           />
         );
       case 4:
