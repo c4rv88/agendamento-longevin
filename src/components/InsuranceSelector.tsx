@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Insurance } from '@/types/feegow';
-import { FeegowApiService } from '@/services/feegowApi';
+import { FeegowApiService } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CreditCard } from 'lucide-react';
