@@ -1,5 +1,5 @@
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, memo } from 'react';
 import { useDateTimeSelection } from '@/hooks/useDateTimeSelection';
 import { DateTimeStatus } from '@/components/datetime/DateTimeStatus';
 import { AvailableDates } from '@/components/datetime/AvailableDates';
@@ -18,7 +18,8 @@ interface DateTimeSelectorProps {
   onSelectTime: (time: string) => void;
 }
 
-export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
+// Using memo to prevent unnecessary renders
+export const DateTimeSelector = memo(({
   selectedDate,
   selectedTime,
   professionalId,
@@ -27,7 +28,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   insuranceId = 0,
   onSelectDate,
   onSelectTime,
-}) => {
+}: DateTimeSelectorProps) => {
   const { 
     availableSchedules, 
     loading, 
@@ -114,4 +115,6 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
       )}
     </div>
   );
-};
+});
+
+DateTimeSelector.displayName = 'DateTimeSelector';

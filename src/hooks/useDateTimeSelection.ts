@@ -17,11 +17,25 @@ export const useDateTimeSelection = (
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   
-  // Use refs to track if we've already auto-selected date/time
+  // Use refs to track if we've already auto-selected date/time and for stable dependencies
   const hasAutoSelectedRef = useRef(false);
+  const professionalIdRef = useRef(professionalId);
+  const unityIdRef = useRef(unityId || 0);
+  const specialtyIdRef = useRef(specialtyId || 0);
+  const insuranceIdRef = useRef(insuranceId || 0);
+  
+  // Update refs when props change
+  useEffect(() => {
+    professionalIdRef.current = professionalId;
+    unityIdRef.current = unityId || 0;
+    specialtyIdRef.current = specialtyId || 0;
+    insuranceIdRef.current = insuranceId || 0;
+  }, [professionalId, unityId, specialtyId, insuranceId]);
 
   const fetchAvailableSchedules = useCallback(async () => {
-    if (!professionalId) {
+    const currentProfessionalId = professionalIdRef.current;
+    
+    if (!currentProfessionalId) {
       console.log('Nenhum profissional selecionado, não buscando horários');
       setLoading(false);
       setError('Por favor, selecione um profissional primeiro.');
@@ -33,13 +47,12 @@ export const useDateTimeSelection = (
       setError(null);
       
       const schedules = await FeegowApiService.getAvailableSchedules(
-        professionalId,
-        unityId || 0,
-        specialtyId || 0,
-        insuranceId || 0
+        currentProfessionalId,
+        unityIdRef.current,
+        specialtyIdRef.current,
+        insuranceIdRef.current
       );
       
-      // Set state only if component is still mounted
       setAvailableSchedules(schedules);
       
       if (schedules.length === 0) {
@@ -48,7 +61,7 @@ export const useDateTimeSelection = (
         return;
       }
       
-      // Only auto-select if we have schedules, no date is already selected, and we haven't auto-selected yet
+      // Only auto-select if we have schedules, and we haven't auto-selected yet
       if (schedules.length > 0 && onSelectDate && !hasAutoSelectedRef.current) {
         hasAutoSelectedRef.current = true;
         onSelectDate(schedules[0].date);
@@ -65,7 +78,7 @@ export const useDateTimeSelection = (
     } finally {
       setLoading(false);
     }
-  }, [professionalId, unityId, specialtyId, insuranceId, onSelectDate, onSelectTime]);
+  }, [onSelectDate, onSelectTime]);
 
   // Retry function for UI
   const retry = useCallback(() => {
@@ -73,10 +86,11 @@ export const useDateTimeSelection = (
     setRetryCount(prev => prev + 1);
   }, []);
 
+  // Effect for fetching data - dependencies are minimized to prevent unnecessary calls
   useEffect(() => {
-    hasAutoSelectedRef.current = false; // Reset when dependencies change
+    hasAutoSelectedRef.current = false;
     fetchAvailableSchedules();
-  }, [fetchAvailableSchedules, retryCount]);
+  }, [fetchAvailableSchedules, retryCount, professionalId, unityId, specialtyId, insuranceId]);
 
   // Memoize this function to prevent unnecessary recreations
   const getAvailableTimesForDate = useCallback((date: string): string[] => {
