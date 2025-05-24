@@ -1,3 +1,4 @@
+
 import { AvailableSchedule } from '@/types/feegow';
 import { API_BASE_URL, apiHeaders } from './apiConfig';
 
@@ -123,7 +124,11 @@ export const ScheduleService = {
     }
   },
   
-  getAvailableSchedule: async (profissional_id: number, date: string): Promise<AvailableSchedule | null> => {
+  getAvailableSchedule: async (
+    profissional_id: number, 
+    date: string,
+    unidade_id?: number // Add unidade_id parameter
+  ): Promise<AvailableSchedule | null> => {
     try {
       // Convert date to dd-mm-YYYY if needed
       const formattedDate = date.includes('-') && date.split('-').length === 3 ? 
@@ -162,6 +167,7 @@ export const ScheduleService = {
             if (profData && profData.local_id) {
               const localKeys = Object.keys(profData.local_id);
               if (localKeys.length > 0) {
+                // Use the provided unidade_id or default to the first available local
                 const localId = unidade_id && profData.local_id[unidade_id] 
                   ? unidade_id 
                   : localKeys[0];
