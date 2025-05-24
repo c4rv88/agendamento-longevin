@@ -21,8 +21,22 @@ export const DailyScheduleService = {
       const formattedDate = date.includes('-') && date.split('-').length === 3 ? 
         formatDateFromISO(date) : date;
       
-      // Changed tipo=p to tipo=P (uppercase)
-      const url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${profissional_id}&date=${formattedDate}&tipo=P&procedimento_id=1`;
+      // Build URL with parameters in the requested order
+      let url = `${API_BASE_URL}/api/appoints/available-schedule?`;
+      url += `tipo=P`;  // Uppercase P as requested
+      url += `&procedimento_id=1`;
+      
+      // For daily schedule, use the date parameter instead of date_start/date_end
+      url += `&date=${formattedDate}`;
+      
+      // Add unit ID if provided
+      if (unidade_id) {
+        url += `&unidade_id=${unidade_id}`;
+      }
+      
+      // Add professional ID
+      url += `&profissional_id=${profissional_id}`;
+      
       console.log('Single day schedule request URL:', url);
       
       const response = await fetch(url, {

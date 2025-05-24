@@ -41,14 +41,22 @@ export const AvailableSchedulesService = {
       const sanitizedSpecialtyId = Number(especialidade_id || 0);
       const sanitizedInsuranceId = Number(convenio_id || 0);
       
-      // Build the URL with the required and optional parameters
-      // Changed tipo=p to tipo=P (uppercase)
-      let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${sanitizedProfessionalId}&tipo=P&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
+      // Build the URL with the required parameters in the specified order
+      let url = `${API_BASE_URL}/api/appoints/available-schedule?`;
       
-      // Add optional parameters
+      // Params in the requested order
+      url += `tipo=P`;  // Uppercase P as requested
+      url += `&procedimento_id=1`;
+      url += `&data_start=${startDate}`;
+      url += `&data_end=${endDateStr}`;
       url += `&unidade_id=${sanitizedUnityId}`;
-      url += `&especialidade_id=${sanitizedSpecialtyId}`;
+      url += `&profissional_id=${sanitizedProfessionalId}`;
       url += `&convenio_id=${sanitizedInsuranceId}`;
+      
+      // Add specialty parameter (wasn't in the specified order but still needed)
+      if (sanitizedSpecialtyId > 0) {
+        url += `&especialidade_id=${sanitizedSpecialtyId}`;
+      }
       
       console.log('Schedule API request URL:', url);
       
