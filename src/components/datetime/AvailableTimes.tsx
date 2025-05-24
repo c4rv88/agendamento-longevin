@@ -52,12 +52,29 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
     return time;
   };
 
+  // Group times by morning, afternoon and evening
+  const groupedTimes = {
+    morning: times.filter(time => {
+      const hour = parseInt(time.split(':')[0], 10);
+      return hour >= 6 && hour < 12;
+    }),
+    afternoon: times.filter(time => {
+      const hour = parseInt(time.split(':')[0], 10);
+      return hour >= 12 && hour < 18;
+    }),
+    evening: times.filter(time => {
+      const hour = parseInt(time.split(':')[0], 10);
+      return hour >= 18 || hour < 6;
+    })
+  };
+
   // Debug logs
   console.log('Available times component rendering with:', {
     timesCount: times.length,
     selectedTime,
     selectedDate,
-    times
+    times,
+    groupedTimes
   });
 
   if (!selectedDate || times.length === 0) {
@@ -71,8 +88,10 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
         </CardHeader>
         <CardContent>
           <div className="p-4 text-center">
-            <p className="text-gray-500">
-              Nenhum horário disponível para esta data.
+            <p className="text-muted-foreground">
+              {selectedDate 
+                ? "Nenhum horário disponível para esta data."
+                : "Selecione uma data para ver os horários disponíveis."}
             </p>
           </div>
         </CardContent>
@@ -89,18 +108,66 @@ export const AvailableTimes: React.FC<AvailableTimesProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-          {times.map((time) => (
-            <Button
-              key={time}
-              variant={selectedTime === time ? "default" : "outline"}
-              size="sm"
-              onClick={() => onSelectTime(time)}
-              className="text-sm"
-            >
-              {formatTime(time)}
-            </Button>
-          ))}
+        <div className="space-y-6">
+          {/* Morning times */}
+          {groupedTimes.morning.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-muted-foreground">Manhã</h4>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                {groupedTimes.morning.map((time) => (
+                  <Button
+                    key={time}
+                    variant={selectedTime === time ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => onSelectTime(time)}
+                    className="text-sm"
+                  >
+                    {formatTime(time)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Afternoon times */}
+          {groupedTimes.afternoon.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-muted-foreground">Tarde</h4>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                {groupedTimes.afternoon.map((time) => (
+                  <Button
+                    key={time}
+                    variant={selectedTime === time ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => onSelectTime(time)}
+                    className="text-sm"
+                  >
+                    {formatTime(time)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Evening times */}
+          {groupedTimes.evening.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-muted-foreground">Noite</h4>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                {groupedTimes.evening.map((time) => (
+                  <Button
+                    key={time}
+                    variant={selectedTime === time ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => onSelectTime(time)}
+                    className="text-sm"
+                  >
+                    {formatTime(time)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

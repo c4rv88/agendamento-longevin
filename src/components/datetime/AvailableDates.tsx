@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AvailableSchedule } from '@/types/feegow';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { CalendarCheck } from 'lucide-react';
-import { format, parse } from 'date-fns';
+import { CalendarCheck, Calendar as CalendarIcon } from 'lucide-react';
+import { format, parse, isValid, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Calendar } from '@/components/ui/calendar';
+import { Badge } from '@/components/ui/badge';
 
 interface AvailableDatesProps {
   availableSchedules: AvailableSchedule[];
@@ -18,10 +19,12 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
   selectedDate,
   onSelectDate
 }) => {
-  // Function to format date for display
-  const formatDisplayDate = (dateString: string): string => {
+  // Function to parse dates from string to Date object
+  const parseDate = (dateString: string): Date | null => {
     try {
-      let date;
+      if (!dateString) return null;
+      
+      let date: Date | null = null;
       // Check if date is in dd-mm-yyyy or yyyy-mm-dd format
       if (dateString.includes('-') && dateString.split('-').length === 3) {
         const parts = dateString.split('-');
@@ -33,20 +36,67 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
           // Otherwise it's in dd-MM-yyyy format
           date = parse(dateString, 'dd-MM-yyyy', new Date());
         }
-        return format(date, "EEE, dd 'de' MMMM", { locale: ptBR });
       }
-      return dateString;
+      
+      return isValid(date) ? date : null;
     } catch (error) {
-      console.error('Error formatting date:', error, dateString);
-      return dateString;
+      console.error('Error parsing date:', error, dateString);
+      return null;
     }
   };
 
-  // Debug logs to help troubleshoot
-  console.log('Available dates component rendering with:', {
-    schedulesCount: availableSchedules.length,
+  // Get all dates that have available schedules
+  const availableDates: Date[] = availableSchedules
+    .map(schedule => parseDate(schedule.date))
+    .filter((date): date is Date => date !== null);
+
+  // Get currently selected date as Date object
+  const parsedSelectedDate = selectedDate ? parseDate(selectedDate) : null;
+
+  // Function to check if a date has available schedules
+  const isDateAvailable = (date: Date): boolean => {
+    return availableDates.some(availableDate => 
+      availableDate && isSameDay(availableDate, date)
+    );
+  };
+
+  // Function to format date back to string format expected by the API
+  const formatDateToString = (date: Date): string => {
+    // Find the corresponding schedule for this date
+    const matchingSchedule = availableSchedules.find(schedule => {
+      const scheduleDate = parseDate(schedule.date);
+      return scheduleDate && isSameDay(scheduleDate, date);
+    });
+    
+    // If found, return the original string format
+    if (matchingSchedule) {
+      return matchingSchedule.date;
+    }
+    
+    // Fallback: format to yyyy-MM-dd
+    return format(date, 'yyyy-MM-dd');
+  };
+
+  // Function to handle date selection from calendar
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date && isDateAvailable(date)) {
+      const dateString = formatDateToString(date);
+      onSelectDate(dateString);
+    }
+  };
+
+  // Get the count of available times for the selected date
+  const getTimesCountForDate = (dateStr: string): number => {
+    const schedule = availableSchedules.find(s => s.date === dateStr);
+    return schedule ? schedule.times.length : 0;
+  };
+
+  // Debug logs
+  console.log('Calendar component rendering with:', {
+    availableDatesCount: availableDates.length,
     selectedDate,
-    firstSchedule: availableSchedules.length > 0 ? availableSchedules[0] : null
+    parsedSelectedDate,
+    availableSchedules
   });
 
   return (
@@ -54,28 +104,66 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CalendarCheck className="w-5 h-5" />
-          Próximas Datas Disponíveis
+          Datas Disponíveis
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {availableSchedules.map((schedule) => (
-            <Button
-              key={schedule.date}
-              variant={selectedDate === schedule.date ? "default" : "outline"}
-              className="p-3 h-auto justify-start"
-              onClick={() => onSelectDate(schedule.date)}
-            >
-              <div className="text-left">
-                <div className="font-semibold">
-                  {formatDisplayDate(schedule.date)}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {schedule.times.length} horários disponíveis
-                </div>
-              </div>
-            </Button>
-          ))}
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="md:w-1/2">
+            <Calendar
+              mode="single"
+              selected={parsedSelectedDate || undefined}
+              onSelect={handleDateSelect}
+              disabled={(date) => !isDateAvailable(date)}
+              modifiers={{
+                available: availableDates
+              }}
+              modifiersClassNames={{
+                available: "bg-blue-100 text-blue-900 font-bold"
+              }}
+              className="rounded-md border p-3 pointer-events-auto"
+            />
+          </div>
+          <div className="md:w-1/2">
+            <h4 className="font-medium mb-3 flex items-center gap-2">
+              <CalendarIcon className="w-4 h-4" />
+              Próximas datas com horários
+            </h4>
+            <div className="grid grid-cols-1 gap-2 max-h-[260px] overflow-y-auto pr-2">
+              {availableSchedules.map((schedule) => {
+                const date = parseDate(schedule.date);
+                const isSelected = selectedDate === schedule.date;
+                
+                if (!date) return null;
+                
+                return (
+                  <button
+                    key={schedule.date}
+                    className={`text-left p-3 rounded-md border transition-colors ${
+                      isSelected 
+                        ? 'bg-primary border-primary text-primary-foreground' 
+                        : 'hover:bg-accent'
+                    }`}
+                    onClick={() => onSelectDate(schedule.date)}
+                  >
+                    <div className="font-medium">
+                      {format(date, "EEE, dd 'de' MMMM", { locale: ptBR })}
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-sm">
+                        {schedule.times.length} horários
+                      </span>
+                      {isSelected && (
+                        <Badge variant="outline" className="bg-primary/20 border-primary/30">
+                          Selecionado
+                        </Badge>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
