@@ -7,9 +7,11 @@ export const UnityService = {
     try {
       console.log('Calling Feegow API for unities with filters:', { professionalId, specialtyId });
       
-      // We'll still need to fetch all units and then filter them,
-      // since the API doesn't provide filtering by professional and specialty
-      const response = await fetch(`${API_BASE_URL}/api/company/list-unity`, {
+      let url = `${API_BASE_URL}/api/company/list-unity`;
+      
+      // We're still fetching all units and then filtering them client-side
+      // since the API doesn't provide direct filtering by professional and specialty
+      const response = await fetch(url, {
         method: 'GET',
         headers: apiHeaders,
       });
@@ -28,7 +30,7 @@ export const UnityService = {
       // Add matriz if it exists
       if (data.content && data.content.matriz) {
         data.content.matriz.forEach((unit: any) => {
-          if (ALLOWED_UNITS.includes(unit.nome_fantasia)) {
+          if (ALLOWED_UNITS.includes(unit.nome_fantasia) && unit.ExibirAgendamentoOnline === 1) {
             unities.push({
               unity_id: parseInt(unit.unidade_id),
               unity_name: unit.nome_fantasia,
@@ -42,7 +44,7 @@ export const UnityService = {
       // Add unidades if they exist
       if (data.content && data.content.unidades) {
         data.content.unidades.forEach((unit: any) => {
-          if (ALLOWED_UNITS.includes(unit.nome_fantasia)) {
+          if (ALLOWED_UNITS.includes(unit.nome_fantasia) && unit.ExibirAgendamentoOnline === 1) {
             unities.push({
               unity_id: parseInt(unit.unidade_id),
               unity_name: unit.nome_fantasia,

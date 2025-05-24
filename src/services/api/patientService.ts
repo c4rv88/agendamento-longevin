@@ -14,6 +14,7 @@ export const PatientService = {
         headers: apiHeaders,
       });
       const data = await response.json();
+      console.log('Patient search response:', data);
       return data.success && data.data.length > 0 ? data.data[0] : null;
     } catch (error) {
       console.error('Erro ao buscar paciente:', error);
@@ -23,12 +24,39 @@ export const PatientService = {
   
   createPatient: async (patient: Patient): Promise<Patient | null> => {
     try {
+      // Format the date from YYYY-MM-DD to DD-MM-YYYY if it exists
+      let formattedPatient = { ...patient };
+      
+      if (patient.patient_birth) {
+        const [year, month, day] = patient.patient_birth.split('-');
+        formattedPatient.patient_birth = `${day}-${month}-${year}`;
+      }
+      
+      // Ensure CPF has only numbers
+      formattedPatient.patient_cpf = patient.patient_cpf.replace(/\D/g, '');
+      
+      // Ensure phone has only numbers
+      if (patient.patient_phone) {
+        formattedPatient.patient_phone = patient.patient_phone.replace(/\D/g, '');
+      }
+      
+      console.log('Creating patient with data:', formattedPatient);
+      
       const response = await fetch(`${API_BASE_URL}/api/patient/create`, {
         method: 'POST',
         headers: apiHeaders,
-        body: JSON.stringify(patient),
+        body: JSON.stringify({
+          nome_completo: formattedPatient.patient_name,
+          cpf: formattedPatient.patient_cpf,
+          data_nascimento: formattedPatient.patient_birth,
+          telefone: formattedPatient.patient_phone,
+          email: formattedPatient.patient_email,
+          endereco: formattedPatient.patient_address
+        }),
       });
+      
       const data = await response.json();
+      console.log('Patient creation response:', data);
       return data.success ? data.data : null;
     } catch (error) {
       console.error('Erro ao criar paciente:', error);

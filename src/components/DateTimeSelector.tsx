@@ -5,7 +5,7 @@ import { FeegowApiService } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CalendarCheck } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -13,6 +13,8 @@ interface DateTimeSelectorProps {
   selectedDate: string;
   selectedTime: string;
   professionalId: number;
+  unityId?: number;
+  specialtyId?: number;
   onSelectDate: (date: string) => void;
   onSelectTime: (time: string) => void;
 }
@@ -21,6 +23,8 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   selectedDate,
   selectedTime,
   professionalId,
+  unityId,
+  specialtyId,
   onSelectDate,
   onSelectTime,
 }) => {
@@ -40,7 +44,12 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
         setLoading(true);
         setError(null);
         
-        const schedules = await FeegowApiService.getAvailableSchedules(professionalId);
+        const schedules = await FeegowApiService.getAvailableSchedules(
+          professionalId,
+          unityId,
+          specialtyId
+        );
+        
         setAvailableSchedules(schedules);
         
         // Automatically select the first available date if there is one
@@ -61,11 +70,35 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     };
 
     fetchAvailableSchedules();
-  }, [professionalId, onSelectDate, onSelectTime]);
+  }, [professionalId, unityId, specialtyId, onSelectDate, onSelectTime]);
 
   const getAvailableTimesForDate = (date: string): string[] => {
     const schedule = availableSchedules.find(s => s.date === date);
     return schedule ? schedule.times : [];
+  };
+
+  // Function to format date for display
+  const formatDisplayDate = (dateString: string): string => {
+    try {
+      // Check if date is in dd-mm-yyyy format
+      if (dateString.includes('-') && dateString.split('-').length === 3) {
+        const [day, month, year] = dateString.split('-');
+        // Parse in dd-mm-yyyy format
+        if (day.length === 2) {
+          const date = parse(dateString, 'dd-MM-yyyy', new Date());
+          return format(date, "dd 'de' MMMM", { locale: ptBR });
+        } 
+        // Parse in yyyy-mm-dd format
+        else {
+          const date = parse(dateString, 'yyyy-MM-dd', new Date());
+          return format(date, "dd 'de' MMMM", { locale: ptBR });
+        }
+      }
+      return dateString;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateString;
+    }
   };
 
   if (loading) {
@@ -152,7 +185,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
               >
                 <div className="text-left">
                   <div className="font-semibold">
-                    {format(new Date(schedule.date), "dd 'de' MMMM", { locale: ptBR })}
+                    {formatDisplayDate(schedule.date)}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {schedule.times.length} horários disponíveis
@@ -168,7 +201,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
         <Card className="w-full">
           <CardHeader>
             <CardTitle>
-              Horários Disponíveis - {format(new Date(selectedDate), "dd 'de' MMMM", { locale: ptBR })}
+              Horários Disponíveis - {formatDisplayDate(selectedDate)}
             </CardTitle>
           </CardHeader>
           <CardContent>
