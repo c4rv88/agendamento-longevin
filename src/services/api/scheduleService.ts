@@ -17,10 +17,12 @@ export const ScheduleService = {
       today.setDate(today.getDate() + 2); // Add 2 days to current date
       const startDate = formatDate(today);
       
-      // Format date as dd-mm-YYYY (30 days after start date)
+      // Format date as dd-mm-YYYY (60 days after start date)
       const endDate = new Date(today);
-      endDate.setDate(today.getDate() + 30);
+      endDate.setDate(today.getDate() + 60); // Changed from 30 to 60 days
       const endDateStr = formatDate(endDate);
+      
+      console.log('Date range:', { startDate, endDateStr });
       
       // Build the URL with the required and optional parameters
       let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${profissional_id}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
