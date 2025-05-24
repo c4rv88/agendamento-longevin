@@ -1,13 +1,15 @@
 
 import React from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
-import { UnitySelector } from '@/components/UnitySelector';
-import { SpecialtySelector } from '@/components/SpecialtySelector';
-import { ProfessionalSelector } from '@/components/ProfessionalSelector';
-import { InsuranceSelector } from '@/components/InsuranceSelector';
-import { DateTimeSelector } from '@/components/DateTimeSelector';
-import { PatientForm } from '@/components/PatientForm';
-import { AppointmentSummary } from '@/components/AppointmentSummary';
+import {
+  UnityStep,
+  SpecialtyStep,
+  ProfessionalStep,
+  InsuranceStep,
+  DateTimeStep,
+  PatientStep,
+  SummaryStep
+} from './steps';
 
 interface AppointmentStepContentProps {
   currentStep: number;
@@ -25,79 +27,62 @@ export const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
   switch (currentStep) {
     case 1: // Unidade
       return (
-        <UnitySelector
+        <UnityStep
           selectedUnity={state.selectedUnity}
-          onSelect={(unity) => {
-            // Clear related selections when changing unity
-            updateState({ 
-              selectedUnity: unity,
-              selectedSpecialty: null,
-              selectedProfessional: null,
-              selectedInsurance: null
-            });
-          }}
+          updateState={updateState}
         />
       );
     case 2: // Especialidade
       return (
-        <SpecialtySelector
+        <SpecialtyStep
           selectedSpecialty={state.selectedSpecialty}
           unityId={state.selectedUnity?.unity_id}
-          onSelect={(specialty) => {
-            // Clear professionals when selecting a new specialty
-            updateState({ 
-              selectedSpecialty: specialty,
-              selectedProfessional: null,
-              selectedInsurance: null
-            });
-          }}
+          updateState={updateState}
         />
       );
     case 3: // Profissional
       return (
-        <ProfessionalSelector
+        <ProfessionalStep
           selectedProfessional={state.selectedProfessional}
           specialtyId={state.selectedSpecialty?.specialty_id}
           unityId={state.selectedUnity?.unity_id}
-          onSelect={(professional) => {
-            // Clear insurance when selecting a new professional
-            updateState({ 
-              selectedProfessional: professional,
-              selectedInsurance: null
-            });
-          }}
+          updateState={updateState}
         />
       );
     case 4: // Convênio
       return (
-        <InsuranceSelector
+        <InsuranceStep
           selectedInsurance={state.selectedInsurance}
           professionalId={state.selectedProfessional?.professional_id}
-          onSelect={(insurance) => updateState({ selectedInsurance: insurance })}
+          updateState={updateState}
         />
       );
     case 5: // Data/Hora
       return (
-        <DateTimeSelector
+        <DateTimeStep
           selectedDate={state.selectedDate}
           selectedTime={state.selectedTime}
           professionalId={state.selectedProfessional?.professional_id!}
           unityId={state.selectedUnity?.unity_id}
           specialtyId={state.selectedSpecialty?.specialty_id}
           insuranceId={state.selectedInsurance?.insurance_id}
-          onSelectDate={(date) => updateState({ selectedDate: date })}
-          onSelectTime={(time) => updateState({ selectedTime: time })}
+          updateState={updateState}
         />
       );
     case 6: // Paciente
       return (
-        <PatientForm
+        <PatientStep
           patient={state.patient}
-          onPatientUpdate={(patient) => updateState({ patient })}
+          updateState={updateState}
         />
       );
     case 7: // Confirmação
-      return <AppointmentSummary appointmentData={state} onConfirm={resetFlow} />;
+      return (
+        <SummaryStep
+          appointmentData={state}
+          resetFlow={resetFlow}
+        />
+      );
     default:
       return null;
   }
