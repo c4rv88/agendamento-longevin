@@ -84,6 +84,7 @@ export const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
           professionalId={state.selectedProfessional?.professional_id!}
           unityId={state.selectedUnity?.unity_id}
           specialtyId={state.selectedSpecialty?.specialty_id}
+          insuranceId={state.selectedInsurance?.insurance_id}
           onSelectDate={(date) => updateState({ selectedDate: date })}
           onSelectTime={(time) => updateState({ selectedTime: time })}
         />

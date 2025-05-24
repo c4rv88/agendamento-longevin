@@ -25,15 +25,15 @@ export const ScheduleService = {
       // Build the URL with the required and optional parameters
       let url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${professionalId}&tipo=p&procedimento_id=1&data_start=${startDate}&data_end=${endDateStr}`;
       
-      if (unityId) {
+      if (unityId && unityId > 0) {
         url += `&unidade_id=${unityId}`;
       }
       
-      if (specialtyId) {
+      if (specialtyId && specialtyId > 0) {
         url += `&especialidade_id=${specialtyId}`;
       }
       
-      if (insuranceId) {
+      if (insuranceId && insuranceId > 0) {
         url += `&convenio_id=${insuranceId}`;
       }
       
@@ -47,48 +47,48 @@ export const ScheduleService = {
       const data = await response.json();
       console.log('API response for available schedules:', data);
       
-      if (!data.success) {
-        console.error('API returned error:', data);
-        return [];
-      }
-      
       // Transform the API response structure to get the available dates and times
       const schedules: AvailableSchedule[] = [];
       
-      // Handle the new JSON structure
+      // Check if data is an array with success property
       if (Array.isArray(data) && data[0]?.success) {
         const content = data[0].content;
-        const professionalData = content?.profissional_id?.[professionalId];
         
-        if (professionalData) {
-          const localData = professionalData.local_id || {};
+        // Handle the nested structure with profissional_id
+        if (content && content.profissional_id) {
+          // Get the professional data using the professionalId as key or first available
+          const professionalDataKey = Object.keys(content.profissional_id)[0];
+          const professionalData = content.profissional_id[professionalDataKey];
           
-          // Find the correct local_id data
-          let datesAndTimes = {};
-          if (unityId && localData[unityId]) {
-            datesAndTimes = localData[unityId];
-          } else {
-            // If no specific unity is selected, use the first one
-            const firstLocalId = Object.keys(localData)[0];
-            if (firstLocalId) {
-              datesAndTimes = localData[firstLocalId];
+          if (professionalData && professionalData.local_id) {
+            // Get local_id data - either for specific unityId or first available
+            const localDataKeys = Object.keys(professionalData.local_id);
+            let localData = null;
+            
+            if (unityId && professionalData.local_id[unityId]) {
+              localData = professionalData.local_id[unityId];
+            } else if (localDataKeys.length > 0) {
+              // Use the first available local_id if no specific unityId is requested
+              localData = professionalData.local_id[localDataKeys[0]];
             }
-          }
-          
-          // Transform dates and times into our format
-          Object.entries(datesAndTimes).forEach(([date, times]) => {
-            if (Array.isArray(times) && times.length > 0) {
-              schedules.push({
-                date: date,
-                times: times as string[],
-                professional_id: professionalId
+            
+            // Transform dates and times into our format
+            if (localData) {
+              Object.entries(localData).forEach(([date, times]) => {
+                if (Array.isArray(times) && times.length > 0) {
+                  schedules.push({
+                    date: date,
+                    times: times as string[],
+                    professional_id: parseInt(professionalDataKey, 10)
+                  });
+                }
               });
             }
-          });
+          }
         }
-      } else if (data.success && data.content) {
-        // Handle the original JSON structure we were expecting before
-        if (data.content && Array.isArray(data.content)) {
+      } else if (!Array.isArray(data) && data.success && data.content) {
+        // Handle the original JSON structure
+        if (Array.isArray(data.content)) {
           data.content.forEach((dateItem: any) => {
             if (dateItem.date && dateItem.horarios && dateItem.horarios.length > 0) {
               schedules.push({
@@ -126,7 +126,38 @@ export const ScheduleService = {
       const data = await response.json();
       console.log('API response for single day schedule:', data);
       
-      return data.success && data.data ? data.data : null;
+      // Process the response similar to getAvailableSchedules
+      let schedule: AvailableSchedule | null = null;
+      
+      if (Array.isArray(data) && data[0]?.success) {
+        const content = data[0].content;
+        if (content && content.profissional_id) {
+          const professionalDataKey = Object.keys(content.profissional_id)[0];
+          const professionalData = content.profissional_id[professionalDataKey];
+          
+          if (professionalData && professionalData.local_id) {
+            const localDataKeys = Object.keys(professionalData.local_id);
+            let times: string[] = [];
+            
+            if (localDataKeys.length > 0) {
+              const localData = professionalData.local_id[localDataKeys[0]];
+              if (localData && localData[formattedDate] && Array.isArray(localData[formattedDate])) {
+                times = localData[formattedDate] as string[];
+              }
+            }
+            
+            if (times.length > 0) {
+              schedule = {
+                date: formattedDate,
+                times: times,
+                professional_id: parseInt(professionalDataKey, 10)
+              };
+            }
+          }
+        }
+      }
+      
+      return schedule;
     } catch (error) {
       console.error('Erro ao buscar horários disponíveis para o dia:', error);
       return null;
