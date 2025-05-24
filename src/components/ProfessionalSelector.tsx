@@ -21,17 +21,26 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
 }) => {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfessionals = async () => {
-      if (!unityId || !specialtyId) return;
+      if (!unityId || !specialtyId) {
+        setLoading(false);
+        setError('Por favor, selecione unidade e especialidade primeiro.');
+        return;
+      }
       
       try {
+        console.log('Fetching professionals with:', { unityId, specialtyId });
         setLoading(true);
+        setError(null);
         const data = await FeegowApiService.getProfessionals(unityId, specialtyId);
+        console.log('Professionals fetched:', data);
         setProfessionals(data);
       } catch (error) {
         console.error('Erro ao carregar profissionais:', error);
+        setError('Falha ao carregar profissionais. Por favor, tente novamente.');
       } finally {
         setLoading(false);
       }
@@ -54,6 +63,49 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-16 bg-gray-200 rounded-lg animate-pulse" />
             ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="w-5 h-5" />
+            Selecione o Profissional
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center">
+            <p className="text-red-500">{error}</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="mt-4"
+              variant="outline"
+            >
+              Tentar Novamente
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (professionals.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="w-5 h-5" />
+            Selecione o Profissional
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center">
+            <p className="text-gray-500">Nenhum profissional encontrado para esta especialidade nesta unidade.</p>
           </div>
         </CardContent>
       </Card>

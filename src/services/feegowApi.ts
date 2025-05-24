@@ -101,6 +101,8 @@ export class FeegowApiService {
 
   static async getProfessionals(unityId?: number, specialtyId?: number): Promise<Professional[]> {
     try {
+      console.log('Calling Feegow API for professionals with params:', { unityId, specialtyId });
+      
       let url = `${API_BASE_URL}/api/professional/list`;
       const params = new URLSearchParams();
       
@@ -110,13 +112,39 @@ export class FeegowApiService {
       if (params.toString()) {
         url += `?${params.toString()}`;
       }
+      
+      console.log('Request URL:', url);
 
       const response = await fetch(url, {
         method: 'GET',
         headers: apiHeaders,
       });
+      
       const data = await response.json();
-      return data.success ? data.data : [];
+      console.log('API response for professionals:', data);
+      
+      if (!data.success) {
+        console.error('API returned error:', data);
+        return [];
+      }
+      
+      // Transformar a resposta da API no formato Professional[]
+      const professionals: Professional[] = [];
+      
+      if (data.content) {
+        data.content.forEach((prof: any) => {
+          professionals.push({
+            professional_id: parseInt(prof.profissional_id),
+            professional_name: prof.nome,
+            professional_email: prof.email || '',
+            specialty_id: specialtyId,
+            unity_id: unityId
+          });
+        });
+      }
+      
+      console.log('Transformed professionals:', professionals);
+      return professionals;
     } catch (error) {
       console.error('Erro ao buscar profissionais:', error);
       return [];
