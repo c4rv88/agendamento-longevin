@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
 import { PatientForm } from '@/components/PatientForm';
+import { useToast } from '@/hooks/use-toast';
 
 interface PatientStepProps {
   patient: AppointmentState['patient'];
