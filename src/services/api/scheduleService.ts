@@ -18,7 +18,6 @@ export const ScheduleService = {
       
       // Format date as dd-mm-YYYY (3 months from now)
       const endDate = new Date();
-      endDate.setDate(today.getDate());
       endDate.setMonth(today.getMonth() + 3);
       const endDateStr = formatDate(endDate);
       
@@ -32,7 +31,7 @@ export const ScheduleService = {
         url += `&especialidade_id=${specialtyId}`;
       }
       
-      console.log('Request URL:', url);
+      console.log('Schedule request URL:', url);
       
       const response = await fetch(url, {
         method: 'GET',
@@ -76,14 +75,20 @@ export const ScheduleService = {
       const formattedDate = date.includes('-') && date.split('-').length === 3 ? 
         formatDateFromISO(date) : date;
       
-      const response = await fetch(`${API_BASE_URL}/api/appoints/available-schedule?professional_id=${professionalId}&date=${formattedDate}&tipo=A`, {
+      const url = `${API_BASE_URL}/api/appoints/available-schedule?profissional_id=${professionalId}&date=${formattedDate}&tipo=A`;
+      console.log('Single day schedule request URL:', url);
+      
+      const response = await fetch(url, {
         method: 'GET',
         headers: apiHeaders,
       });
+      
       const data = await response.json();
-      return data.success ? data.data : null;
+      console.log('API response for single day schedule:', data);
+      
+      return data.success && data.data ? data.data : null;
     } catch (error) {
-      console.error('Erro ao buscar horários disponíveis:', error);
+      console.error('Erro ao buscar horários disponíveis para o dia:', error);
       return null;
     }
   }

@@ -10,12 +10,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 interface ProfessionalSelectorProps {
   selectedProfessional: Professional | null;
   specialtyId?: number;
+  unityId?: number;
   onSelect: (professional: Professional) => void;
 }
 
 export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({ 
   selectedProfessional, 
-  specialtyId, 
+  specialtyId,
+  unityId,
   onSelect 
 }) => {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
@@ -31,10 +33,10 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
       }
       
       try {
-        console.log('Fetching professionals with specialty ID:', specialtyId);
+        console.log('Fetching professionals with filters:', { specialtyId, unityId });
         setLoading(true);
         setError(null);
-        const data = await FeegowApiService.getProfessionals(specialtyId);
+        const data = await FeegowApiService.getProfessionals(specialtyId, unityId);
         console.log('Professionals fetched:', data);
         setProfessionals(data);
       } catch (error) {
@@ -46,7 +48,7 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
     };
 
     fetchProfessionals();
-  }, [specialtyId]);
+  }, [specialtyId, unityId]);
 
   if (loading) {
     return (

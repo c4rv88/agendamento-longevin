@@ -9,15 +9,24 @@ export const UnityService = {
       
       let url = `${API_BASE_URL}/api/company/list-unity`;
       
-      // We're still fetching all units and then filtering them client-side
-      // since the API doesn't provide direct filtering by professional and specialty
+      // Add query parameters if provided
+      const params = new URLSearchParams();
+      if (professionalId) params.append('professional_id', professionalId.toString());
+      if (specialtyId) params.append('specialty_id', specialtyId.toString());
+      
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+      
+      console.log('Unity request URL:', url);
+      
       const response = await fetch(url, {
         method: 'GET',
         headers: apiHeaders,
       });
       
       const data = await response.json();
-      console.log('API response:', data);
+      console.log('API response for unities:', data);
       
       if (!data.success) {
         console.error('API returned error:', data);

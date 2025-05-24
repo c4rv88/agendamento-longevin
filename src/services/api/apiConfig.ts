@@ -10,5 +10,6 @@ export const apiHeaders = {
   'Host': 'api.feegow.com/v1'
 };
 
-// List of allowed unit names
+// List of allowed unit names - these should match exactly what's in the API response
 export const ALLOWED_UNITS = ['ISV - Papicu', 'ISV - Meireles', 'ISV - Oliveira Paiva'];
+
