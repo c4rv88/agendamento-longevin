@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { User } from 'lucide-react';
+import { User, MessageCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -42,9 +42,9 @@ export const PatientData: React.FC<PatientDataProps> = ({
   };
   
   return (
-    <Card className="w-full">
+    <Card className="w-full bg-white/80 backdrop-blur-sm border-blue-200">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-blue-700">
           <User className="w-5 h-5" />
           Dados do Paciente
         </CardTitle>
@@ -52,7 +52,7 @@ export const PatientData: React.FC<PatientDataProps> = ({
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="name" className={errors.patient_name ? "text-destructive" : ""}>
+            <Label htmlFor="name" className={errors.patient_name ? "text-destructive" : "text-blue-700"}>
               Nome Completo *
             </Label>
             <Input
@@ -61,14 +61,14 @@ export const PatientData: React.FC<PatientDataProps> = ({
               value={formData.patient_name}
               onChange={(e) => onInputChange('patient_name', e.target.value)}
               required
-              className={errors.patient_name ? "border-destructive" : ""}
+              className={errors.patient_name ? "border-destructive" : "border-blue-200 focus:border-blue-400"}
             />
             {errors.patient_name && (
               <p className="text-xs text-destructive mt-1">{errors.patient_name}</p>
             )}
           </div>
           <div>
-            <Label htmlFor="cpf" className={errors.patient_cpf ? "text-destructive" : ""}>
+            <Label htmlFor="cpf" className={errors.patient_cpf ? "text-destructive" : "text-blue-700"}>
               CPF *
             </Label>
             <Input
@@ -78,14 +78,14 @@ export const PatientData: React.FC<PatientDataProps> = ({
               onChange={handleCpfChange}
               maxLength={14}
               required
-              className={errors.patient_cpf ? "border-destructive" : ""}
+              className={errors.patient_cpf ? "border-destructive" : "border-blue-200 focus:border-blue-400"}
             />
             {errors.patient_cpf && (
               <p className="text-xs text-destructive mt-1">{errors.patient_cpf}</p>
             )}
           </div>
           <div>
-            <Label htmlFor="email" className={errors.patient_email ? "text-destructive" : ""}>
+            <Label htmlFor="email" className={errors.patient_email ? "text-destructive" : "text-blue-700"}>
               E-mail
             </Label>
             <Input
@@ -94,15 +94,16 @@ export const PatientData: React.FC<PatientDataProps> = ({
               placeholder="email@exemplo.com"
               value={formData.patient_email || ''}
               onChange={handleEmailChange}
-              className={errors.patient_email ? "border-destructive" : ""}
+              className={errors.patient_email ? "border-destructive" : "border-blue-200 focus:border-blue-400"}
             />
             {errors.patient_email && (
               <p className="text-xs text-destructive mt-1">{errors.patient_email}</p>
             )}
           </div>
           <div>
-            <Label htmlFor="phone" className={errors.patient_phone ? "text-destructive" : ""}>
-              Telefone *
+            <Label htmlFor="phone" className={errors.patient_phone ? "text-destructive" : "text-blue-700 flex items-center gap-1"}>
+              <MessageCircle className="w-3 h-3 text-green-500" />
+              Celular *
             </Label>
             <Input
               id="phone"
@@ -111,14 +112,14 @@ export const PatientData: React.FC<PatientDataProps> = ({
               onChange={(e) => onInputChange('patient_phone', validatePhoneInput(e.target.value))}
               maxLength={15}
               required
-              className={errors.patient_phone ? "border-destructive" : ""}
+              className={errors.patient_phone ? "border-destructive" : "border-blue-200 focus:border-blue-400"}
             />
             {errors.patient_phone && (
               <p className="text-xs text-destructive mt-1">{errors.patient_phone}</p>
             )}
           </div>
           <div>
-            <Label htmlFor="birth" className={errors.patient_birth ? "text-destructive" : ""}>
+            <Label htmlFor="birth" className={errors.patient_birth ? "text-destructive" : "text-blue-700"}>
               Data de Nascimento *
             </Label>
             <Input
@@ -127,14 +128,14 @@ export const PatientData: React.FC<PatientDataProps> = ({
               value={formData.patient_birth || ''}
               onChange={(e) => onInputChange('patient_birth', e.target.value)}
               required
-              className={errors.patient_birth ? "border-destructive" : ""}
+              className={errors.patient_birth ? "border-destructive" : "border-blue-200 focus:border-blue-400"}
             />
             {errors.patient_birth && (
               <p className="text-xs text-destructive mt-1">{errors.patient_birth}</p>
             )}
           </div>
         </div>
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-blue-600/70">
           * Campos obrigatórios
         </div>
         
