@@ -1,5 +1,5 @@
 
-import { API_BASE_URL, apiHeaders } from './apiConfig';
+import { API_BASE_URL, apiHeaders, getUnitIdByName } from './apiConfig';
 
 export const AppointmentService = {
   createAppointment: async (appointmentData: any): Promise<boolean> => {
@@ -16,28 +16,45 @@ export const AppointmentService = {
         }
         // Se já está em DD-MM-YYYY, manter como está
       }
+
+      // Get the correct local_id based on unity name
+      const localId = appointmentData.unity_name 
+        ? getUnitIdByName(appointmentData.unity_name)
+        : appointmentData.unity_id || 0;
       
       console.log('Creating appointment with data:', formattedData);
+      
+      const requestBody = {
+        local_id: localId,
+        paciente_id: formattedData.patient_id,
+        profissional_id: formattedData.professional_id,
+        especialidade_id: formattedData.specialty_id,
+        procedimento_id: 1, // Always 1 as specified
+        data: formattedData.date,
+        hora: formattedData.time,
+        valor: '0.00', // Always 0.00 as specified
+        plano: 1, // Always 1 as specified
+        convenio_id: formattedData.insurance_id || 0,
+        notas: 'agende-isv', // As specified
+        celular: formattedData.patient_phone?.replace(/\D/g, '') || ''
+      };
+
+      console.log('Sending appointment request with body:', requestBody);
       
       const response = await fetch(`${API_BASE_URL}/api/appoints/new-appoint`, {
         method: 'POST',
         headers: apiHeaders,
-        body: JSON.stringify({
-          local_id: formattedData.unity_id,
-          paciente_id: formattedData.patient_id,
-          profissional_id: formattedData.professional_id,
-          especialidade_id: formattedData.specialty_id,
-          procedimento_id: 1, // ID for consultation
-          data: formattedData.date,
-          hora: formattedData.time,
-          convenio_id: formattedData.insurance_id || 0,
-          valor: '0.00', // Adding the value parameter as requested
-          celular: formattedData.patient_phone?.replace(/\D/g, '')
-        }),
+        body: JSON.stringify(requestBody),
       });
       
       const data = await response.json();
       console.log('Appointment creation response:', data);
+      
+      if (!response.ok) {
+        console.error('API Error Response:', data);
+        throw new Error(`API Error: ${JSON.stringify(data)}`);
+      }
+      
       return data.success;
     } catch (error) {
       console.error('Erro ao criar agendamento:', error);

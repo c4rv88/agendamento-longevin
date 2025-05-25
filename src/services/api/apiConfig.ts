@@ -18,3 +18,8 @@ export const UNIT_IDS = {
 
 // List of allowed unit names - these should match exactly what's in the API response
 export const ALLOWED_UNITS = ['ISV - Papicu', 'ISV - Meireles', 'ISV - Oliveira Paiva'];
+
+// Function to get unit ID by name
+export const getUnitIdByName = (unitName: string): number => {
+  return UNIT_IDS[unitName as keyof typeof UNIT_IDS] || 0;
+};

@@ -15,23 +15,28 @@ export const useAppointmentConfirmation = () => {
       // Se o paciente não tem ID, criar primeiro
       let patientData = appointmentData.patient;
       if (!patientData?.patient_id) {
+        console.log('Creating new patient...');
         patientData = await FeegowApiService.createPatient(appointmentData.patient!);
         if (!patientData) {
           throw new Error('Erro ao criar paciente');
         }
+        console.log('Patient created with ID:', patientData.patient_id);
       }
 
-      // Criar agendamento
+      // Criar agendamento com todos os campos obrigatórios
       const appointmentPayload = {
         unity_id: appointmentData.selectedUnity?.unity_id,
+        unity_name: appointmentData.selectedUnity?.unity_name,
         specialty_id: appointmentData.selectedSpecialty?.specialty_id,
         professional_id: appointmentData.selectedProfessional?.professional_id,
         insurance_id: appointmentData.selectedInsurance?.insurance_id,
         date: appointmentData.selectedDate,
         time: appointmentData.selectedTime,
         patient_id: patientData.patient_id,
-        notes: 'Agendamento via sistema online',
+        patient_phone: patientData.patient_phone,
       };
+
+      console.log('Appointment payload:', appointmentPayload);
 
       const success = await FeegowApiService.createAppointment(appointmentPayload);
       
@@ -45,6 +50,7 @@ export const useAppointmentConfirmation = () => {
         throw new Error('Erro ao criar agendamento');
       }
     } catch (error) {
+      console.error('Error in appointment confirmation:', error);
       toast({
         title: "Erro no agendamento",
         description: "Ocorreu um erro ao confirmar o agendamento. Tente novamente.",
