@@ -56,13 +56,13 @@ export const PatientService = {
       let formattedPatient = { ...patient };
       
       if (patient.patient_birth) {
-        // Verificar se a data está no formato YYYY-MM-DD
-        if (patient.patient_birth.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          // Converter de YYYY-MM-DD para DD-MM-YYYY
-          const [year, month, day] = patient.patient_birth.split('-');
-          formattedPatient.patient_birth = `${day}-${month}-${year}`;
+        // Verificar se a data está no formato DD-MM-YYYY e converter para YYYY-MM-DD
+        if (patient.patient_birth.match(/^\d{2}-\d{2}-\d{4}$/)) {
+          // Converter de DD-MM-YYYY para YYYY-MM-DD
+          const [day, month, year] = patient.patient_birth.split('-');
+          formattedPatient.patient_birth = `${year}-${month}-${day}`;
         }
-        // Se já está em DD-MM-YYYY, manter como está
+        // Se já está em YYYY-MM-DD, manter como está
       }
       
       // Ensure CPF has only numbers
