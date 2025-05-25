@@ -41,10 +41,13 @@ export const AppointmentSummary: React.FC<AppointmentSummaryProps> = ({
           <Button
             onClick={onConfirm}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-800 via-white to-blue-800 text-blue-900 hover:from-blue-900 hover:via-blue-50 hover:to-blue-900 border border-blue-800"
+            className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-700 hover:via-blue-600 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] disabled:hover:scale-100 disabled:hover:shadow-lg"
             size="lg"
           >
-            {loading ? 'Confirmando...' : 'Confirmar Agendamento'}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <span className="relative z-10 font-medium">
+              {loading ? 'Confirmando...' : 'Confirmar Agendamento'}
+            </span>
           </Button>
         </div>
       </CardContent>
