@@ -23,7 +23,13 @@ export const useAppointmentConfirmation = () => {
         console.log('Patient created with ID:', patientData.patient_id);
       }
 
-      // Criar agendamento com todos os campos obrigatórios
+      // Garantir que temos um patient_id válido
+      const patientId = patientData.patient_id;
+      if (!patientId) {
+        throw new Error('ID do paciente não encontrado');
+      }
+
+      // Criar agendamento com o ID do paciente correto
       const appointmentPayload = {
         unity_id: appointmentData.selectedUnity?.unity_id,
         unity_name: appointmentData.selectedUnity?.unity_name,
@@ -32,11 +38,11 @@ export const useAppointmentConfirmation = () => {
         insurance_id: appointmentData.selectedInsurance?.insurance_id,
         date: appointmentData.selectedDate,
         time: appointmentData.selectedTime,
-        patient_id: patientData.patient_id,
+        patient_id: patientId, // Usar o ID do paciente criado/existente
         patient_phone: patientData.patient_phone,
       };
 
-      console.log('Appointment payload:', appointmentPayload);
+      console.log('Appointment payload with patient ID:', appointmentPayload);
 
       const success = await FeegowApiService.createAppointment(appointmentPayload);
       
