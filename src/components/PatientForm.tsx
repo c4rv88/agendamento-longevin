@@ -3,6 +3,7 @@ import { Patient } from '@/types/feegow';
 import { PatientSearch } from '@/components/patient/PatientSearch';
 import { PatientData } from '@/components/patient/PatientData';
 import { maskEmail, maskPhone } from '@/utils/formatters';
+import { getCpfValidationError } from '@/utils/cpfValidator';
 import { useToast } from '@/hooks/use-toast';
 
 interface PatientFormProps {
@@ -49,11 +50,10 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
       newErrors.patient_name = 'Nome deve ter pelo menos 3 caracteres';
     }
     
-    // Validate CPF
-    if (!data.patient_cpf || data.patient_cpf.replace(/\D/g, '').length === 0) {
-      newErrors.patient_cpf = 'CPF é obrigatório';
-    } else if (data.patient_cpf.replace(/\D/g, '').length !== 11) {
-      newErrors.patient_cpf = 'CPF deve ter 11 dígitos';
+    // Validate CPF using the new validator
+    const cpfError = getCpfValidationError(data.patient_cpf);
+    if (cpfError) {
+      newErrors.patient_cpf = cpfError;
     }
     
     // Validate phone
@@ -78,31 +78,24 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
   };
 
   const handlePatientFound = (foundPatient: Patient) => {
-    // Store original sensitive data
     setOriginalData({
       patient_email: foundPatient.patient_email || '',
       patient_phone: foundPatient.patient_phone || '',
     });
 
-    // Create masked version for display but keep phone editable
     const maskedPatient = {
       ...foundPatient,
       patient_email: maskEmail(foundPatient.patient_email || ''),
-      // Don't mask the phone anymore - keep it editable
       patient_phone: foundPatient.patient_phone || '',
-      // Remove address for privacy
       patient_address: '',
     };
 
     setFormData(maskedPatient);
-    // Keep original data in what we pass to the parent
     onPatientUpdate({
       ...foundPatient,
-      // Still remove address as requested
       patient_address: '',
     });
 
-    // Clear any existing errors when a patient is found
     setErrors({});
   };
 
@@ -120,12 +113,9 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
     const updatedData = { ...formData, [field]: value };
     setFormData(updatedData);
     
-    // Run validation on the updated data
     const isValid = validateForm(updatedData);
     
-    // If updating email and we have original values, keep them for submission
     if (field === 'patient_email' && originalData[field]) {
-      // User is changing the masked field, override original data
       setOriginalData(prev => ({
         ...prev,
         [field]: value,
@@ -138,11 +128,9 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
         });
       }
     } else {
-      // For other fields or when originals don't exist
       if (isValid) {
         onPatientUpdate({
           ...updatedData,
-          // Always restore original email if it exists, but phone is now always the current value
           patient_email: originalData.patient_email || updatedData.patient_email,
           patient_phone: updatedData.patient_phone,
         });

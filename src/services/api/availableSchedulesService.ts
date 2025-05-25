@@ -10,6 +10,7 @@ import { processScheduleData, generateMockScheduleData } from './scheduleDataPro
 export const AvailableSchedulesService = {
   /**
    * Get available schedules for a professional with optional filters
+   * Tries progressively: 30 days, then 60 days, then 90 days if no schedules found
    */
   getAvailableSchedules: async (
     profissional_id: number, 
@@ -30,57 +31,69 @@ export const AvailableSchedulesService = {
         return [];
       }
       
-      // Get date range (starting 2 days from today, ending 30 days later)
-      const { startDate, endDateStr } = getDateRange(2, 30);
-      
-      console.log('Date range for schedule search:', { startDate, endDateStr });
-      
       // Ensure all parameters are numbers and sanitize
       const sanitizedProfessionalId = Number(profissional_id);
       const sanitizedUnityId = Number(unidade_id || 0);
       const sanitizedSpecialtyId = Number(especialidade_id || 0);
       const sanitizedInsuranceId = Number(convenio_id || 0);
       
-      // Build the URL with the required parameters in the specified order
-      let url = `${API_BASE_URL}/api/appoints/available-schedule?`;
+      // Try different date ranges progressively
+      const dateRanges = [30, 60, 90];
       
-      // Params in the requested order
-      url += `tipo=P`;  // Uppercase P as requested
-      url += `&procedimento_id=1`;
-      url += `&data_start=${startDate}`;
-      url += `&data_end=${endDateStr}`;
-      url += `&unidade_id=${sanitizedUnityId}`;
-      url += `&profissional_id=${sanitizedProfessionalId}`;
-      url += `&convenio_id=${sanitizedInsuranceId}`;
-      
-      // Add specialty parameter (wasn't in the specified order but still needed)
-      if (sanitizedSpecialtyId > 0) {
-        url += `&especialidade_id=${sanitizedSpecialtyId}`;
+      for (const days of dateRanges) {
+        console.log(`Trying to fetch schedules for ${days} days...`);
+        
+        // Get date range (starting 2 days from today, ending X days later)
+        const { startDate, endDateStr } = getDateRange(2, days);
+        
+        console.log(`Date range for ${days} days:`, { startDate, endDateStr });
+        
+        // Build the URL with the required parameters in the specified order
+        let url = `${API_BASE_URL}/api/appoints/available-schedule?`;
+        
+        // Params in the requested order
+        url += `tipo=P`;  // Uppercase P as requested
+        url += `&procedimento_id=1`;
+        url += `&data_start=${startDate}`;
+        url += `&data_end=${endDateStr}`;
+        url += `&unidade_id=${sanitizedUnityId}`;
+        url += `&profissional_id=${sanitizedProfessionalId}`;
+        url += `&convenio_id=${sanitizedInsuranceId}`;
+        
+        // Add specialty parameter
+        if (sanitizedSpecialtyId > 0) {
+          url += `&especialidade_id=${sanitizedSpecialtyId}`;
+        }
+        
+        console.log(`Schedule API request URL for ${days} days:`, url);
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: apiHeaders,
+        });
+        
+        const data = await response.json();
+        console.log(`API response for ${days} days:`, data);
+        
+        // If API returns success and has schedules, process them
+        if (data.success) {
+          const schedules = processScheduleData(data, sanitizedProfessionalId, sanitizedUnityId);
+          
+          if (schedules.length > 0) {
+            console.log(`Found ${schedules.length} schedules with ${days} days range`);
+            return schedules;
+          }
+        }
+        
+        console.log(`No schedules found for ${days} days, trying next range...`);
       }
       
-      console.log('Schedule API request URL:', url);
+      // If no schedules found in any range, use mock data for testing
+      console.log('No schedules found in any date range, using mock data');
+      const today = new Date();
+      today.setDate(today.getDate() + 2); // Add 2 days to current date
+      return generateMockScheduleData(sanitizedProfessionalId, today);
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: apiHeaders,
-      });
-      
-      const data = await response.json();
-      console.log('API response for available schedules:', data);
-      
-      // Mock data for testing when API returns error
-      if (!data.success) {
-        console.log('Using mock data because API returned error');
-        const today = new Date();
-        today.setDate(today.getDate() + 2); // Add 2 days to current date
-        return generateMockScheduleData(sanitizedProfessionalId, today);
-      }
-      
-      // Process the API response
-      const schedules = processScheduleData(data, sanitizedProfessionalId, sanitizedUnityId);
-      
-      console.log('Available schedules processed:', schedules);
-      return schedules;
     } catch (error) {
       console.error('Erro ao buscar horários disponíveis:', error);
       return [];

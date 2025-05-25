@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Patient } from '@/types/feegow';
 import { formatCpf, formatPhone } from '@/utils/formatters';
+import { validateCpf, getCpfValidationError } from '@/utils/cpfValidator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface PatientDataProps {
@@ -32,6 +33,12 @@ export const PatientData: React.FC<PatientDataProps> = ({
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     onInputChange('patient_email', value);
+  };
+
+  // CPF validation helper
+  const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '');
+    onInputChange('patient_cpf', value);
   };
   
   return (
@@ -68,7 +75,7 @@ export const PatientData: React.FC<PatientDataProps> = ({
               id="cpf"
               placeholder="000.000.000-00"
               value={formatCpf(formData.patient_cpf)}
-              onChange={(e) => onInputChange('patient_cpf', e.target.value.replace(/\D/g, ''))}
+              onChange={handleCpfChange}
               maxLength={14}
               required
               className={errors.patient_cpf ? "border-destructive" : ""}
