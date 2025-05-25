@@ -1,4 +1,3 @@
-
 import { Patient } from '@/types/feegow';
 import { API_BASE_URL, apiHeaders } from './apiConfig';
 
@@ -107,10 +106,10 @@ export const PatientService = {
         return null;
       }
       
-      // Return the patient with the new ID
-      if (data.success && data.content) {
+      // Return the patient with the new ID - corrigido para usar paciente_id do Feegow
+      if (data.success && data.content && data.content.paciente_id) {
         return {
-          patient_id: data.content.id,
+          patient_id: data.content.paciente_id, // Mapear paciente_id do Feegow para patient_id
           patient_name: formattedPatient.patient_name,
           patient_cpf: formattedPatient.patient_cpf,
           patient_email: formattedPatient.patient_email,
