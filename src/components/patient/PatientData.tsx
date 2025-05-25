@@ -111,13 +111,20 @@ export const PatientData: React.FC<PatientDataProps> = ({
             )}
           </div>
           <div>
-            <Label htmlFor="birth">Data de Nascimento</Label>
+            <Label htmlFor="birth" className={errors.patient_birth ? "text-destructive" : ""}>
+              Data de Nascimento *
+            </Label>
             <Input
               id="birth"
               type="date"
               value={formData.patient_birth || ''}
               onChange={(e) => onInputChange('patient_birth', e.target.value)}
+              required
+              className={errors.patient_birth ? "border-destructive" : ""}
             />
+            {errors.patient_birth && (
+              <p className="text-xs text-destructive mt-1">{errors.patient_birth}</p>
+            )}
           </div>
         </div>
         <div className="text-xs text-muted-foreground">

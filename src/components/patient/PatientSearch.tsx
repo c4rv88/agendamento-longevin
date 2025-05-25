@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { formatCpf, formatPhone } from '@/utils/formatters';
+import { formatCpf } from '@/utils/formatters';
 import { FeegowApiService } from '@/services/api';
 import { Patient } from '@/types/feegow';
 
@@ -20,15 +20,14 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
   onSearchComplete 
 }) => {
   const [searchCpf, setSearchCpf] = useState('');
-  const [searchPhone, setSearchPhone] = useState('');
   const [searching, setSearching] = useState(false);
   const { toast } = useToast();
 
   const handleSearch = async () => {
-    if (!searchCpf && !searchPhone) {
+    if (!searchCpf) {
       toast({
         title: "Erro",
-        description: "Informe o CPF ou telefone para buscar",
+        description: "Informe o CPF para buscar",
         variant: "destructive",
       });
       return;
@@ -38,14 +37,12 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
     try {
       // Garantir que o CPF esteja sendo enviado apenas com números
       const cleanCpf = searchCpf.replace(/\D/g, '');
-      const cleanPhone = searchPhone.replace(/\D/g, '');
       
       console.log('Buscando paciente com CPF limpo:', cleanCpf);
-      console.log('Buscando paciente com telefone limpo:', cleanPhone);
       
       const foundPatient = await FeegowApiService.searchPatient(
         cleanCpf,
-        cleanPhone
+        undefined // Removido o telefone da busca
       );
 
       if (foundPatient) {
@@ -61,7 +58,7 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
           title: "Paciente não encontrado",
           description: "Preencha os dados para criar um novo cadastro",
         });
-        onSearchComplete(false, cleanCpf, cleanPhone);
+        onSearchComplete(false, cleanCpf);
       }
     } catch (error) {
       toast({
@@ -84,27 +81,15 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="searchCpf">CPF</Label>
-            <Input
-              id="searchCpf"
-              placeholder="000.000.000-00"
-              value={searchCpf}
-              onChange={(e) => setSearchCpf(formatCpf(e.target.value))}
-              maxLength={14}
-            />
-          </div>
-          <div>
-            <Label htmlFor="searchPhone">Telefone</Label>
-            <Input
-              id="searchPhone"
-              placeholder="(00) 00000-0000"
-              value={searchPhone}
-              onChange={(e) => setSearchPhone(formatPhone(e.target.value))}
-              maxLength={15}
-            />
-          </div>
+        <div>
+          <Label htmlFor="searchCpf">CPF</Label>
+          <Input
+            id="searchCpf"
+            placeholder="000.000.000-00"
+            value={searchCpf}
+            onChange={(e) => setSearchCpf(formatCpf(e.target.value))}
+            maxLength={14}
+          />
         </div>
         <Button 
           onClick={handleSearch} 

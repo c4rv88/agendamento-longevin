@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Patient } from '@/types/feegow';
 import { PatientSearch } from '@/components/patient/PatientSearch';
@@ -64,6 +63,11 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
       newErrors.patient_phone = 'Telefone deve ter pelo menos 10 dígitos';
     }
     
+    // Validate birth date (now required)
+    if (!data.patient_birth || data.patient_birth.trim() === '') {
+      newErrors.patient_birth = 'Data de nascimento é obrigatória';
+    }
+    
     // Optional validation for email if provided
     if (data.patient_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.patient_email)) {
       newErrors.patient_email = 'E-mail inválido';
@@ -80,11 +84,12 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
       patient_phone: foundPatient.patient_phone || '',
     });
 
-    // Create masked version for display
+    // Create masked version for display but keep phone editable
     const maskedPatient = {
       ...foundPatient,
       patient_email: maskEmail(foundPatient.patient_email || ''),
-      patient_phone: maskPhone(foundPatient.patient_phone || ''),
+      // Don't mask the phone anymore - keep it editable
+      patient_phone: foundPatient.patient_phone || '',
       // Remove address for privacy
       patient_address: '',
     };
@@ -118,8 +123,8 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
     // Run validation on the updated data
     const isValid = validateForm(updatedData);
     
-    // If updating email or phone and we have original values, keep them for submission
-    if ((field === 'patient_email' || field === 'patient_phone') && originalData[field]) {
+    // If updating email and we have original values, keep them for submission
+    if (field === 'patient_email' && originalData[field]) {
       // User is changing the masked field, override original data
       setOriginalData(prev => ({
         ...prev,
@@ -137,9 +142,9 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
       if (isValid) {
         onPatientUpdate({
           ...updatedData,
-          // Always restore original email/phone if they exist
+          // Always restore original email if it exists, but phone is now always the current value
           patient_email: originalData.patient_email || updatedData.patient_email,
-          patient_phone: originalData.patient_phone || updatedData.patient_phone,
+          patient_phone: updatedData.patient_phone,
         });
       }
     }
