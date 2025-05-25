@@ -19,7 +19,7 @@ export const AppointmentService = {
         headers: apiHeaders,
         body: JSON.stringify({
           local_id: formattedData.unity_id,
-          paciente_id: formattedData.patient.patient_id,
+          paciente_id: formattedData.patient_id, // Changed from formattedData.patient.patient_id
           profissional_id: formattedData.professional_id,
           especialidade_id: formattedData.specialty_id,
           procedimento_id: 1, // ID for consultation
@@ -27,7 +27,7 @@ export const AppointmentService = {
           hora: formattedData.time,
           convenio_id: formattedData.insurance_id || 0,
           valor: '0.00', // Adding the value parameter as requested
-          celular: formattedData.patient.patient_phone?.replace(/\D/g, '')
+          celular: formattedData.patient_phone?.replace(/\D/g, '') // Changed from formattedData.patient.patient_phone
         }),
       });
       
