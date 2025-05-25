@@ -1,5 +1,5 @@
 
-import React, { memo, useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, ChevronDown } from 'lucide-react';
@@ -11,74 +11,14 @@ interface AvailableTimesProps {
   onSelectTime: (time: string) => void;
 }
 
-// TimeButton component to reduce re-renders
-const TimeButton = memo(({ 
-  time, 
-  isSelected, 
-  onSelect 
-}: { 
-  time: string; 
-  isSelected: boolean; 
-  onSelect: () => void 
-}) => {
-  // Format time (remove seconds)
-  const formattedTime = time.includes(':') ? time.split(':').slice(0, 2).join(':') : time;
-  
-  return (
-    <Button
-      variant={isSelected ? "default" : "outline"}
-      size="sm"
-      onClick={onSelect}
-      className="text-sm w-full"
-    >
-      {formattedTime}
-    </Button>
-  );
-});
-TimeButton.displayName = 'TimeButton';
-
-// TimePeriod component to reduce re-renders
-const TimePeriod = memo(({ 
-  title, 
-  times, 
-  selectedTime, 
-  onSelectTime 
-}: { 
-  title: string; 
-  times: string[]; 
-  selectedTime: string; 
-  onSelectTime: (time: string) => void 
-}) => {
-  if (times.length === 0) return null;
-  
-  return (
-    <div className="space-y-2">
-      <h4 className="text-sm font-medium text-muted-foreground">{title}</h4>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-        {times.map(time => (
-          <TimeButton 
-            key={time} 
-            time={time} 
-            isSelected={selectedTime === time}
-            onSelect={() => onSelectTime(time)}
-          />
-        ))}
-      </div>
-    </div>
-  );
-});
-TimePeriod.displayName = 'TimePeriod';
-
-// Main component using memo to prevent unnecessary re-renders
-export const AvailableTimes = memo(({
+export const AvailableTimes: React.FC<AvailableTimesProps> = ({
   times,
   selectedTime,
   selectedDate,
   onSelectTime
-}: AvailableTimesProps) => {
+}) => {
   const [showAllTimes, setShowAllTimes] = useState(false);
   
-  // If no times or no date selected, show message
   if (!selectedDate || times.length === 0) {
     return (
       <Card className="w-full">
@@ -101,7 +41,7 @@ export const AvailableTimes = memo(({
     );
   }
   
-  // Get closest 4 times if not showing all
+  // Show only first 4 times or all times based on state
   const timesToShow = showAllTimes ? times : times.slice(0, 4);
   
   // Group times by period
@@ -120,6 +60,34 @@ export const AvailableTimes = memo(({
     })
   };
 
+  const renderTimePeriod = (title: string, periodTimes: string[]) => {
+    if (periodTimes.length === 0) return null;
+    
+    return (
+      <div className="space-y-2">
+        <h4 className="text-sm font-medium text-muted-foreground">{title}</h4>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+          {periodTimes.map(time => {
+            const formattedTime = time.includes(':') ? time.split(':').slice(0, 2).join(':') : time;
+            const isSelected = selectedTime === time;
+            
+            return (
+              <Button
+                key={time}
+                variant={isSelected ? "default" : "outline"}
+                size="sm"
+                onClick={() => onSelectTime(time)}
+                className="text-sm w-full"
+              >
+                {formattedTime}
+              </Button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -132,31 +100,10 @@ export const AvailableTimes = memo(({
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {/* Morning times */}
-          <TimePeriod 
-            title="Manhã" 
-            times={groupedTimes.morning}
-            selectedTime={selectedTime}
-            onSelectTime={onSelectTime}
-          />
-
-          {/* Afternoon times */}
-          <TimePeriod 
-            title="Tarde" 
-            times={groupedTimes.afternoon}
-            selectedTime={selectedTime}
-            onSelectTime={onSelectTime}
-          />
-
-          {/* Evening times */}
-          <TimePeriod 
-            title="Noite" 
-            times={groupedTimes.evening}
-            selectedTime={selectedTime}
-            onSelectTime={onSelectTime}
-          />
+          {renderTimePeriod("Manhã", groupedTimes.morning)}
+          {renderTimePeriod("Tarde", groupedTimes.afternoon)}
+          {renderTimePeriod("Noite", groupedTimes.evening)}
           
-          {/* Button to show all times or less times */}
           {times.length > 4 && (
             <div className="pt-2 flex justify-center">
               <Button 
@@ -173,5 +120,4 @@ export const AvailableTimes = memo(({
       </CardContent>
     </Card>
   );
-});
-AvailableTimes.displayName = 'AvailableTimes';
+};

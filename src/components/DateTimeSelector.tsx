@@ -1,5 +1,5 @@
 
-import React, { useMemo, useCallback, memo } from 'react';
+import React from 'react';
 import { useDateTimeSelection } from '@/hooks/useDateTimeSelection';
 import { DateTimeStatus } from '@/components/datetime/DateTimeStatus';
 import { AvailableDates } from '@/components/datetime/AvailableDates';
@@ -18,8 +18,7 @@ interface DateTimeSelectorProps {
   onSelectTime: (time: string) => void;
 }
 
-// Using memo to prevent unnecessary renders
-export const DateTimeSelector = memo(({
+export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
   selectedDate,
   selectedTime,
   professionalId,
@@ -28,7 +27,7 @@ export const DateTimeSelector = memo(({
   insuranceId = 0,
   onSelectDate,
   onSelectTime,
-}: DateTimeSelectorProps) => {
+}) => {
   const { 
     availableSchedules, 
     loading, 
@@ -43,21 +42,6 @@ export const DateTimeSelector = memo(({
     onSelectDate,
     onSelectTime
   );
-
-  // Use useCallback for handlers to prevent unnecessary recreation
-  const handleSelectDate = useCallback((date: string) => {
-    onSelectDate(date);
-  }, [onSelectDate]);
-
-  const handleSelectTime = useCallback((time: string) => {
-    onSelectTime(time);
-  }, [onSelectTime]);
-
-  // Use useMemo to prevent unnecessary calculations of available times
-  const availableTimes = useMemo(() => {
-    if (!selectedDate) return [];
-    return getAvailableTimesForDate(selectedDate);
-  }, [selectedDate, getAvailableTimesForDate]);
 
   if (loading) {
     return <DateTimeStatus loading />;
@@ -87,22 +71,20 @@ export const DateTimeSelector = memo(({
               Não foram encontrados horários disponíveis para este profissional.
               Tente selecionar outro convênio ou profissional.
             </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Parâmetros de busca: Profissional #{professionalId}, Unidade #{unityId}, 
-              Especialidade #{specialtyId}, Convênio #{insuranceId}
-            </p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
+  const availableTimes = selectedDate ? getAvailableTimesForDate(selectedDate) : [];
+
   return (
     <div className="space-y-6">
       <AvailableDates 
         availableSchedules={availableSchedules}
         selectedDate={selectedDate}
-        onSelectDate={handleSelectDate}
+        onSelectDate={onSelectDate}
       />
 
       {selectedDate && (
@@ -110,11 +92,9 @@ export const DateTimeSelector = memo(({
           times={availableTimes}
           selectedTime={selectedTime}
           selectedDate={selectedDate}
-          onSelectTime={handleSelectTime}
+          onSelectTime={onSelectTime}
         />
       )}
     </div>
   );
-});
-
-DateTimeSelector.displayName = 'DateTimeSelector';
+};
