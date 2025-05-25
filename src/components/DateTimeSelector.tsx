@@ -44,8 +44,10 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
     insuranceId,
     (date: string) => {
       onSelectDate(date);
-      // Scroll to times section when date is selected
-      scrollToElement('available-times', 100);
+      // Scroll gradativo: primeiro para as datas, depois para os horários
+      setTimeout(() => {
+        scrollToElement('available-times', 100);
+      }, 500);
     },
     onSelectTime
   );
@@ -65,9 +67,9 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
 
   if (!availableSchedules || availableSchedules.length === 0) {
     return (
-      <Card className="w-full bg-white/80 backdrop-blur-sm border-blue-200">
+      <Card className="w-full bg-white/80 backdrop-blur-sm border-blue-800">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-blue-700">
+          <CardTitle className="flex items-center gap-2 text-blue-900">
             <CalendarCheck className="w-5 h-5" />
             Próximas Datas Disponíveis
           </CardTitle>
@@ -93,7 +95,10 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
         selectedDate={selectedDate}
         onSelectDate={(date: string) => {
           onSelectDate(date);
-          scrollToElement('available-times', 100);
+          // Scroll gradativo para os horários após selecionar data
+          setTimeout(() => {
+            scrollToElement('available-times', 100);
+          }, 300);
         }}
       />
 

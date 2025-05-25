@@ -41,7 +41,7 @@ export const AppointmentSummary: React.FC<AppointmentSummaryProps> = ({
           <Button
             onClick={onConfirm}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+            className="w-full bg-gradient-to-r from-blue-800 via-white to-blue-800 text-blue-900 hover:from-blue-900 hover:via-blue-50 hover:to-blue-900 border border-blue-800"
             size="lg"
           >
             {loading ? 'Confirmando...' : 'Confirmar Agendamento'}

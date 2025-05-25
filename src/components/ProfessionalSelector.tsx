@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAutoScroll } from '@/hooks/useAutoScroll';
 
 interface ProfessionalSelectorProps {
   selectedProfessional: Professional | null;
@@ -23,6 +24,7 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { scrollToElement } = useAutoScroll();
 
   useEffect(() => {
     const fetchProfessionals = async () => {
@@ -49,6 +51,14 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
 
     fetchProfessionals();
   }, [specialtyId, unityId]);
+
+  const handleSelectProfessional = (professional: Professional) => {
+    onSelect(professional);
+    // Rolar para baixo após selecionar profissional
+    setTimeout(() => {
+      window.scrollBy({ top: 300, behavior: 'smooth' });
+    }, 300);
+  };
 
   if (loading) {
     return (
@@ -128,7 +138,7 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
               key={professional.professional_id}
               variant={selectedProfessional?.professional_id === professional.professional_id ? "default" : "outline"}
               className="p-4 h-auto justify-start"
-              onClick={() => onSelect(professional)}
+              onClick={() => handleSelectProfessional(professional)}
             >
               <div className="text-left">
                 <div className="font-semibold">{professional.professional_name}</div>

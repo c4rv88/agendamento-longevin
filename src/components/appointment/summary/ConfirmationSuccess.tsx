@@ -19,8 +19,11 @@ export const ConfirmationSuccess: React.FC<ConfirmationSuccessProps> = ({ onConf
         <p className="text-gray-600 mb-6">
           Seu agendamento foi realizado com sucesso. Você receberá uma confirmação em breve.
         </p>
-        <Button onClick={onConfirm} className="bg-gradient-to-r from-green-600 to-blue-600">
-          Fazer Novo Agendamento
+        <Button 
+          onClick={onConfirm} 
+          className="bg-gradient-to-r from-blue-800 via-white to-blue-800 text-blue-900 hover:from-blue-900 hover:via-blue-50 hover:to-blue-900 border border-blue-800"
+        >
+          Novo Agendamento
         </Button>
       </CardContent>
     </Card>

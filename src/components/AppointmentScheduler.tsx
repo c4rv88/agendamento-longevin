@@ -48,39 +48,31 @@ export const AppointmentScheduler: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           <ProgressIndicator currentStep={state.currentStep} totalSteps={7} />
           
-          {/* Centered Navigation Buttons */}
-          <div className="flex justify-center items-center gap-4 my-6">
-            <Button
-              variant="outline"
-              onClick={handlePrev}
-              disabled={state.currentStep === 1}
-              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-blue-200 hover:bg-blue-50 text-blue-700 px-4 py-2"
-              size="sm"
-            >
-              <ChevronUp className="w-4 h-4" />
-              Voltar
-            </Button>
-            
-            {state.currentStep < 7 ? (
+          {/* Centered Navigation Buttons - Only show on steps 1-6 */}
+          {state.currentStep < 7 && (
+            <div className="flex justify-center items-center gap-4 my-6">
+              <Button
+                variant="outline"
+                onClick={handlePrev}
+                disabled={state.currentStep === 1}
+                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-blue-800 hover:bg-blue-50 text-blue-900 px-3 py-1.5"
+                size="sm"
+              >
+                <ChevronUp className="w-3 h-3" />
+                Voltar
+              </Button>
+              
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-4 py-2"
+                className="flex items-center gap-2 bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-900 hover:to-blue-950 px-3 py-1.5"
                 size="sm"
               >
                 Próximo
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3 h-3" />
               </Button>
-            ) : (
-              <Button
-                onClick={resetFlow}
-                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 px-4 py-2"
-                size="sm"
-              >
-                Novo Agendamento
-              </Button>
-            )}
-          </div>
+            </div>
+          )}
           
           <div className="mt-8">
             <AppointmentStepContent 
@@ -97,14 +89,14 @@ export const AppointmentScheduler: React.FC = () => {
               variant="outline"
               onClick={handlePrev}
               disabled={state.currentStep === 1}
-              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-blue-200 hover:bg-blue-50 text-blue-700"
+              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-blue-800 hover:bg-blue-50 text-blue-900"
             >
               <ChevronUp className="w-4 h-4" />
               Voltar
             </Button>
             
             {/* Credits centered */}
-            <div className="text-xs text-blue-600/70 font-medium">
+            <div className="text-xs text-blue-800/70 font-medium">
               Desenvolvido por Sauv®
             </div>
             
@@ -112,18 +104,13 @@ export const AppointmentScheduler: React.FC = () => {
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                className="flex items-center gap-2 bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-900 hover:to-blue-950"
               >
                 Próximo
                 <ChevronDown className="w-4 h-4" />
               </Button>
             ) : (
-              <Button
-                onClick={resetFlow}
-                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-              >
-                Novo Agendamento
-              </Button>
+              <div></div> // Empty div to maintain flex layout
             )}
           </div>
         </div>
