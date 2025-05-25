@@ -78,24 +78,49 @@ export const PatientService = {
         formattedPatient.patient_address = 'Não informado';
       }
       
-      console.log('Creating patient with data:', formattedPatient);
+      // Prepare request body
+      const requestBody = {
+        nome_completo: formattedPatient.patient_name,
+        cpf: formattedPatient.patient_cpf,
+        data_nascimento: formattedPatient.patient_birth,
+        telefone: formattedPatient.patient_phone,
+        email: formattedPatient.patient_email || '',
+        endereco: formattedPatient.patient_address
+      };
+      
+      console.log('Creating patient with formatted data:', formattedPatient);
+      console.log('Request body for patient creation:', requestBody);
       
       const response = await fetch(`${API_BASE_URL}/api/patient/create`, {
         method: 'POST',
         headers: apiHeaders,
-        body: JSON.stringify({
-          nome_completo: formattedPatient.patient_name,
-          cpf: formattedPatient.patient_cpf,
-          data_nascimento: formattedPatient.patient_birth,
-          telefone: formattedPatient.patient_phone,
-          email: formattedPatient.patient_email,
-          endereco: formattedPatient.patient_address
-        }),
+        body: JSON.stringify(requestBody),
       });
       
       const data = await response.json();
       console.log('Patient creation response:', data);
-      return data.success ? data.data : null;
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        console.error('Patient creation failed with status:', response.status);
+        console.error('Error response:', data);
+        return null;
+      }
+      
+      // Return the patient with the new ID
+      if (data.success && data.content) {
+        return {
+          patient_id: data.content.id,
+          patient_name: formattedPatient.patient_name,
+          patient_cpf: formattedPatient.patient_cpf,
+          patient_email: formattedPatient.patient_email,
+          patient_phone: formattedPatient.patient_phone,
+          patient_birth: formattedPatient.patient_birth,
+          patient_address: formattedPatient.patient_address
+        };
+      }
+      
+      return null;
     } catch (error) {
       console.error('Erro ao criar paciente:', error);
       return null;
