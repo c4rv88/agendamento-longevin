@@ -1,3 +1,4 @@
+
 import { Patient } from '@/types/feegow';
 import { API_BASE_URL, apiHeaders } from './apiConfig';
 
@@ -99,6 +100,8 @@ export const PatientService = {
       const data = await response.json();
       console.log('Patient creation response:', data);
       console.log('Response status:', response.status);
+      console.log('Response data content:', data.content);
+      console.log('paciente_id from response:', data.content?.paciente_id);
       
       if (!response.ok) {
         console.error('Patient creation failed with status:', response.status);
@@ -108,7 +111,7 @@ export const PatientService = {
       
       // Return the patient with the new ID - corrigido para usar paciente_id do Feegow
       if (data.success && data.content && data.content.paciente_id) {
-        return {
+        const newPatient = {
           patient_id: data.content.paciente_id, // Mapear paciente_id do Feegow para patient_id
           patient_name: formattedPatient.patient_name,
           patient_cpf: formattedPatient.patient_cpf,
@@ -117,6 +120,15 @@ export const PatientService = {
           patient_birth: formattedPatient.patient_birth,
           patient_address: formattedPatient.patient_address
         };
+        
+        console.log('Returning new patient with ID:', newPatient);
+        console.log('New patient ID specifically:', newPatient.patient_id);
+        return newPatient;
+      } else {
+        console.error('Patient creation response missing required data:');
+        console.error('- success:', data.success);
+        console.error('- content:', data.content);
+        console.error('- paciente_id:', data.content?.paciente_id);
       }
       
       return null;

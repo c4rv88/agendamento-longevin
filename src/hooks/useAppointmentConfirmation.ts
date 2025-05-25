@@ -16,7 +16,9 @@ export const useAppointmentConfirmation = () => {
       let patientData = appointmentData.patient;
       if (!patientData?.patient_id) {
         console.log('Creating new patient...');
+        console.log('Patient data before creation:', patientData);
         patientData = await FeegowApiService.createPatient(appointmentData.patient!);
+        console.log('Patient data after creation:', patientData);
         if (!patientData) {
           throw new Error('Erro ao criar paciente');
         }
@@ -25,7 +27,12 @@ export const useAppointmentConfirmation = () => {
 
       // Garantir que temos um patient_id válido
       const patientId = patientData.patient_id;
+      console.log('Final patient ID to use:', patientId);
+      console.log('Patient ID type:', typeof patientId);
+      console.log('Patient ID value:', patientId);
+      
       if (!patientId) {
+        console.error('Patient data after creation/retrieval:', patientData);
         throw new Error('ID do paciente não encontrado');
       }
 
