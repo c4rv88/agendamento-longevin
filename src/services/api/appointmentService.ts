@@ -31,7 +31,7 @@ export const AppointmentService = {
         especialidade_id: formattedData.specialty_id,
         procedimento_id: 1, // Always 1 as specified
         data: formattedData.date,
-        hora: formattedData.time,
+        horario: formattedData.time, // Changed from 'hora' to 'horario'
         valor: '0.00', // Always 0.00 as specified
         plano: 1, // Always 1 as specified
         convenio_id: formattedData.insurance_id || 0,
