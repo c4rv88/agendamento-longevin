@@ -11,7 +11,7 @@ export const ProfessionalService = {
       const params = new URLSearchParams();
       
       if (specialtyId) params.append('especialidade_id', specialtyId.toString());
-      if (unityId) params.append('unidade_id', unityId.toString());
+      if (unityId !== undefined) params.append('unidade_id', unityId.toString());
       
       if (params.toString()) {
         url += `?${params.toString()}`;

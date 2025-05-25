@@ -41,7 +41,11 @@ export const AppointmentSummary: React.FC<AppointmentSummaryProps> = ({
           <Button
             onClick={onConfirm}
             disabled={loading}
-            className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-700 hover:via-blue-600 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] disabled:hover:scale-100 disabled:hover:shadow-lg"
+            className="w-full relative overflow-hidden text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] disabled:hover:scale-100 disabled:hover:shadow-lg"
+            style={{ 
+              background: `linear-gradient(to right, #004264, #005580, #004264)`,
+              '--hover-bg': 'linear-gradient(to right, #003050, #004264, #003050)'
+            }}
             size="lg"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-1000"></div>

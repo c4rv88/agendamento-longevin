@@ -55,7 +55,8 @@ export const AppointmentScheduler: React.FC = () => {
                 variant="outline"
                 onClick={handlePrev}
                 disabled={state.currentStep === 1}
-                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-blue-800 hover:bg-blue-50 text-blue-900 px-3 py-1.5"
+                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-[#004264] hover:bg-blue-50 text-[#004264] px-3 py-1.5"
+                style={{ borderColor: '#004264', color: '#004264' }}
                 size="sm"
               >
                 <ChevronUp className="w-3 h-3" />
@@ -65,7 +66,8 @@ export const AppointmentScheduler: React.FC = () => {
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-900 hover:to-blue-950 px-3 py-1.5"
+                className="flex items-center gap-2 px-3 py-1.5"
+                style={{ backgroundColor: '#004264' }}
                 size="sm"
               >
                 Próximo
@@ -89,22 +91,36 @@ export const AppointmentScheduler: React.FC = () => {
               variant="outline"
               onClick={handlePrev}
               disabled={state.currentStep === 1}
-              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-blue-800 hover:bg-blue-50 text-blue-900"
+              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-[#004264] hover:bg-blue-50 text-[#004264]"
+              style={{ borderColor: '#004264', color: '#004264' }}
             >
               <ChevronUp className="w-4 h-4" />
               Voltar
             </Button>
             
-            {/* Credits centered */}
-            <div className="text-xs text-blue-800/70 font-medium">
-              Desenvolvido por Sauv®
+            {/* Credits centered with Sauv link */}
+            <div className="text-xs text-blue-800/70 font-medium flex items-center gap-1">
+              Desenvolvido por 
+              <a 
+                href="https://sauv.com.br" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center"
+              >
+                <img 
+                  src="/lovable-uploads/49cf4a31-a6cc-4bd7-b448-28866752a33e.png" 
+                  alt="Sauv" 
+                  className="h-3 w-auto opacity-70 hover:opacity-100 transition-opacity"
+                />
+              </a>
             </div>
             
             {state.currentStep < 7 ? (
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-900 hover:to-blue-950"
+                className="flex items-center gap-2"
+                style={{ backgroundColor: '#004264' }}
               >
                 Próximo
                 <ChevronDown className="w-4 h-4" />

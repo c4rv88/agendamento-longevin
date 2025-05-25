@@ -21,7 +21,10 @@ export const ConfirmationSuccess: React.FC<ConfirmationSuccessProps> = ({ onConf
         </p>
         <Button 
           onClick={onConfirm} 
-          className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-700 hover:via-blue-600 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+          className="relative overflow-hidden text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+          style={{ 
+            background: `linear-gradient(to right, #004264, #005580, #004264)`
+          }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-1000"></div>
           <span className="relative z-10 font-medium">
