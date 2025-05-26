@@ -48,9 +48,25 @@ export const AppointmentScheduler: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           <ProgressIndicator currentStep={state.currentStep} totalSteps={7} />
           
+          {/* Centered Sauv Logo above buttons */}
+          <div className="flex justify-center my-6">
+            <a 
+              href="https://sauv.com.br" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center opacity-60 hover:opacity-100 transition-opacity"
+            >
+              <img 
+                src="/lovable-uploads/9f61ac48-e159-4e9e-8504-b0a1a6aba493.png" 
+                alt="Sauv" 
+                className="h-6 w-auto"
+              />
+            </a>
+          </div>
+          
           {/* Centered Navigation Buttons - Only show on steps 1-6 */}
           {state.currentStep < 7 && (
-            <div className="flex justify-center items-center gap-4 my-6">
+            <div className="flex justify-center items-center gap-4 mb-6">
               <Button
                 variant="outline"
                 onClick={handlePrev}
@@ -85,7 +101,7 @@ export const AppointmentScheduler: React.FC = () => {
             />
           </div>
 
-          {/* Bottom Navigation and Credits */}
+          {/* Bottom Navigation */}
           <div className="flex justify-between items-center mt-8">
             <Button
               variant="outline"
@@ -98,21 +114,9 @@ export const AppointmentScheduler: React.FC = () => {
               Voltar
             </Button>
             
-            {/* Credits centered with Sauv link */}
-            <div className="text-xs text-blue-800/70 font-medium flex items-center gap-1">
-              Desenvolvido por 
-              <a 
-                href="https://sauv.com.br" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center"
-              >
-                <img 
-                  src="/lovable-uploads/49cf4a31-a6cc-4bd7-b448-28866752a33e.png" 
-                  alt="Sauv" 
-                  className="h-3 w-auto opacity-70 hover:opacity-100 transition-opacity"
-                />
-              </a>
+            {/* Credits text only */}
+            <div className="text-xs text-blue-800/70 font-medium">
+              Desenvolvido por Sauv
             </div>
             
             {state.currentStep < 7 ? (

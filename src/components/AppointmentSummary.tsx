@@ -43,8 +43,7 @@ export const AppointmentSummary: React.FC<AppointmentSummaryProps> = ({
             disabled={loading}
             className="w-full relative overflow-hidden text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] disabled:hover:scale-100 disabled:hover:shadow-lg"
             style={{ 
-              background: `linear-gradient(to right, #004264, #005580, #004264)`,
-              '--hover-bg': 'linear-gradient(to right, #003050, #004264, #003050)'
+              background: `linear-gradient(135deg, #004264 0%, #0066cc 50%, #004264 100%)`
             }}
             size="lg"
           >
