@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { useAppointmentFlow } from '@/hooks/useAppointmentFlow';
 import { ProgressIndicator } from '@/components/ProgressIndicator';
@@ -59,12 +58,19 @@ export const AppointmentScheduler: React.FC = () => {
               <img 
                 src="https://isv.med.br/wp-content/uploads/2025/05/sauv-preto.png" 
                 alt="Sauv" 
-                className="h-8 w-auto"
+                className="h-10 w-auto max-w-[120px]"
+                style={{ display: 'block' }}
                 onError={(e) => {
-                  console.error('Erro ao carregar imagem da Sauv:', e);
-                  e.currentTarget.style.display = 'none';
+                  console.error('Erro ao carregar logo da Sauv:', e);
+                  console.log('URL da imagem:', e.currentTarget.src);
                 }}
-                onLoad={() => console.log('Logo da Sauv carregada com sucesso')}
+                onLoad={() => {
+                  console.log('Logo da Sauv carregada com sucesso');
+                  console.log('Dimensões da imagem:', {
+                    width: (e.target as HTMLImageElement).naturalWidth,
+                    height: (e.target as HTMLImageElement).naturalHeight
+                  });
+                }}
               />
             </a>
           </div>
