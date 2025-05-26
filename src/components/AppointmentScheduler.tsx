@@ -85,39 +85,8 @@ export const AppointmentScheduler: React.FC = () => {
             />
           </div>
 
-          {/* Credits with Sauv logo - Above bottom navigation */}
-          <div className="flex justify-center mt-8 mb-4">
-            <div className="flex items-center gap-2 text-xs text-blue-800/70 font-medium">
-              <span>Desenvolvido por</span>
-              <a 
-                href="https://sauv.com.br" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center opacity-70 hover:opacity-100 transition-opacity"
-              >
-                <img 
-                  src="https://isv.med.br/wp-content/uploads/2025/05/sauv-preto2-e1748220200282.png" 
-                  alt="Sauv" 
-                  className="h-6 w-auto"
-                  style={{ display: 'block' }}
-                  onError={(e) => {
-                    console.error('Erro ao carregar logo da Sauv:', e);
-                    console.log('URL da imagem:', e.currentTarget.src);
-                  }}
-                  onLoad={(e) => {
-                    console.log('Logo da Sauv carregada com sucesso');
-                    console.log('Dimensões da imagem:', {
-                      width: (e.target as HTMLImageElement).naturalWidth,
-                      height: (e.target as HTMLImageElement).naturalHeight
-                    });
-                  }}
-                />
-              </a>
-            </div>
-          </div>
-
           {/* Bottom Navigation */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mt-8">
             <Button
               variant="outline"
               onClick={handlePrev}
@@ -142,6 +111,37 @@ export const AppointmentScheduler: React.FC = () => {
             ) : (
               <div></div> // Empty div to maintain flex layout
             )}
+          </div>
+
+          {/* Credits with Sauv logo - Below bottom navigation */}
+          <div className="flex justify-center mt-6 mb-4">
+            <div className="flex items-center gap-2 text-xs text-blue-800/70 font-medium">
+              <span>Desenvolvido por</span>
+              <a 
+                href="https://sauv.com.br" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center opacity-70 hover:opacity-100 transition-opacity"
+              >
+                <img 
+                  src="https://isv.med.br/wp-content/uploads/2025/05/sauv-preto2-e1748220200282.png" 
+                  alt="Sauv" 
+                  className="h-5 w-auto"
+                  style={{ display: 'block' }}
+                  onError={(e) => {
+                    console.error('Erro ao carregar logo da Sauv:', e);
+                    console.log('URL da imagem:', e.currentTarget.src);
+                  }}
+                  onLoad={(e) => {
+                    console.log('Logo da Sauv carregada com sucesso');
+                    console.log('Dimensões da imagem:', {
+                      width: (e.target as HTMLImageElement).naturalWidth,
+                      height: (e.target as HTMLImageElement).naturalHeight
+                    });
+                  }}
+                />
+              </a>
+            </div>
           </div>
         </div>
       </div>
