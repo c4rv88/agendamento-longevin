@@ -56,7 +56,7 @@ export const AppointmentScheduler: React.FC = () => {
               className="inline-flex items-center opacity-60 hover:opacity-100 transition-opacity"
             >
               <img 
-                src="https://isv.med.br/wp-content/uploads/2025/05/sauv-preto2.png" 
+                src="https://isv.med.br/wp-content/uploads/2025/05/sauv-preto2-e1748220200282.png" 
                 alt="Desenvolvido por Sauv" 
                 className="h-8 w-auto max-w-[100px]"
                 style={{ display: 'block' }}
