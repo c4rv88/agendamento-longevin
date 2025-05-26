@@ -59,7 +59,12 @@ export const AppointmentScheduler: React.FC = () => {
               <img 
                 src="/lovable-uploads/d7c07078-1370-48ba-8e23-7bca6a5fff16.png" 
                 alt="Sauv" 
-                className="h-6 w-auto"
+                className="h-8 w-auto"
+                onError={(e) => {
+                  console.error('Erro ao carregar imagem da Sauv:', e);
+                  e.currentTarget.style.display = 'none';
+                }}
+                onLoad={() => console.log('Logo da Sauv carregada com sucesso')}
               />
             </a>
           </div>
