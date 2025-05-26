@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { useAppointmentFlow } from '@/hooks/useAppointmentFlow';
 import { ProgressIndicator } from '@/components/ProgressIndicator';
@@ -46,34 +47,6 @@ export const AppointmentScheduler: React.FC = () => {
       <div className="container mx-auto px-4 py-8" ref={topRef}>
         <div className="max-w-4xl mx-auto">
           <ProgressIndicator currentStep={state.currentStep} totalSteps={7} />
-          
-          {/* Centered Sauv Logo above buttons */}
-          <div className="flex justify-center my-6">
-            <a 
-              href="https://sauv.com.br" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center opacity-60 hover:opacity-100 transition-opacity"
-            >
-              <img 
-                src="https://isv.med.br/wp-content/uploads/2025/05/sauv-preto2-e1748220200282.png" 
-                alt="Desenvolvido por Sauv" 
-                className="h-8 w-auto max-w-[100px]"
-                style={{ display: 'block' }}
-                onError={(e) => {
-                  console.error('Erro ao carregar logo da Sauv:', e);
-                  console.log('URL da imagem:', e.currentTarget.src);
-                }}
-                onLoad={(e) => {
-                  console.log('Logo da Sauv carregada com sucesso');
-                  console.log('Dimensões da imagem:', {
-                    width: (e.target as HTMLImageElement).naturalWidth,
-                    height: (e.target as HTMLImageElement).naturalHeight
-                  });
-                }}
-              />
-            </a>
-          </div>
           
           {/* Centered Navigation Buttons - Only show on steps 1-6 */}
           {state.currentStep < 7 && (
@@ -125,9 +98,33 @@ export const AppointmentScheduler: React.FC = () => {
               Voltar
             </Button>
             
-            {/* Credits text only */}
-            <div className="text-xs text-blue-800/70 font-medium">
-              Desenvolvido por Sauv
+            {/* Credits with Sauv logo */}
+            <div className="flex items-center gap-2 text-xs text-blue-800/70 font-medium">
+              <span>Desenvolvido por</span>
+              <a 
+                href="https://sauv.com.br" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center opacity-70 hover:opacity-100 transition-opacity"
+              >
+                <img 
+                  src="https://isv.med.br/wp-content/uploads/2025/05/sauv-preto2-e1748220200282.png" 
+                  alt="Sauv" 
+                  className="h-6 w-auto"
+                  style={{ display: 'block' }}
+                  onError={(e) => {
+                    console.error('Erro ao carregar logo da Sauv:', e);
+                    console.log('URL da imagem:', e.currentTarget.src);
+                  }}
+                  onLoad={(e) => {
+                    console.log('Logo da Sauv carregada com sucesso');
+                    console.log('Dimensões da imagem:', {
+                      width: (e.target as HTMLImageElement).naturalWidth,
+                      height: (e.target as HTMLImageElement).naturalHeight
+                    });
+                  }}
+                />
+              </a>
             </div>
             
             {state.currentStep < 7 ? (
