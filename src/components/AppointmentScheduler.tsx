@@ -85,20 +85,8 @@ export const AppointmentScheduler: React.FC = () => {
             />
           </div>
 
-          {/* Bottom Navigation */}
-          <div className="flex justify-between items-center mt-8">
-            <Button
-              variant="outline"
-              onClick={handlePrev}
-              disabled={state.currentStep === 1}
-              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-[#004264] hover:bg-blue-50 text-[#004264]"
-              style={{ borderColor: '#004264', color: '#004264' }}
-            >
-              <ChevronUp className="w-4 h-4" />
-              Voltar
-            </Button>
-            
-            {/* Credits with Sauv logo */}
+          {/* Credits with Sauv logo - Above bottom navigation */}
+          <div className="flex justify-center mt-8 mb-4">
             <div className="flex items-center gap-2 text-xs text-blue-800/70 font-medium">
               <span>Desenvolvido por</span>
               <a 
@@ -126,6 +114,20 @@ export const AppointmentScheduler: React.FC = () => {
                 />
               </a>
             </div>
+          </div>
+
+          {/* Bottom Navigation */}
+          <div className="flex justify-between items-center">
+            <Button
+              variant="outline"
+              onClick={handlePrev}
+              disabled={state.currentStep === 1}
+              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-[#004264] hover:bg-blue-50 text-[#004264]"
+              style={{ borderColor: '#004264', color: '#004264' }}
+            >
+              <ChevronUp className="w-4 h-4" />
+              Voltar
+            </Button>
             
             {state.currentStep < 7 ? (
               <Button
