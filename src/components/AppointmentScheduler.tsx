@@ -64,7 +64,7 @@ export const AppointmentScheduler: React.FC = () => {
                   console.error('Erro ao carregar logo da Sauv:', e);
                   console.log('URL da imagem:', e.currentTarget.src);
                 }}
-                onLoad={() => {
+                onLoad={(e) => {
                   console.log('Logo da Sauv carregada com sucesso');
                   console.log('Dimensões da imagem:', {
                     width: (e.target as HTMLImageElement).naturalWidth,
