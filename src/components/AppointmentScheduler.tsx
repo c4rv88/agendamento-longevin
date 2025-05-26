@@ -57,7 +57,7 @@ export const AppointmentScheduler: React.FC = () => {
               className="inline-flex items-center opacity-60 hover:opacity-100 transition-opacity"
             >
               <img 
-                src="/lovable-uploads/9f61ac48-e159-4e9e-8504-b0a1a6aba493.png" 
+                src="/lovable-uploads/d7c07078-1370-48ba-8e23-7bca6a5fff16.png" 
                 alt="Sauv" 
                 className="h-6 w-auto"
               />

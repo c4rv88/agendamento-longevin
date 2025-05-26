@@ -124,9 +124,6 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
             >
               <div className="text-left">
                 <div className="font-semibold">{insurance.insurance_name}</div>
-                {insurance.insurance_id === 0 && (
-                  <div className="text-sm text-muted-foreground">Pagamento direto</div>
-                )}
               </div>
             </Button>
           ))}
