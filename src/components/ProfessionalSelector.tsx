@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Professional } from '@/types/feegow';
 import { FeegowApiService } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { User } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
@@ -52,12 +52,15 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
     fetchProfessionals();
   }, [specialtyId, unityId]);
 
-  const handleSelectProfessional = (professional: Professional) => {
-    onSelect(professional);
-    // Rolar para baixo após selecionar profissional
-    setTimeout(() => {
-      window.scrollBy({ top: 300, behavior: 'smooth' });
-    }, 300);
+  const handleSelectProfessional = (professionalId: string) => {
+    const professional = professionals.find(p => p.professional_id.toString() === professionalId);
+    if (professional) {
+      onSelect(professional);
+      // Rolar para baixo após selecionar profissional
+      setTimeout(() => {
+        window.scrollBy({ top: 300, behavior: 'smooth' });
+      }, 300);
+    }
   };
 
   if (loading) {
@@ -70,11 +73,7 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-16 rounded-lg" />
-            ))}
-          </div>
+          <Skeleton className="h-10 w-full" />
         </CardContent>
       </Card>
     );
@@ -92,13 +91,6 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
         <CardContent>
           <div className="p-4 text-center">
             <p className="text-red-500">{error}</p>
-            <Button 
-              onClick={() => window.location.reload()} 
-              className="mt-4"
-              variant="outline"
-            >
-              Tentar Novamente
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -132,20 +124,24 @@ export const ProfessionalSelector: React.FC<ProfessionalSelectorProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {professionals.map((professional) => (
-            <Button
-              key={professional.professional_id}
-              variant={selectedProfessional?.professional_id === professional.professional_id ? "default" : "outline"}
-              className="p-4 h-auto justify-start"
-              onClick={() => handleSelectProfessional(professional)}
-            >
-              <div className="text-left">
-                <div className="font-semibold">{professional.professional_name}</div>
-              </div>
-            </Button>
-          ))}
-        </div>
+        <Select 
+          value={selectedProfessional?.professional_id.toString() || ""} 
+          onValueChange={handleSelectProfessional}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Escolha um profissional" />
+          </SelectTrigger>
+          <SelectContent className="bg-white">
+            {professionals.map((professional) => (
+              <SelectItem 
+                key={professional.professional_id} 
+                value={professional.professional_id.toString()}
+              >
+                {professional.professional_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </CardContent>
     </Card>
   );

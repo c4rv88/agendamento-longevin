@@ -1,4 +1,3 @@
-
 import { Patient } from '@/types/feegow';
 import { API_BASE_URL, apiHeaders } from './apiConfig';
 
@@ -35,13 +34,31 @@ export const PatientService = {
         return null;
       }
       
+      // Parse birth date from API response
+      let formattedBirthDate = '';
+      if (data.content?.nascimento) {
+        // API can return date in DD-MM-YYYY or DD/MM/YYYY format
+        const birthDate = data.content.nascimento;
+        if (birthDate.includes('-')) {
+          // Convert DD-MM-YYYY to YYYY-MM-DD
+          const [day, month, year] = birthDate.split('-');
+          formattedBirthDate = `${year}-${month}-${day}`;
+        } else if (birthDate.includes('/')) {
+          // Convert DD/MM/YYYY to YYYY-MM-DD
+          const [day, month, year] = birthDate.split('/');
+          formattedBirthDate = `${year}-${month}-${day}`;
+        } else {
+          formattedBirthDate = birthDate;
+        }
+      }
+      
       return data.success && data.content ? {
         patient_id: data.content.id,
         patient_name: data.content.nome,
         patient_cpf: data.content.documentos?.cpf || '',
         patient_email: data.content.email?.[0] || '',
         patient_phone: data.content.celulares?.[0] || '',
-        patient_birth: data.content.nascimento || '',
+        patient_birth: formattedBirthDate,
         patient_address: data.content.endereco || '',
       } : null;
     } catch (error) {

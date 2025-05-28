@@ -87,13 +87,17 @@ export const PatientForm: React.FC<PatientFormProps> = ({ patient, onPatientUpda
       ...foundPatient,
       patient_email: maskEmail(foundPatient.patient_email || ''),
       patient_phone: foundPatient.patient_phone || '',
-      patient_address: '',
+      // Keep the birth date from API without masking
+      patient_birth: foundPatient.patient_birth || '',
+      patient_address: foundPatient.patient_address || '',
     };
 
     setFormData(maskedPatient);
     onPatientUpdate({
       ...foundPatient,
-      patient_address: '',
+      // Keep original birth date for submission
+      patient_birth: foundPatient.patient_birth || '',
+      patient_address: foundPatient.patient_address || '',
     });
 
     setErrors({});

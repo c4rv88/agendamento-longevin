@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { Insurance } from '@/types/feegow';
 import { FeegowApiService } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreditCard } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface InsuranceSelectorProps {
   selectedInsurance: Insurance | null;
@@ -42,6 +43,13 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
     fetchInsurances();
   }, [professionalId]);
 
+  const handleSelectInsurance = (insuranceId: string) => {
+    const insurance = insurances.find(i => i.insurance_id.toString() === insuranceId);
+    if (insurance) {
+      onSelect(insurance);
+    }
+  };
+
   if (loading) {
     return (
       <Card className="w-full">
@@ -52,11 +60,7 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded-lg animate-pulse" />
-            ))}
-          </div>
+          <Skeleton className="h-10 w-full" />
         </CardContent>
       </Card>
     );
@@ -74,13 +78,6 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
         <CardContent>
           <div className="p-4 text-center">
             <p className="text-red-500">{error}</p>
-            <Button 
-              onClick={() => window.location.reload()} 
-              className="mt-4"
-              variant="outline"
-            >
-              Tentar Novamente
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -114,20 +111,24 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          {insurances.map((insurance) => (
-            <Button
-              key={insurance.insurance_id}
-              variant={selectedInsurance?.insurance_id === insurance.insurance_id ? "default" : "outline"}
-              className="w-full p-4 h-auto justify-start"
-              onClick={() => onSelect(insurance)}
-            >
-              <div className="text-left">
-                <div className="font-semibold">{insurance.insurance_name}</div>
-              </div>
-            </Button>
-          ))}
-        </div>
+        <Select 
+          value={selectedInsurance?.insurance_id.toString() || ""} 
+          onValueChange={handleSelectInsurance}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Escolha um convênio" />
+          </SelectTrigger>
+          <SelectContent className="bg-white">
+            {insurances.map((insurance) => (
+              <SelectItem 
+                key={insurance.insurance_id} 
+                value={insurance.insurance_id.toString()}
+              >
+                {insurance.insurance_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </CardContent>
     </Card>
   );
