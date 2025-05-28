@@ -2,7 +2,7 @@
 import { AvailableSchedule } from '@/types/feegow';
 import { API_BASE_URL, apiHeaders } from './apiConfig';
 import { getDateRange, formatDateFromISO } from '@/utils/dateUtils';
-import { processScheduleData, generateMockScheduleData } from './scheduleDataProcessor';
+import { processScheduleData } from './scheduleDataProcessor';
 
 /**
  * Service for fetching available schedules
@@ -88,11 +88,9 @@ export const AvailableSchedulesService = {
         console.log(`No schedules found for ${days} days, trying next range...`);
       }
       
-      // If no schedules found in any range, use mock data for testing
-      console.log('No schedules found in any date range, using mock data');
-      const today = new Date();
-      today.setDate(today.getDate() + 2); // Add 2 days to current date
-      return generateMockScheduleData(sanitizedProfessionalId, today);
+      // If no schedules found in any range, return empty array (no mock data)
+      console.log('No schedules found in any date range');
+      return [];
       
     } catch (error) {
       console.error('Erro ao buscar horários disponíveis:', error);

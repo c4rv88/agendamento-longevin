@@ -40,6 +40,13 @@ export const useDateTimeSelection = (
       setLoading(true);
       setError(null);
       
+      console.log('Fetching schedules with params:', {
+        professionalId,
+        unityId,
+        specialtyId,
+        insuranceId
+      });
+      
       const schedules = await FeegowApiService.getAvailableSchedules(
         professionalId,
         unityId || 0,
@@ -47,10 +54,11 @@ export const useDateTimeSelection = (
         insuranceId || 0
       );
       
+      console.log('Received schedules:', schedules);
       setAvailableSchedules(schedules);
       
       if (schedules.length === 0) {
-        setError('Nenhum horário disponível para este profissional.');
+        setError('Nenhum horário disponível encontrado para este profissional com os filtros selecionados.');
         return;
       }
       
@@ -66,7 +74,7 @@ export const useDateTimeSelection = (
     } catch (error) {
       console.error('Erro ao carregar horários:', error);
       setError('Falha ao carregar horários disponíveis. Por favor, tente novamente.');
-      toast.error('Falha ao carregar horários disponíveis');
+      setAvailableSchedules([]);
     } finally {
       setLoading(false);
     }

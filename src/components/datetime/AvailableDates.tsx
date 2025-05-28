@@ -19,25 +19,31 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
   selectedDate,
   onSelectDate
 }) => {
-  // Function to parse dates from string to Date object
+  // Function to parse dates from string to Date object with better error handling
   const parseDate = (dateString: string): Date | null => {
     try {
       if (!dateString) return null;
       
       let date: Date | null = null;
-      // Check if date is in dd-mm-yyyy or yyyy-mm-dd format
-      if (dateString.includes('-') && dateString.split('-').length === 3) {
-        const parts = dateString.split('-');
-        
-        // If the first part is 4 characters (year), it's in yyyy-MM-dd format
-        if (parts[0].length === 4) {
-          date = parse(dateString, 'yyyy-MM-dd', new Date());
-        } else {
-          // Otherwise it's in dd-MM-yyyy format
-          date = parse(dateString, 'dd-MM-yyyy', new Date());
-        }
+      
+      // Handle dd-mm-yyyy format (most common from our API)
+      if (dateString.match(/^\d{2}-\d{2}-\d{4}$/)) {
+        date = parse(dateString, 'dd-MM-yyyy', new Date());
+      }
+      // Handle yyyy-mm-dd format
+      else if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        date = parse(dateString, 'yyyy-MM-dd', new Date());
+      }
+      // Handle dd/mm/yyyy format
+      else if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        date = parse(dateString, 'dd/MM/yyyy', new Date());
+      }
+      // Handle yyyy/mm/dd format
+      else if (dateString.match(/^\d{4}\/\d{2}\/\d{2}$/)) {
+        date = parse(dateString, 'yyyy/MM/dd', new Date());
       }
       
+      console.log('Parsed date:', dateString, '→', date, 'Valid:', isValid(date));
       return isValid(date) ? date : null;
     } catch (error) {
       console.error('Error parsing date:', error, dateString);
@@ -73,22 +79,17 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
       return matchingSchedule.date;
     }
     
-    // Fallback: format to yyyy-MM-dd
-    return format(date, 'yyyy-MM-dd');
+    // Fallback: format to dd-mm-yyyy (our standard format)
+    return format(date, 'dd-MM-yyyy');
   };
 
   // Function to handle date selection from calendar
   const handleDateSelect = (date: Date | undefined) => {
     if (date && isDateAvailable(date)) {
       const dateString = formatDateToString(date);
+      console.log('Selected date:', date, '→', dateString);
       onSelectDate(dateString);
     }
-  };
-
-  // Get the count of available times for the selected date
-  const getTimesCountForDate = (dateStr: string): number => {
-    const schedule = availableSchedules.find(s => s.date === dateStr);
-    return schedule ? schedule.times.length : 0;
   };
 
   // Debug logs
@@ -96,7 +97,7 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
     availableDatesCount: availableDates.length,
     selectedDate,
     parsedSelectedDate,
-    availableSchedules
+    availableSchedules: availableSchedules.map(s => ({ date: s.date, times: s.times.length }))
   });
 
   return (
@@ -104,7 +105,7 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CalendarCheck className="w-5 h-5" />
-          Datas Disponíveis
+          Datas Disponíveis ({availableSchedules.length})
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -134,7 +135,10 @@ export const AvailableDates: React.FC<AvailableDatesProps> = ({
                 const date = parseDate(schedule.date);
                 const isSelected = selectedDate === schedule.date;
                 
-                if (!date) return null;
+                if (!date) {
+                  console.warn('Could not parse date:', schedule.date);
+                  return null;
+                }
                 
                 return (
                   <button

@@ -75,10 +75,18 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="p-4 text-center">
-            <p className="text-amber-600">
-              Não foram encontrados horários disponíveis para este profissional.
-              Tente selecionar outro convênio ou profissional.
+          <div className="p-6 text-center">
+            <div className="mb-4">
+              <CalendarCheck className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+            </div>
+            <h3 className="text-lg font-medium text-blue-900 mb-2">
+              Sem datas disponíveis
+            </h3>
+            <p className="text-blue-700 mb-4">
+              Não foram encontrados horários disponíveis para este profissional com os filtros selecionados.
+            </p>
+            <p className="text-sm text-blue-600">
+              Tente selecionar outro convênio, profissional ou unidade para ver mais opções.
             </p>
           </div>
         </CardContent>
