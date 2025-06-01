@@ -95,6 +95,7 @@ export const useAppointmentConfirmation = () => {
           horario: formattedTime || '00:00',
           local: formattedLocation || 'Local não informado',
           profissional: String(appointmentData.selectedProfessional?.professional_name || 'Profissional').trim(),
+          convenio: String(appointmentData.selectedInsurance?.insurance_name || 'Particular').trim(),
           telefone: String(patientData.patient_phone || '').replace(/\D/g, '')
         };
 
