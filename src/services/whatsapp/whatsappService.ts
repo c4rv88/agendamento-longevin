@@ -1,5 +1,4 @@
 
-
 interface WhatsAppTemplateData {
   nome: string;
   especialidade: string;
@@ -105,8 +104,17 @@ export const WhatsAppService = {
       if (!response.ok) {
         console.error('=== ERRO NA API WHATSAPP ===');
         console.error('Status:', response.status);
-        console.error('Data:', data);
-        console.error('Erro detalhado:', data.error);
+        console.error('Data completa:', JSON.stringify(data, null, 2));
+        
+        // Log detalhado do erro
+        if (data.error) {
+          console.error('Tipo do erro:', data.error.type);
+          console.error('Código do erro:', data.error.code);
+          console.error('Mensagem do erro:', data.error.message);
+          console.error('Detalhes do erro:', JSON.stringify(data.error.error_data || {}, null, 2));
+          console.error('Trace ID:', data.error.fbtrace_id);
+        }
+        
         return false;
       }
 
@@ -117,8 +125,12 @@ export const WhatsAppService = {
       console.error('Tipo do erro:', typeof error);
       console.error('Erro completo:', error);
       console.error('Stack trace:', error instanceof Error ? error.stack : 'N/A');
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.error('Erro de rede: Verifique a conexão com a internet');
+      }
+      
       return false;
     }
   }
 };
-
