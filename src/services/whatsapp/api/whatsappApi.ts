@@ -32,7 +32,7 @@ export const sendWhatsAppMessage = async (payload: WhatsAppPayload): Promise<boo
   
   console.log('URL da API:', url);
   console.log('=== ENVIANDO REQUISIÇÃO ===');
-  console.log('Headers:', headers);
+  console.log('Headers configurados (token omitido por segurança)');
 
   try {
     const response = await fetch(url, {
