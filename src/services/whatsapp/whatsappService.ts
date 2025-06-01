@@ -1,4 +1,3 @@
-
 interface WhatsAppTemplateData {
   nome: string;
   especialidade: string;
@@ -94,7 +93,8 @@ export const WhatsAppService = {
       console.log('=== PAYLOAD SIMPLIFICADO (SEM BOTÃO) ===');
       console.log(JSON.stringify(payload, null, 2));
 
-      const url = `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`;
+      // URL atualizada para v22.0
+      const url = `https://graph.facebook.com/v22.0/${phoneNumberId}/messages`;
       console.log('URL da API:', url);
       
       const headers = {
