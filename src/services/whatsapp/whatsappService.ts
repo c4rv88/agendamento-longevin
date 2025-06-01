@@ -82,7 +82,7 @@ export const WhatsAppService = {
         return false;
       }
 
-      // Payload completo com template e botão de resposta rápida
+      // Payload simplificado SEM botão de resposta rápida (para testar)
       const payload = {
         messaging_product: "whatsapp",
         to: finalPhone,
@@ -96,23 +96,12 @@ export const WhatsAppService = {
             {
               type: "body",
               parameters: bodyParameters
-            },
-            {
-              type: "button",
-              sub_type: "quick_reply",
-              index: "0",
-              parameters: [
-                {
-                  type: "payload",
-                  payload: "finalizar_atendimento"
-                }
-              ]
             }
           ]
         }
       };
 
-      console.log('=== PAYLOAD COMPLETO COM TEMPLATE E BOTÃO ===');
+      console.log('=== PAYLOAD SIMPLIFICADO (SEM BOTÃO) ===');
       console.log(JSON.stringify(payload, null, 2));
 
       // URL da API do Facebook
