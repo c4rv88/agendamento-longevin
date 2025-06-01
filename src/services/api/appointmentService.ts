@@ -60,13 +60,24 @@ export const AppointmentService = {
       
       if (!response.ok) {
         console.error('API Error Response:', data);
+        // Extrair a mensagem específica da API se disponível
+        const errorMessage = data.content || data.message || `HTTP ${response.status}`;
         throw new Error(`API Error: ${JSON.stringify(data)}`);
+      }
+      
+      // Verificar se a resposta indica sucesso, mesmo com status 200
+      if (data.success === false) {
+        console.error('API returned success:false:', data);
+        // Lançar erro com a mensagem específica da API
+        const errorMessage = data.content || data.message || 'Erro desconhecido da API';
+        throw new Error(errorMessage);
       }
       
       return data.success;
     } catch (error) {
       console.error('Erro ao criar agendamento:', error);
-      return false;
+      // Re-lançar o erro para que seja tratado corretamente no hook
+      throw error;
     }
   }
 };

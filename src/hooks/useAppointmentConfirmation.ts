@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
 import { FeegowApiService } from '@/services/api';
@@ -119,11 +120,23 @@ export const useAppointmentConfirmation = () => {
     } catch (error) {
       console.error('=== ERRO GERAL NA CONFIRMAÇÃO ===');
       console.error('Error in appointment confirmation:', error);
-      toast({
-        title: "Erro no agendamento",
-        description: "Ocorreu um erro ao confirmar o agendamento. Tente novamente.",
-        variant: "destructive",
-      });
+      
+      // Verificar se é o erro específico de agendamento duplicado
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('já possui um agendamento nessa agenda') || 
+          errorMessage.includes('Esse paciente já possui um agendamento')) {
+        toast({
+          title: "Agendamento já existe",
+          description: "Este paciente já possui um agendamento para este profissional nesta data e horário. Escolha outro horário ou data.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro no agendamento",
+          description: "Ocorreu um erro ao confirmar o agendamento. Tente novamente.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setConfirming(false);
     }
