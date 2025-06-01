@@ -24,37 +24,17 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
 
   useEffect(() => {
     const fetchInsurances = async () => {
-      if (!professionalId) {
-        setLoading(false);
-        setError('ID do profissional não fornecido');
-        return;
-      }
+      if (!professionalId) return;
       
       try {
         setLoading(true);
         setError(null);
-        
-        console.log('Fetching insurances for professional:', professionalId);
         const data = await FeegowApiService.getInsurances(professionalId);
-        
-        console.log('Insurance data received:', data);
+        console.log('Fetched insurances:', data);
         setInsurances(data);
-        
-        // If no insurances found (only "Particular"), show appropriate message
-        if (data.length === 1 && data[0].insurance_name === 'Particular') {
-          console.log('Only "Particular" option available for professional:', professionalId);
-        }
-        
       } catch (error) {
-        console.error('Error loading insurances:', error);
-        setError('Falha ao carregar convênios. Verifique a conexão com a API.');
-        
-        // Set only "Particular" as fallback
-        setInsurances([{
-          insurance_id: 0,
-          insurance_name: 'Particular',
-          professional_id: professionalId
-        }]);
+        console.error('Erro ao carregar convênios:', error);
+        setError('Falha ao carregar convênios. Por favor, tente novamente.');
       } finally {
         setLoading(false);
       }
@@ -66,7 +46,6 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
   const handleSelectInsurance = (insuranceId: string) => {
     const insurance = insurances.find(i => i.insurance_id.toString() === insuranceId);
     if (insurance) {
-      console.log('Selected insurance:', insurance);
       onSelect(insurance);
     }
   };
@@ -98,15 +77,30 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
         </CardHeader>
         <CardContent>
           <div className="p-4 text-center">
-            <p className="text-red-500 text-sm">{error}</p>
-            <p className="text-gray-500 text-xs mt-2">Apenas consultas particulares disponíveis</p>
+            <p className="text-red-500">{error}</p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  const hasOnlyParticular = insurances.length === 1 && insurances[0].insurance_name === 'Particular';
+  if (insurances.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            Selecione o Convênio
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center">
+            <p className="text-gray-500">Nenhum convênio disponível para este profissional.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full">
@@ -117,43 +111,24 @@ export const InsuranceSelector: React.FC<InsuranceSelectorProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {hasOnlyParticular ? (
-          <div className="p-4 text-center bg-blue-50 rounded-lg border">
-            <p className="text-blue-700 font-medium">Apenas consultas particulares disponíveis</p>
-            <p className="text-blue-600 text-sm mt-1">
-              Este profissional não possui convênios cadastrados
-            </p>
-          </div>
-        ) : (
-          <Select 
-            value={selectedInsurance?.insurance_id.toString() || ""} 
-            onValueChange={handleSelectInsurance}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Escolha um convênio" />
-            </SelectTrigger>
-            <SelectContent className="bg-white z-50">
-              {insurances.map((insurance) => (
-                <SelectItem 
-                  key={insurance.insurance_id} 
-                  value={insurance.insurance_id.toString()}
-                  className="cursor-pointer hover:bg-blue-50"
-                >
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="w-4 h-4 text-blue-600" />
-                    <span>{insurance.insurance_name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-        
-        {insurances.length > 1 && (
-          <p className="text-xs text-gray-500 mt-2">
-            {insurances.length - 1} convênio(s) + Particular disponíveis
-          </p>
-        )}
+        <Select 
+          value={selectedInsurance?.insurance_id.toString() || ""} 
+          onValueChange={handleSelectInsurance}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Escolha um convênio" />
+          </SelectTrigger>
+          <SelectContent className="bg-white">
+            {insurances.map((insurance) => (
+              <SelectItem 
+                key={insurance.insurance_id} 
+                value={insurance.insurance_id.toString()}
+              >
+                {insurance.insurance_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </CardContent>
     </Card>
   );
