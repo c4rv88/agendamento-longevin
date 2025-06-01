@@ -1,5 +1,4 @@
 
-
 interface WhatsAppTemplateData {
   nome: string;
   especialidade: string;
@@ -16,6 +15,16 @@ export const WhatsAppService = {
       console.log('=== INICIANDO ENVIO WHATSAPP ===');
       console.log('Template data recebido:', templateData);
       
+      // Log dos dados originais ANTES de qualquer processamento
+      console.log('=== DADOS ORIGINAIS RECEBIDOS ===');
+      console.log('Nome original:', JSON.stringify(templateData.nome));
+      console.log('Especialidade original:', JSON.stringify(templateData.especialidade));
+      console.log('Data original:', JSON.stringify(templateData.data));
+      console.log('Horário original:', JSON.stringify(templateData.horario));
+      console.log('Local original:', JSON.stringify(templateData.local));
+      console.log('Profissional original:', JSON.stringify(templateData.profissional));
+      console.log('Telefone original:', JSON.stringify(templateData.telefone));
+      
       // Validar e garantir que TODOS os campos tenham valores não vazios e válidos
       const cleanData = {
         nome: String(templateData.nome || 'Paciente').trim() || 'Paciente',
@@ -29,7 +38,7 @@ export const WhatsAppService = {
 
       console.log('=== DADOS LIMPOS E VALIDADOS ===');
       Object.entries(cleanData).forEach(([key, value]) => {
-        console.log(`${key}:`, typeof value, `"${value}"`, value.length, 'chars');
+        console.log(`${key}:`, typeof value, `"${value}"`, `length: ${value.length}`);
         if (key !== 'telefone' && (!value || value.trim() === '' || value.length === 0)) {
           console.error(`🚨 CAMPO VAZIO DETECTADO: ${key} = "${value}"`);
         }
@@ -57,7 +66,7 @@ export const WhatsAppService = {
       const finalPhone = `55${formattedPhone}`;
       console.log('Telefone final formatado:', finalPhone);
       
-      // Criar parâmetros do template seguindo exatamente a ordem do template
+      // Criar parâmetros do template - ESTRUTURA SIMPLIFICADA
       const bodyParameters = [
         { type: "text", text: cleanData.nome },
         { type: "text", text: cleanData.especialidade },
@@ -71,6 +80,12 @@ export const WhatsAppService = {
       let hasEmptyParameter = false;
       bodyParameters.forEach((param, index) => {
         console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));
+        console.log(`  - Tipo: ${param.type}`);
+        console.log(`  - Texto: "${param.text}"`);
+        console.log(`  - Comprimento: ${param.text.length}`);
+        console.log(`  - É string: ${typeof param.text === 'string'}`);
+        console.log(`  - Está vazio: ${!param.text || param.text.trim() === ''}`);
+        
         if (!param.text || typeof param.text !== 'string' || param.text.trim() === '' || param.text.length === 0) {
           console.error(`🚨 ERRO CRÍTICO: Parâmetro ${index + 1} está vazio ou inválido!`, param);
           hasEmptyParameter = true;
@@ -82,7 +97,7 @@ export const WhatsAppService = {
         return false;
       }
 
-      // Payload simplificado SEM botão de resposta rápida (para testar)
+      // Payload com estrutura mínima - TESTE COM TEMPLATE NAME EXATO
       const payload = {
         messaging_product: "whatsapp",
         to: finalPhone,
@@ -101,8 +116,17 @@ export const WhatsAppService = {
         }
       };
 
-      console.log('=== PAYLOAD SIMPLIFICADO (SEM BOTÃO) ===');
+      console.log('=== PAYLOAD FINAL PARA ENVIO ===');
+      console.log('JSON completo do payload:');
       console.log(JSON.stringify(payload, null, 2));
+      
+      // Log específico do template
+      console.log('=== DETALHES DO TEMPLATE ===');
+      console.log('Nome do template:', payload.template.name);
+      console.log('Código do idioma:', payload.template.language.code);
+      console.log('Número de componentes:', payload.template.components.length);
+      console.log('Tipo do primeiro componente:', payload.template.components[0].type);
+      console.log('Número de parâmetros no body:', payload.template.components[0].parameters.length);
 
       // URL da API do Facebook
       const url = `https://graph.facebook.com/v22.0/${phoneNumberId}/messages`;
@@ -114,6 +138,7 @@ export const WhatsAppService = {
       };
 
       console.log('=== ENVIANDO REQUISIÇÃO ===');
+      console.log('Headers:', headers);
       
       const response = await fetch(url, {
         method: 'POST',
@@ -161,4 +186,3 @@ export const WhatsAppService = {
     }
   }
 };
-
