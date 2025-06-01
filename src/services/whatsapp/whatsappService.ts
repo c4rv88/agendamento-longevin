@@ -25,11 +25,40 @@ export const WhatsAppService = {
       console.log('Profissional original:', JSON.stringify(templateData.profissional));
       console.log('Telefone original:', JSON.stringify(templateData.telefone));
       
+      // Função para converter data para formato DD-MM-YYYY
+      const formatDateToBrazilian = (dateString: string): string => {
+        if (!dateString) return '01-01-2024';
+        
+        // Se já está no formato DD-MM-YYYY, retornar como está
+        if (dateString.match(/^\d{2}-\d{2}-\d{4}$/)) {
+          console.log('Data já no formato correto DD-MM-YYYY:', dateString);
+          return dateString;
+        }
+        
+        // Se está no formato YYYY-MM-DD, converter para DD-MM-YYYY
+        if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [year, month, day] = dateString.split('-');
+          const brazilianDate = `${day}-${month}-${year}`;
+          console.log(`Convertendo data de ${dateString} para ${brazilianDate}`);
+          return brazilianDate;
+        }
+        
+        // Se está no formato DD/MM/YYYY, converter para DD-MM-YYYY
+        if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+          const converted = dateString.replace(/\//g, '-');
+          console.log(`Convertendo data de ${dateString} para ${converted}`);
+          return converted;
+        }
+        
+        console.error('Formato de data não reconhecido:', dateString);
+        return '01-01-2024'; // Fallback
+      };
+      
       // Validar e garantir que TODOS os campos tenham valores não vazios e válidos
       const cleanData = {
         nome: String(templateData.nome || 'Paciente').trim() || 'Paciente',
         especialidade: String(templateData.especialidade || 'Consulta').trim() || 'Consulta',
-        data: String(templateData.data || '01-01-2024').trim() || '01-01-2024',
+        data: formatDateToBrazilian(String(templateData.data || '01-01-2024').trim()),
         horario: String(templateData.horario || '09:00').trim() || '09:00',
         local: String(templateData.local || 'Clinica').trim() || 'Clinica',
         profissional: String(templateData.profissional || 'Medico').trim() || 'Medico',
@@ -66,11 +95,11 @@ export const WhatsAppService = {
       const finalPhone = `55${formattedPhone}`;
       console.log('Telefone final formatado:', finalPhone);
       
-      // Criar parâmetros do template - ESTRUTURA SIMPLIFICADA
+      // Criar parâmetros do template - AGORA COM DATA NO FORMATO CORRETO
       const bodyParameters = [
         { type: "text", text: cleanData.nome },
         { type: "text", text: cleanData.especialidade },
-        { type: "text", text: cleanData.data },
+        { type: "text", text: cleanData.data }, // AGORA GARANTIDAMENTE DD-MM-YYYY
         { type: "text", text: cleanData.horario },
         { type: "text", text: cleanData.local },
         { type: "text", text: cleanData.profissional }
