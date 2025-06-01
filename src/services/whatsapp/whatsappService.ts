@@ -15,30 +15,52 @@ export const WhatsAppService = {
       console.log('=== INICIANDO ENVIO WHATSAPP ===');
       console.log('Template data recebido:', templateData);
       
-      // Validar e garantir que todos os campos estão preenchidos
-      const validatedData = {
-        nome: templateData.nome?.trim() || 'Nome não informado',
-        especialidade: templateData.especialidade?.trim() || 'Especialidade não informada',
-        data: templateData.data?.trim() || 'Data não informada',
-        horario: templateData.horario?.trim() || 'Horário não informado',
-        local: templateData.local?.trim() || 'Local não informado',
-        profissional: templateData.profissional?.trim() || 'Profissional não informado'
+      // Validar rigorosamente cada campo
+      const cleanData = {
+        nome: String(templateData.nome || '').trim(),
+        especialidade: String(templateData.especialidade || '').trim(),
+        data: String(templateData.data || '').trim(),
+        horario: String(templateData.horario || '').trim(),
+        local: String(templateData.local || '').trim(),
+        profissional: String(templateData.profissional || '').trim(),
+        telefone: String(templateData.telefone || '').replace(/\D/g, '')
       };
 
-      console.log('=== DADOS VALIDADOS ===');
-      console.log('Nome:', `"${validatedData.nome}"`);
-      console.log('Especialidade:', `"${validatedData.especialidade}"`);
-      console.log('Data:', `"${validatedData.data}"`);
-      console.log('Horário:', `"${validatedData.horario}"`);
-      console.log('Local:', `"${validatedData.local}"`);
-      console.log('Profissional:', `"${validatedData.profissional}"`);
-      
+      console.log('=== DADOS LIMPOS ===');
+      Object.entries(cleanData).forEach(([key, value]) => {
+        console.log(`${key}:`, typeof value, `"${value}"`, value.length, 'chars');
+        if (key !== 'telefone' && (!value || value.length === 0)) {
+          console.error(`🚨 CAMPO VAZIO DETECTADO: ${key}`);
+        }
+      });
+
+      // Se qualquer campo obrigatório estiver vazio, usar valores padrão
+      const safeData = {
+        nome: cleanData.nome || 'Paciente',
+        especialidade: cleanData.especialidade || 'Consulta',
+        data: cleanData.data || new Date().toLocaleDateString('pt-BR'),
+        horario: cleanData.horario || '00:00',
+        local: cleanData.local || 'Clínica',
+        profissional: cleanData.profissional || 'Médico'
+      };
+
+      console.log('=== DADOS SEGUROS PARA ENVIO ===');
+      Object.entries(safeData).forEach(([key, value]) => {
+        console.log(`${key}:`, typeof value, `"${value}"`, value.length, 'chars');
+      });
+
+      // Verificar telefone
+      if (!cleanData.telefone || cleanData.telefone.length < 10) {
+        console.error('🚨 TELEFONE INVÁLIDO:', cleanData.telefone);
+        return false;
+      }
+
       // WhatsApp Cloud API credentials
       const token = 'EAAVlloPc6eABO4tOWmbgl16kuG500Msz3fZAC46SK8TZBOAF8pQXwUC5Yjs5qrkQZCchzs6OQRoRcHSr7idDx99USb1jHA0Onv1PZAlpFlPbqlW8DdndZBJtR5fhMUj28GWrlTDQhgZCV3C9s6bPosVm0BByHAZBJHYNEi4MupOyyBdlNhKf4HjyWpjnluS3p5NAgZDZD';
       const phoneNumberId = '401831683009192';
       
       // Format phone number for WhatsApp
-      let formattedPhone = templateData.telefone.replace(/\D/g, '');
+      let formattedPhone = cleanData.telefone;
       console.log('Telefone original:', templateData.telefone);
       console.log('Telefone após limpar:', formattedPhone);
       
@@ -49,21 +71,21 @@ export const WhatsAppService = {
       const finalPhone = `55${formattedPhone}`;
       console.log('Telefone final formatado:', finalPhone);
       
-      // Criar parâmetros do template com validação individual
+      // Criar parâmetros do template garantindo que NUNCA estejam vazios
       const templateParameters = [
-        { type: "text", text: validatedData.nome },
-        { type: "text", text: validatedData.especialidade },
-        { type: "text", text: validatedData.data },
-        { type: "text", text: validatedData.horario },
-        { type: "text", text: validatedData.local },
-        { type: "text", text: validatedData.profissional }
+        { type: "text", text: safeData.nome },
+        { type: "text", text: safeData.especialidade },
+        { type: "text", text: safeData.data },
+        { type: "text", text: safeData.horario },
+        { type: "text", text: safeData.local },
+        { type: "text", text: safeData.profissional }
       ];
 
-      console.log('=== PARÂMETROS DO TEMPLATE ===');
+      console.log('=== PARÂMETROS FINAIS DO TEMPLATE ===');
       templateParameters.forEach((param, index) => {
         console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));
         if (!param.text || param.text.trim() === '') {
-          console.warn(`⚠️ ALERTA: Parâmetro ${index + 1} está vazio!`);
+          console.error(`🚨 ERRO: Parâmetro ${index + 1} ainda está vazio após processamento!`);
         }
       });
 
