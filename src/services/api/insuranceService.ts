@@ -15,8 +15,13 @@ export const InsuranceService = {
         headers: apiHeaders,
       });
       
+      if (!response.ok) {
+        console.error('API response error:', response.status, response.statusText);
+        throw new Error(`API Error: ${response.status}`);
+      }
+      
       const data = await response.json();
-      console.log('API response for insurances:', data);
+      console.log('Raw API response for insurances:', data);
       
       const insurances: Insurance[] = [];
       
@@ -27,39 +32,55 @@ export const InsuranceService = {
         professional_id: professionalId
       });
       
-      // Check if data has the expected structure
-      if (data.success && data.content && Array.isArray(data.content)) {
-        // Map the API response to our Insurance type
-        data.content.forEach((ins: any) => {
-          // Avoid duplicating "Particular"
-          if (parseInt(ins.convenio_id) !== 0 && ins.nome.toLowerCase() !== 'particular') {
-            insurances.push({
-              insurance_id: parseInt(ins.convenio_id),
-              insurance_name: ins.nome,
-              professional_id: professionalId
-            });
-          }
-        });
-      } else if (Array.isArray(data) && data[0]?.success && data[0]?.content) {
-        // Handle alternative response format - array with nested content
-        const contentArray = data[0].content;
-        if (Array.isArray(contentArray)) {
-          contentArray.forEach((ins: any) => {
-            if (parseInt(ins.convenio_id) !== 0 && ins.nome.toLowerCase() !== 'particular') {
-              insurances.push({
-                insurance_id: parseInt(ins.convenio_id),
-                insurance_name: ins.nome,
-                professional_id: professionalId
-              });
-            }
-          });
+      // Process API response to extract real insurance data
+      let insuranceData = [];
+      
+      // Handle different response formats from the API
+      if (data.success && data.content) {
+        if (Array.isArray(data.content)) {
+          insuranceData = data.content;
+        } else if (data.content.data && Array.isArray(data.content.data)) {
+          insuranceData = data.content.data;
         }
+      } else if (Array.isArray(data)) {
+        // Handle case where response is directly an array
+        insuranceData = data;
       }
       
-      console.log('Transformed insurances:', insurances);
-      return insurances;
+      console.log('Processed insurance data:', insuranceData);
+      
+      // Filter and map only valid insurance entries
+      insuranceData.forEach((insurance: any) => {
+        // Check for valid insurance data structure
+        const insuranceId = insurance.convenio_id || insurance.insurance_id || insurance.id;
+        const insuranceName = insurance.nome || insurance.insurance_name || insurance.name;
+        
+        if (insuranceId && insuranceName && 
+            parseInt(insuranceId) !== 0 && 
+            insuranceName.toLowerCase() !== 'particular') {
+          
+          // Only add if it's a real insurance entry with proper data
+          insurances.push({
+            insurance_id: parseInt(insuranceId),
+            insurance_name: insuranceName.trim(),
+            professional_id: professionalId
+          });
+        }
+      });
+      
+      console.log('Final filtered insurances for professional', professionalId, ':', insurances);
+      
+      // Remove duplicates based on insurance_id
+      const uniqueInsurances = insurances.filter((insurance, index, self) => 
+        index === self.findIndex(i => i.insurance_id === insurance.insurance_id)
+      );
+      
+      return uniqueInsurances;
+      
     } catch (error) {
-      console.error('Erro ao buscar convênios:', error);
+      console.error('Error fetching insurances:', error);
+      
+      // Return only "Particular" option in case of error
       return [{
         insurance_id: 0,
         insurance_name: 'Particular',
