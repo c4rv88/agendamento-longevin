@@ -14,6 +14,9 @@ export const useAppointmentConfirmation = () => {
   const handleConfirmAppointment = async (appointmentData: AppointmentState) => {
     setConfirming(true);
     try {
+      console.log('=== INICIANDO CONFIRMAÇÃO DE AGENDAMENTO ===');
+      console.log('Dados do agendamento:', appointmentData);
+      
       // Se o paciente não tem ID, criar primeiro
       let patientData = appointmentData.patient;
       if (!patientData?.patient_id) {
@@ -56,10 +59,10 @@ export const useAppointmentConfirmation = () => {
       const success = await FeegowApiService.createAppointment(appointmentPayload);
       
       if (success) {
+        console.log('=== AGENDAMENTO CRIADO, ENVIANDO WHATSAPP ===');
+        
         // Enviar notificação via WhatsApp
         try {
-          console.log('Sending WhatsApp notification...');
-          
           // Formatar data para exibição (DD/MM/YYYY)
           const formattedDate = appointmentData.selectedDate.split('-').reverse().join('/');
           
@@ -73,16 +76,34 @@ export const useAppointmentConfirmation = () => {
             telefone: patientData.patient_phone
           };
 
+          console.log('=== DADOS PARA WHATSAPP ===');
           console.log('WhatsApp data being sent:', whatsappData);
+          
+          // Validar se todos os campos obrigatórios estão preenchidos
+          const missingFields = [];
+          if (!whatsappData.nome) missingFields.push('nome');
+          if (!whatsappData.especialidade) missingFields.push('especialidade');
+          if (!whatsappData.data) missingFields.push('data');
+          if (!whatsappData.horario) missingFields.push('horario');
+          if (!whatsappData.local) missingFields.push('local');
+          if (!whatsappData.profissional) missingFields.push('profissional');
+          if (!whatsappData.telefone) missingFields.push('telefone');
+          
+          if (missingFields.length > 0) {
+            console.error('Campos obrigatórios faltando:', missingFields);
+            console.warn('Enviando WhatsApp mesmo com campos faltando...');
+          }
 
           const whatsappSent = await WhatsAppService.sendAppointmentNotification(whatsappData);
           
           if (whatsappSent) {
-            console.log('WhatsApp notification sent successfully');
+            console.log('=== WHATSAPP ENVIADO COM SUCESSO ===');
           } else {
-            console.warn('Failed to send WhatsApp notification, but appointment was created');
+            console.warn('=== FALHA AO ENVIAR WHATSAPP ===');
+            console.warn('Agendamento foi criado, mas WhatsApp falhou');
           }
         } catch (whatsappError) {
+          console.error('=== ERRO NO WHATSAPP ===');
           console.error('Error sending WhatsApp notification:', whatsappError);
           // Não falhar o agendamento se o WhatsApp falhar
         }
@@ -96,6 +117,7 @@ export const useAppointmentConfirmation = () => {
         throw new Error('Erro ao criar agendamento');
       }
     } catch (error) {
+      console.error('=== ERRO GERAL NA CONFIRMAÇÃO ===');
       console.error('Error in appointment confirmation:', error);
       toast({
         title: "Erro no agendamento",
