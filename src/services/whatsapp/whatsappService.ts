@@ -108,12 +108,23 @@ export const WhatsAppService = {
             {
               type: "body",
               parameters: templateParameters
+            },
+            {
+              type: "button",
+              sub_type: "quick_reply",
+              index: "0",
+              parameters: [
+                {
+                  type: "payload",
+                  payload: "CONFIRMAR_AGENDAMENTO"
+                }
+              ]
             }
           ]
         }
       };
 
-      console.log('=== PAYLOAD COMPLETO ===');
+      console.log('=== PAYLOAD COMPLETO COM BOTÃO ===');
       console.log(JSON.stringify(payload, null, 2));
 
       const url = `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`;
