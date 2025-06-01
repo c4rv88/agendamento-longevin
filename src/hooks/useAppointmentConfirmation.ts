@@ -1,5 +1,3 @@
-
-
 import { useState } from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
 import { FeegowApiService } from '@/services/api';
@@ -33,8 +31,6 @@ export const useAppointmentConfirmation = () => {
       // Garantir que temos um patient_id válido
       const patientId = patientData.patient_id;
       console.log('Final patient ID to use:', patientId);
-      console.log('Patient ID type:', typeof patientId);
-      console.log('Patient ID value:', patientId);
       
       if (!patientId) {
         console.error('Patient data after creation/retrieval:', patientData);
@@ -59,53 +55,57 @@ export const useAppointmentConfirmation = () => {
       const success = await FeegowApiService.createAppointment(appointmentPayload);
       
       if (success) {
-        console.log('=== AGENDAMENTO CRIADO, ENVIANDO WHATSAPP ===');
+        console.log('=== AGENDAMENTO CRIADO, PREPARANDO DADOS PARA WHATSAPP ===');
         
-        // Enviar notificação via WhatsApp
+        // Formatar data para exibição (DD/MM/YYYY)
+        const formattedDate = appointmentData.selectedDate?.split('-').reverse().join('/') || '';
+        
+        // Preparar dados do WhatsApp com validação detalhada
+        const whatsappData = {
+          nome: patientData.patient_name || 'Nome não informado',
+          especialidade: appointmentData.selectedSpecialty?.specialty_name || 'Especialidade não informada',
+          data: formattedDate,
+          horario: appointmentData.selectedTime || 'Horário não informado',
+          local: appointmentData.selectedUnity?.unity_name || 'Local não informado',
+          profissional: appointmentData.selectedProfessional?.professional_name || 'Profissional não informado',
+          telefone: patientData.patient_phone || ''
+        };
+
+        console.log('=== DADOS PARA WHATSAPP (ANTES DO ENVIO) ===');
+        console.log('Nome:', `"${whatsappData.nome}"`);
+        console.log('Especialidade:', `"${whatsappData.especialidade}"`);
+        console.log('Data:', `"${whatsappData.data}"`);
+        console.log('Horário:', `"${whatsappData.horario}"`);
+        console.log('Local:', `"${whatsappData.local}"`);
+        console.log('Profissional:', `"${whatsappData.profissional}"`);
+        console.log('Telefone:', `"${whatsappData.telefone}"`);
+        
+        // Verificar campos obrigatórios
+        const missingFields = [];
+        if (!whatsappData.nome || whatsappData.nome.trim() === '') missingFields.push('nome');
+        if (!whatsappData.especialidade || whatsappData.especialidade.trim() === '') missingFields.push('especialidade');
+        if (!whatsappData.data || whatsappData.data.trim() === '') missingFields.push('data');
+        if (!whatsappData.horario || whatsappData.horario.trim() === '') missingFields.push('horario');
+        if (!whatsappData.local || whatsappData.local.trim() === '') missingFields.push('local');
+        if (!whatsappData.profissional || whatsappData.profissional.trim() === '') missingFields.push('profissional');
+        if (!whatsappData.telefone || whatsappData.telefone.trim() === '') missingFields.push('telefone');
+        
+        if (missingFields.length > 0) {
+          console.error('⚠️ Campos obrigatórios vazios ou ausentes:', missingFields);
+        }
+
+        console.log('=== INICIANDO ENVIO WHATSAPP ===');
         try {
-          // Formatar data para exibição (DD/MM/YYYY)
-          const formattedDate = appointmentData.selectedDate.split('-').reverse().join('/');
-          
-          const whatsappData = {
-            nome: patientData.patient_name,
-            especialidade: appointmentData.selectedSpecialty?.specialty_name || '',
-            data: formattedDate,
-            horario: appointmentData.selectedTime,
-            local: appointmentData.selectedUnity?.unity_name || '',
-            profissional: appointmentData.selectedProfessional?.professional_name || '',
-            telefone: patientData.patient_phone
-          };
-
-          console.log('=== DADOS PARA WHATSAPP ===');
-          console.log('WhatsApp data being sent:', whatsappData);
-          
-          // Validar se todos os campos obrigatórios estão preenchidos
-          const missingFields = [];
-          if (!whatsappData.nome) missingFields.push('nome');
-          if (!whatsappData.especialidade) missingFields.push('especialidade');
-          if (!whatsappData.data) missingFields.push('data');
-          if (!whatsappData.horario) missingFields.push('horario');
-          if (!whatsappData.local) missingFields.push('local');
-          if (!whatsappData.profissional) missingFields.push('profissional');
-          if (!whatsappData.telefone) missingFields.push('telefone');
-          
-          if (missingFields.length > 0) {
-            console.error('Campos obrigatórios faltando:', missingFields);
-            console.warn('Enviando WhatsApp mesmo com campos faltando...');
-          }
-
           const whatsappSent = await WhatsAppService.sendAppointmentNotification(whatsappData);
           
           if (whatsappSent) {
-            console.log('=== WHATSAPP ENVIADO COM SUCESSO ===');
+            console.log('✅ WHATSAPP ENVIADO COM SUCESSO');
           } else {
-            console.warn('=== FALHA AO ENVIAR WHATSAPP ===');
-            console.warn('Agendamento foi criado, mas WhatsApp falhou');
+            console.warn('❌ FALHA AO ENVIAR WHATSAPP');
           }
         } catch (whatsappError) {
           console.error('=== ERRO NO WHATSAPP ===');
           console.error('Error sending WhatsApp notification:', whatsappError);
-          // Não falhar o agendamento se o WhatsApp falhar
         }
 
         setConfirmed(true);
@@ -136,4 +136,3 @@ export const useAppointmentConfirmation = () => {
     setConfirmed,
   };
 };
-

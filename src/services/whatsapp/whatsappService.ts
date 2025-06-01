@@ -15,11 +15,29 @@ export const WhatsAppService = {
       console.log('=== INICIANDO ENVIO WHATSAPP ===');
       console.log('Template data recebido:', templateData);
       
-      // WhatsApp Cloud API credentials (securely stored)
+      // Validar e garantir que todos os campos estão preenchidos
+      const validatedData = {
+        nome: templateData.nome?.trim() || 'Nome não informado',
+        especialidade: templateData.especialidade?.trim() || 'Especialidade não informada',
+        data: templateData.data?.trim() || 'Data não informada',
+        horario: templateData.horario?.trim() || 'Horário não informado',
+        local: templateData.local?.trim() || 'Local não informado',
+        profissional: templateData.profissional?.trim() || 'Profissional não informado'
+      };
+
+      console.log('=== DADOS VALIDADOS ===');
+      console.log('Nome:', `"${validatedData.nome}"`);
+      console.log('Especialidade:', `"${validatedData.especialidade}"`);
+      console.log('Data:', `"${validatedData.data}"`);
+      console.log('Horário:', `"${validatedData.horario}"`);
+      console.log('Local:', `"${validatedData.local}"`);
+      console.log('Profissional:', `"${validatedData.profissional}"`);
+      
+      // WhatsApp Cloud API credentials
       const token = 'EAAVlloPc6eABO4tOWmbgl16kuG500Msz3fZAC46SK8TZBOAF8pQXwUC5Yjs5qrkQZCchzs6OQRoRcHSr7idDx99USb1jHA0Onv1PZAlpFlPbqlW8DdndZBJtR5fhMUj28GWrlTDQhgZCV3C9s6bPosVm0BByHAZBJHYNEi4MupOyyBdlNhKf4HjyWpjnluS3p5NAgZDZD';
       const phoneNumberId = '401831683009192';
       
-      // Format phone number for WhatsApp (remove country code if present)
+      // Format phone number for WhatsApp
       let formattedPhone = templateData.telefone.replace(/\D/g, '');
       console.log('Telefone original:', templateData.telefone);
       console.log('Telefone após limpar:', formattedPhone);
@@ -31,6 +49,24 @@ export const WhatsAppService = {
       const finalPhone = `55${formattedPhone}`;
       console.log('Telefone final formatado:', finalPhone);
       
+      // Criar parâmetros do template com validação individual
+      const templateParameters = [
+        { type: "text", text: validatedData.nome },
+        { type: "text", text: validatedData.especialidade },
+        { type: "text", text: validatedData.data },
+        { type: "text", text: validatedData.horario },
+        { type: "text", text: validatedData.local },
+        { type: "text", text: validatedData.profissional }
+      ];
+
+      console.log('=== PARÂMETROS DO TEMPLATE ===');
+      templateParameters.forEach((param, index) => {
+        console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));
+        if (!param.text || param.text.trim() === '') {
+          console.warn(`⚠️ ALERTA: Parâmetro ${index + 1} está vazio!`);
+        }
+      });
+
       const payload = {
         messaging_product: "whatsapp",
         to: finalPhone,
@@ -43,32 +79,7 @@ export const WhatsAppService = {
           components: [
             {
               type: "body",
-              parameters: [
-                {
-                  type: "text",
-                  text: templateData.nome
-                },
-                {
-                  type: "text",
-                  text: templateData.especialidade
-                },
-                {
-                  type: "text",
-                  text: templateData.data
-                },
-                {
-                  type: "text",
-                  text: templateData.horario
-                },
-                {
-                  type: "text",
-                  text: templateData.local
-                },
-                {
-                  type: "text",
-                  text: templateData.profissional
-                }
-              ]
+              parameters: templateParameters
             }
           ]
         }
@@ -84,7 +95,6 @@ export const WhatsAppService = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
-      console.log('Headers:', headers);
 
       console.log('=== ENVIANDO REQUISIÇÃO ===');
       
