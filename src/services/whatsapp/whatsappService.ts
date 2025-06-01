@@ -1,3 +1,4 @@
+
 interface WhatsAppTemplateData {
   nome: string;
   especialidade: string;
@@ -14,20 +15,23 @@ export const WhatsAppService = {
       console.log('=== INICIANDO ENVIO WHATSAPP ===');
       console.log('Template data recebido:', templateData);
       
-      // Validar e garantir que TODOS os campos tenham valores não vazios
+      // Validar e garantir que TODOS os campos tenham valores não vazios e válidos
       const cleanData = {
-        nome: (templateData.nome || 'Paciente').trim() || 'Paciente',
-        especialidade: (templateData.especialidade || 'Consulta').trim() || 'Consulta',
-        data: (templateData.data || '01-01-2024').trim() || '01-01-2024',
-        horario: (templateData.horario || '09:00').trim() || '09:00',
-        local: (templateData.local || 'Clínica').trim() || 'Clínica',
-        profissional: (templateData.profissional || 'Médico').trim() || 'Médico',
+        nome: String(templateData.nome || 'Paciente').trim() || 'Paciente',
+        especialidade: String(templateData.especialidade || 'Consulta').trim() || 'Consulta',
+        data: String(templateData.data || '01-01-2024').trim() || '01-01-2024',
+        horario: String(templateData.horario || '09:00').trim() || '09:00',
+        local: String(templateData.local || 'Clinica').trim() || 'Clinica',
+        profissional: String(templateData.profissional || 'Medico').trim() || 'Medico',
         telefone: String(templateData.telefone || '').replace(/\D/g, '')
       };
 
       console.log('=== DADOS LIMPOS E VALIDADOS ===');
       Object.entries(cleanData).forEach(([key, value]) => {
         console.log(`${key}:`, typeof value, `"${value}"`, value.length, 'chars');
+        if (key !== 'telefone' && (!value || value.trim() === '' || value.length === 0)) {
+          console.error(`🚨 CAMPO VAZIO DETECTADO: ${key} = "${value}"`);
+        }
       });
 
       // Verificar telefone
@@ -52,7 +56,7 @@ export const WhatsAppService = {
       const finalPhone = `55${formattedPhone}`;
       console.log('Telefone final formatado:', finalPhone);
       
-      // Criar parâmetros do template com validação EXTRA
+      // Criar parâmetros do template com validação EXTREMA
       const templateParameters = [
         { type: "text", text: cleanData.nome },
         { type: "text", text: cleanData.especialidade },
@@ -62,16 +66,22 @@ export const WhatsAppService = {
         { type: "text", text: cleanData.profissional }
       ];
 
-      console.log('=== PARÂMETROS FINAIS DO TEMPLATE ===');
+      console.log('=== VALIDAÇÃO FINAL DOS PARÂMETROS ===');
+      let hasEmptyParameter = false;
       templateParameters.forEach((param, index) => {
         console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));
-        if (!param.text || param.text.length === 0) {
-          console.error(`🚨 ERRO CRÍTICO: Parâmetro ${index + 1} está vazio!`);
-          throw new Error(`Parâmetro ${index + 1} não pode estar vazio`);
+        if (!param.text || typeof param.text !== 'string' || param.text.trim() === '' || param.text.length === 0) {
+          console.error(`🚨 ERRO CRÍTICO: Parâmetro ${index + 1} está vazio ou inválido!`, param);
+          hasEmptyParameter = true;
         }
       });
 
-      // Payload simplificado - REMOVENDO o botão que pode estar causando o erro
+      if (hasEmptyParameter) {
+        console.error('🚨 ABORTANDO ENVIO - PARÂMETROS VAZIOS DETECTADOS');
+        return false;
+      }
+
+      // Payload com template correto: notifica_agendamento e idioma pt_BR
       const payload = {
         messaging_product: "whatsapp",
         to: finalPhone,
@@ -90,10 +100,10 @@ export const WhatsAppService = {
         }
       };
 
-      console.log('=== PAYLOAD SIMPLIFICADO (SEM BOTÃO) ===');
+      console.log('=== PAYLOAD FINAL COM TEMPLATE CORRETO ===');
       console.log(JSON.stringify(payload, null, 2));
 
-      // URL atualizada para v22.0
+      // URL da API do Facebook
       const url = `https://graph.facebook.com/v22.0/${phoneNumberId}/messages`;
       console.log('URL da API:', url);
       
