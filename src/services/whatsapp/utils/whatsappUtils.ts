@@ -92,9 +92,10 @@ export const validateAndCleanTemplateData = (templateData: WhatsAppTemplateData)
 };
 
 /**
- * Create WhatsApp parameters from clean data with correct structure for Facebook API
+ * Create WhatsApp parameters with correct structure for the template variables
  */
 export const createWhatsAppParameters = (cleanData: ReturnType<typeof validateAndCleanTemplateData>): WhatsAppParameter[] => {
+  // Based on your template, the parameters should match the order of variables in the template
   const parameters: WhatsAppParameter[] = [
     { type: "text", text: cleanData.nome },
     { type: "text", text: cleanData.especialidade },
@@ -104,7 +105,15 @@ export const createWhatsAppParameters = (cleanData: ReturnType<typeof validateAn
     { type: "text", text: cleanData.profissional }
   ];
 
-  console.log('=== PARÂMETROS CRIADOS PARA API ===');
+  console.log('=== PARÂMETROS CRIADOS PARA TEMPLATE ===');
+  console.log('Ordem dos parâmetros baseada no template:');
+  console.log('1. Nome do paciente');
+  console.log('2. Especialidade');
+  console.log('3. Data');
+  console.log('4. Horário');
+  console.log('5. Local');
+  console.log('6. Profissional');
+  
   parameters.forEach((param, index) => {
     console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));
     console.log(`  - Tipo: ${param.type}`);
