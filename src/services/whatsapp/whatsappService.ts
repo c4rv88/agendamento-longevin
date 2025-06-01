@@ -1,4 +1,5 @@
 
+
 interface WhatsAppTemplateData {
   nome: string;
   especialidade: string;
@@ -56,8 +57,8 @@ export const WhatsAppService = {
       const finalPhone = `55${formattedPhone}`;
       console.log('Telefone final formatado:', finalPhone);
       
-      // Criar parâmetros do template com validação EXTREMA
-      const templateParameters = [
+      // Criar parâmetros do template seguindo exatamente a ordem do template
+      const bodyParameters = [
         { type: "text", text: cleanData.nome },
         { type: "text", text: cleanData.especialidade },
         { type: "text", text: cleanData.data },
@@ -68,7 +69,7 @@ export const WhatsAppService = {
 
       console.log('=== VALIDAÇÃO FINAL DOS PARÂMETROS ===');
       let hasEmptyParameter = false;
-      templateParameters.forEach((param, index) => {
+      bodyParameters.forEach((param, index) => {
         console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));
         if (!param.text || typeof param.text !== 'string' || param.text.trim() === '' || param.text.length === 0) {
           console.error(`🚨 ERRO CRÍTICO: Parâmetro ${index + 1} está vazio ou inválido!`, param);
@@ -81,7 +82,7 @@ export const WhatsAppService = {
         return false;
       }
 
-      // Payload com template correto: notifica_agendamento e idioma pt_BR
+      // Payload completo com template e botão de resposta rápida
       const payload = {
         messaging_product: "whatsapp",
         to: finalPhone,
@@ -94,13 +95,24 @@ export const WhatsAppService = {
           components: [
             {
               type: "body",
-              parameters: templateParameters
+              parameters: bodyParameters
+            },
+            {
+              type: "button",
+              sub_type: "quick_reply",
+              index: "0",
+              parameters: [
+                {
+                  type: "payload",
+                  payload: "finalizar_atendimento"
+                }
+              ]
             }
           ]
         }
       };
 
-      console.log('=== PAYLOAD FINAL COM TEMPLATE CORRETO ===');
+      console.log('=== PAYLOAD COMPLETO COM TEMPLATE E BOTÃO ===');
       console.log(JSON.stringify(payload, null, 2));
 
       // URL da API do Facebook
@@ -160,3 +172,4 @@ export const WhatsAppService = {
     }
   }
 };
+
