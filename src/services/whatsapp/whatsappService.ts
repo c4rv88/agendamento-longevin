@@ -15,39 +15,20 @@ export const WhatsAppService = {
       console.log('=== INICIANDO ENVIO WHATSAPP ===');
       console.log('Template data recebido:', templateData);
       
-      // Validar e limpar cada campo RIGOROSAMENTE
+      // Validar e garantir que TODOS os campos tenham valores não vazios
       const cleanData = {
-        nome: String(templateData.nome || 'Paciente').trim(),
-        especialidade: String(templateData.especialidade || 'Consulta').trim(),
-        data: String(templateData.data || '01-01-2024').trim(),
-        horario: String(templateData.horario || '00:00').trim(),
-        local: String(templateData.local || 'Clínica').trim(),
-        profissional: String(templateData.profissional || 'Médico').trim(),
+        nome: (templateData.nome || 'Paciente').trim() || 'Paciente',
+        especialidade: (templateData.especialidade || 'Consulta').trim() || 'Consulta',
+        data: (templateData.data || '01-01-2024').trim() || '01-01-2024',
+        horario: (templateData.horario || '09:00').trim() || '09:00',
+        local: (templateData.local || 'Clínica').trim() || 'Clínica',
+        profissional: (templateData.profissional || 'Médico').trim() || 'Médico',
         telefone: String(templateData.telefone || '').replace(/\D/g, '')
       };
 
       console.log('=== DADOS LIMPOS E VALIDADOS ===');
       Object.entries(cleanData).forEach(([key, value]) => {
         console.log(`${key}:`, typeof value, `"${value}"`, value.length, 'chars');
-      });
-
-      // GARANTIA ABSOLUTA: Se qualquer campo estiver vazio, usar valor padrão
-      const safeData = {
-        nome: cleanData.nome || 'Paciente',
-        especialidade: cleanData.especialidade || 'Consulta',
-        data: cleanData.data || '01-01-2024',
-        horario: cleanData.horario || '00:00',
-        local: cleanData.local || 'Clínica',
-        profissional: cleanData.profissional || 'Médico'
-      };
-
-      console.log('=== DADOS SEGUROS FINAIS ===');
-      Object.entries(safeData).forEach(([key, value]) => {
-        console.log(`${key}:`, typeof value, `"${value}"`, value.length, 'chars');
-        if (!value || value.trim() === '') {
-          console.error(`🚨 ERRO CRÍTICO: Campo ${key} ainda está vazio!`);
-          throw new Error(`Campo ${key} não pode estar vazio`);
-        }
       });
 
       // Verificar telefone
@@ -72,29 +53,26 @@ export const WhatsAppService = {
       const finalPhone = `55${formattedPhone}`;
       console.log('Telefone final formatado:', finalPhone);
       
-      // Criar parâmetros do template com GARANTIA ABSOLUTA de não estarem vazios
+      // Criar parâmetros do template com validação EXTRA
       const templateParameters = [
-        { type: "text", text: safeData.nome },
-        { type: "text", text: safeData.especialidade },
-        { type: "text", text: safeData.data },
-        { type: "text", text: safeData.horario },
-        { type: "text", text: safeData.local },
-        { type: "text", text: safeData.profissional }
+        { type: "text", text: cleanData.nome },
+        { type: "text", text: cleanData.especialidade },
+        { type: "text", text: cleanData.data },
+        { type: "text", text: cleanData.horario },
+        { type: "text", text: cleanData.local },
+        { type: "text", text: cleanData.profissional }
       ];
 
       console.log('=== PARÂMETROS FINAIS DO TEMPLATE ===');
       templateParameters.forEach((param, index) => {
         console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));
-        if (!param.text || param.text.trim() === '') {
+        if (!param.text || param.text.length === 0) {
           console.error(`🚨 ERRO CRÍTICO: Parâmetro ${index + 1} está vazio!`);
           throw new Error(`Parâmetro ${index + 1} não pode estar vazio`);
         }
-        if (param.text.length < 1) {
-          console.error(`🚨 ERRO CRÍTICO: Parâmetro ${index + 1} tem tamanho inválido!`);
-          throw new Error(`Parâmetro ${index + 1} deve ter pelo menos 1 caractere`);
-        }
       });
 
+      // Payload simplificado - REMOVENDO o botão que pode estar causando o erro
       const payload = {
         messaging_product: "whatsapp",
         to: finalPhone,
@@ -108,23 +86,12 @@ export const WhatsAppService = {
             {
               type: "body",
               parameters: templateParameters
-            },
-            {
-              type: "button",
-              sub_type: "quick_reply",
-              index: "0",
-              parameters: [
-                {
-                  type: "payload",
-                  payload: "CONFIRMAR_AGENDAMENTO"
-                }
-              ]
             }
           ]
         }
       };
 
-      console.log('=== PAYLOAD COMPLETO COM BOTÃO ===');
+      console.log('=== PAYLOAD SIMPLIFICADO (SEM BOTÃO) ===');
       console.log(JSON.stringify(payload, null, 2));
 
       const url = `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`;
