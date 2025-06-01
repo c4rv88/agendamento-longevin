@@ -1,4 +1,5 @@
 
+
 interface WhatsAppTemplateData {
   nome: string;
   especialidade: string;
@@ -95,67 +96,25 @@ export const WhatsAppService = {
       const finalPhone = `55${formattedPhone}`;
       console.log('Telefone final formatado:', finalPhone);
       
-      // Criar parâmetros do template - AGORA COM DATA NO FORMATO CORRETO
-      const bodyParameters = [
-        { type: "text", text: cleanData.nome },
-        { type: "text", text: cleanData.especialidade },
-        { type: "text", text: cleanData.data }, // AGORA GARANTIDAMENTE DD-MM-YYYY
-        { type: "text", text: cleanData.horario },
-        { type: "text", text: cleanData.local },
-        { type: "text", text: cleanData.profissional }
-      ];
-
-      console.log('=== VALIDAÇÃO FINAL DOS PARÂMETROS ===');
-      let hasEmptyParameter = false;
-      bodyParameters.forEach((param, index) => {
-        console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));
-        console.log(`  - Tipo: ${param.type}`);
-        console.log(`  - Texto: "${param.text}"`);
-        console.log(`  - Comprimento: ${param.text.length}`);
-        console.log(`  - É string: ${typeof param.text === 'string'}`);
-        console.log(`  - Está vazio: ${!param.text || param.text.trim() === ''}`);
-        
-        if (!param.text || typeof param.text !== 'string' || param.text.trim() === '' || param.text.length === 0) {
-          console.error(`🚨 ERRO CRÍTICO: Parâmetro ${index + 1} está vazio ou inválido!`, param);
-          hasEmptyParameter = true;
-        }
-      });
-
-      if (hasEmptyParameter) {
-        console.error('🚨 ABORTANDO ENVIO - PARÂMETROS VAZIOS DETECTADOS');
-        return false;
-      }
-
-      // Payload com estrutura mínima - TESTE COM TEMPLATE NAME EXATO
+      // TESTE: Vamos tentar com o template "hello_world" primeiro para verificar se o problema é o template
+      console.log('=== TESTANDO COM TEMPLATE HELLO_WORLD ===');
+      
+      // Payload mais simples possível
       const payload = {
         messaging_product: "whatsapp",
         to: finalPhone,
         type: "template",
         template: {
-          name: "notifica_agendamento",
+          name: "hello_world",
           language: {
-            code: "pt_BR"
-          },
-          components: [
-            {
-              type: "body",
-              parameters: bodyParameters
-            }
-          ]
+            code: "en_US"
+          }
         }
       };
 
-      console.log('=== PAYLOAD FINAL PARA ENVIO ===');
+      console.log('=== PAYLOAD DE TESTE (HELLO_WORLD) ===');
       console.log('JSON completo do payload:');
       console.log(JSON.stringify(payload, null, 2));
-      
-      // Log específico do template
-      console.log('=== DETALHES DO TEMPLATE ===');
-      console.log('Nome do template:', payload.template.name);
-      console.log('Código do idioma:', payload.template.language.code);
-      console.log('Número de componentes:', payload.template.components.length);
-      console.log('Tipo do primeiro componente:', payload.template.components[0].type);
-      console.log('Número de parâmetros no body:', payload.template.components[0].parameters.length);
 
       // URL da API do Facebook
       const url = `https://graph.facebook.com/v22.0/${phoneNumberId}/messages`;
@@ -166,7 +125,7 @@ export const WhatsAppService = {
         'Content-Type': 'application/json',
       };
 
-      console.log('=== ENVIANDO REQUISIÇÃO ===');
+      console.log('=== ENVIANDO REQUISIÇÃO DE TESTE ===');
       console.log('Headers:', headers);
       
       const response = await fetch(url, {
@@ -199,7 +158,8 @@ export const WhatsAppService = {
         return false;
       }
 
-      console.log('=== MENSAGEM ENVIADA COM SUCESSO ===');
+      console.log('=== TESTE HELLO_WORLD ENVIADO COM SUCESSO ===');
+      console.log('Se o hello_world funcionou, o problema está no template customizado');
       return true;
     } catch (error) {
       console.error('=== ERRO GERAL NO ENVIO ===');
@@ -215,3 +175,4 @@ export const WhatsAppService = {
     }
   }
 };
+
