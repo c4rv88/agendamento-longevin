@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
 import { FeegowApiService } from '@/services/api';
+import { WhatsAppService } from '@/services/whatsapp/whatsappService';
 import { useToast } from '@/hooks/use-toast';
 
 export const useAppointmentConfirmation = () => {
@@ -45,7 +46,7 @@ export const useAppointmentConfirmation = () => {
         insurance_id: appointmentData.selectedInsurance?.insurance_id,
         date: appointmentData.selectedDate,
         time: appointmentData.selectedTime,
-        patient_id: patientId, // Usar o ID do paciente criado/existente
+        patient_id: patientId,
         patient_phone: patientData.patient_phone,
       };
 
@@ -54,6 +55,35 @@ export const useAppointmentConfirmation = () => {
       const success = await FeegowApiService.createAppointment(appointmentPayload);
       
       if (success) {
+        // Enviar notificação via WhatsApp
+        try {
+          console.log('Sending WhatsApp notification...');
+          
+          // Formatar data para exibição (DD/MM/YYYY)
+          const formattedDate = appointmentData.selectedDate.split('-').reverse().join('/');
+          
+          const whatsappData = {
+            nome: patientData.patient_name,
+            especialidade: appointmentData.selectedSpecialty?.specialty_name || '',
+            data: formattedDate,
+            horario: appointmentData.selectedTime,
+            local: appointmentData.selectedUnity?.unity_name || '',
+            profissional: appointmentData.selectedProfessional?.professional_name || '',
+            telefone: patientData.patient_phone
+          };
+
+          const whatsappSent = await WhatsAppService.sendAppointmentNotification(whatsappData);
+          
+          if (whatsappSent) {
+            console.log('WhatsApp notification sent successfully');
+          } else {
+            console.warn('Failed to send WhatsApp notification, but appointment was created');
+          }
+        } catch (whatsappError) {
+          console.error('Error sending WhatsApp notification:', whatsappError);
+          // Não falhar o agendamento se o WhatsApp falhar
+        }
+
         setConfirmed(true);
         toast({
           title: "Agendamento confirmado!",
