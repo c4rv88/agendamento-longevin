@@ -1,4 +1,5 @@
 
+
 import { useState } from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
 import { FeegowApiService } from '@/services/api';
@@ -72,6 +73,8 @@ export const useAppointmentConfirmation = () => {
             telefone: patientData.patient_phone
           };
 
+          console.log('WhatsApp data being sent:', whatsappData);
+
           const whatsappSent = await WhatsAppService.sendAppointmentNotification(whatsappData);
           
           if (whatsappSent) {
@@ -111,3 +114,4 @@ export const useAppointmentConfirmation = () => {
     setConfirmed,
   };
 };
+

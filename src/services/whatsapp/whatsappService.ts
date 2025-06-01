@@ -1,4 +1,5 @@
 
+
 interface WhatsAppTemplateData {
   nome: string;
   especialidade: string;
@@ -60,17 +61,6 @@ export const WhatsAppService = {
                   text: templateData.profissional
                 }
               ]
-            },
-            {
-              type: "button",
-              sub_type: "quick_reply",
-              index: 0,
-              parameters: [
-                {
-                  type: "payload",
-                  payload: "Finalizar Atendimento"
-                }
-              ]
             }
           ]
         }
@@ -102,3 +92,4 @@ export const WhatsAppService = {
     }
   }
 };
+
