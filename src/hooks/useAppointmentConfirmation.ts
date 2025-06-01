@@ -1,5 +1,4 @@
 
-
 import { useState } from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
 import { FeegowApiService } from '@/services/api';
@@ -59,46 +58,56 @@ export const useAppointmentConfirmation = () => {
       if (success) {
         console.log('=== AGENDAMENTO CRIADO, PREPARANDO DADOS PARA WHATSAPP ===');
         
-        // Formatar data para exibição (DD/MM/YYYY)
-        const formattedDate = appointmentData.selectedDate?.split('-').reverse().join('/') || '';
+        // Formatar data no formato DD-MM-AAAA
+        let formattedDate = '';
+        if (appointmentData.selectedDate) {
+          const dateParts = appointmentData.selectedDate.split('-');
+          if (dateParts.length === 3) {
+            // De YYYY-MM-DD para DD-MM-YYYY
+            formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+          }
+        }
+        
+        // Formatar horário no formato HH:MM
+        let formattedTime = appointmentData.selectedTime || '';
+        if (formattedTime && formattedTime.includes(':')) {
+          const timeParts = formattedTime.split(':');
+          formattedTime = `${timeParts[0]}:${timeParts[1]}`;
+        }
+        
+        // Formatar local com endereço completo
+        let formattedLocation = '';
+        if (appointmentData.selectedUnity) {
+          const unity = appointmentData.selectedUnity;
+          formattedLocation = `${unity.unity_name} - ${unity.unity_address}`;
+        }
+        
+        console.log('=== DADOS FORMATADOS ===');
+        console.log('Data formatada:', formattedDate);
+        console.log('Horário formatado:', formattedTime);
+        console.log('Local formatado:', formattedLocation);
         
         // Preparar dados do WhatsApp com validação MUITO detalhada
-        console.log('=== DADOS BRUTOS ANTES DA PREPARAÇÃO ===');
-        console.log('patientData.patient_name:', typeof patientData.patient_name, JSON.stringify(patientData.patient_name));
-        console.log('appointmentData.selectedSpecialty?.specialty_name:', typeof appointmentData.selectedSpecialty?.specialty_name, JSON.stringify(appointmentData.selectedSpecialty?.specialty_name));
-        console.log('formattedDate:', typeof formattedDate, JSON.stringify(formattedDate));
-        console.log('appointmentData.selectedTime:', typeof appointmentData.selectedTime, JSON.stringify(appointmentData.selectedTime));
-        console.log('appointmentData.selectedUnity?.unity_name:', typeof appointmentData.selectedUnity?.unity_name, JSON.stringify(appointmentData.selectedUnity?.unity_name));
-        console.log('appointmentData.selectedProfessional?.professional_name:', typeof appointmentData.selectedProfessional?.professional_name, JSON.stringify(appointmentData.selectedProfessional?.professional_name));
-        console.log('patientData.patient_phone:', typeof patientData.patient_phone, JSON.stringify(patientData.patient_phone));
-        
         const whatsappData = {
-          nome: String(patientData.patient_name || '').trim() || 'Nome não informado',
-          especialidade: String(appointmentData.selectedSpecialty?.specialty_name || '').trim() || 'Especialidade não informada',
-          data: String(formattedDate || '').trim() || 'Data não informada',
-          horario: String(appointmentData.selectedTime || '').trim() || 'Horário não informado',
-          local: String(appointmentData.selectedUnity?.unity_name || '').trim() || 'Local não informado',
-          profissional: String(appointmentData.selectedProfessional?.professional_name || '').trim() || 'Profissional não informado',
-          telefone: String(patientData.patient_phone || '').replace(/\D/g, '') || ''
+          nome: String(patientData.patient_name || 'Paciente').trim(),
+          especialidade: String(appointmentData.selectedSpecialty?.specialty_name || 'Consulta').trim(),
+          data: formattedDate || 'Data não informada',
+          horario: formattedTime || '00:00',
+          local: formattedLocation || 'Local não informado',
+          profissional: String(appointmentData.selectedProfessional?.professional_name || 'Profissional').trim(),
+          telefone: String(patientData.patient_phone || '').replace(/\D/g, '')
         };
 
-        console.log('=== DADOS PARA WHATSAPP (APÓS PROCESSAMENTO) ===');
+        console.log('=== DADOS FINAIS PARA WHATSAPP ===');
         Object.entries(whatsappData).forEach(([key, value]) => {
           console.log(`${key}:`, typeof value, `"${value}"`, value.length, 'chars');
+          if (key !== 'telefone' && (!value || value.trim() === '')) {
+            console.error(`🚨 CAMPO CRÍTICO VAZIO: ${key}`);
+          }
         });
-        
-        // Verificar se algum campo crítico está vazio
-        const criticalFields = ['nome', 'especialidade', 'data', 'horario', 'local', 'profissional'];
-        const emptyFields = criticalFields.filter(field => !whatsappData[field as keyof typeof whatsappData] || whatsappData[field as keyof typeof whatsappData].trim() === '');
-        
-        if (emptyFields.length > 0) {
-          console.error('⚠️ CAMPOS CRÍTICOS VAZIOS:', emptyFields);
-          console.error('⚠️ DADOS COMPLETOS:', whatsappData);
-        }
 
         if (!whatsappData.telefone) {
           console.error('⚠️ TELEFONE VAZIO - WHATSAPP NÃO PODE SER ENVIADO');
-          // Ainda assim, continuar com o processo já que o agendamento foi criado
         }
 
         console.log('=== INICIANDO ENVIO WHATSAPP ===');
