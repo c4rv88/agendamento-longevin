@@ -1,5 +1,4 @@
 
-
 interface WhatsAppTemplateData {
   nome: string;
   especialidade: string;
@@ -96,38 +95,28 @@ export const WhatsAppService = {
       const finalPhone = `55${formattedPhone}`;
       console.log('Telefone final formatado:', finalPhone);
       
-      // Criar parâmetros do template com data no formato DD-MM-YYYY
-      const bodyParameters = [
-        { type: "text", text: cleanData.nome },
-        { type: "text", text: cleanData.especialidade },
-        { type: "text", text: cleanData.data }, // Agora no formato DD-MM-YYYY
-        { type: "text", text: cleanData.horario },
-        { type: "text", text: cleanData.local },
-        { type: "text", text: cleanData.profissional }
+      // VERIFICAÇÃO CRÍTICA: Vamos testar com valores fixos e simples primeiro
+      console.log('=== TESTE COM VALORES SIMPLES ===');
+      
+      const simpleParameters = [
+        { type: "text", text: "João Silva" },
+        { type: "text", text: "Cardiologia" },
+        { type: "text", text: "15-06-2025" },
+        { type: "text", text: "14:30" },
+        { type: "text", text: "Clinica Central" },
+        { type: "text", text: "Dr. Pedro Santos" }
       ];
 
-      console.log('=== VALIDAÇÃO FINAL DOS PARÂMETROS ===');
-      let hasEmptyParameter = false;
-      bodyParameters.forEach((param, index) => {
-        console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));
-        console.log(`  - Tipo: ${param.type}`);
-        console.log(`  - Texto: "${param.text}"`);
-        console.log(`  - Comprimento: ${param.text.length}`);
-        console.log(`  - É string: ${typeof param.text === 'string'}`);
-        console.log(`  - Está vazio: ${!param.text || param.text.trim() === ''}`);
-        
-        if (!param.text || typeof param.text !== 'string' || param.text.trim() === '' || param.text.length === 0) {
-          console.error(`🚨 ERRO CRÍTICO: Parâmetro ${index + 1} está vazio ou inválido!`, param);
-          hasEmptyParameter = true;
-        }
+      console.log('=== VALIDAÇÃO DOS PARÂMETROS SIMPLES ===');
+      simpleParameters.forEach((param, index) => {
+        console.log(`Parâmetro simples ${index + 1}:`, JSON.stringify(param));
+        console.log(`  - Validação texto: "${param.text}"`);
+        console.log(`  - Tem acentos: ${/[àáâãäéêëíîïóôõöúûüç]/i.test(param.text)}`);
+        console.log(`  - Tem caracteres especiais: ${/[^\w\s\-.:]/i.test(param.text)}`);
+        console.log(`  - Encoding UTF-8 válido: ${encodeURIComponent(param.text) === param.text ? 'não precisa' : 'precisa encoding'}`);
       });
 
-      if (hasEmptyParameter) {
-        console.error('🚨 ABORTANDO ENVIO - PARÂMETROS VAZIOS DETECTADOS');
-        return false;
-      }
-
-      // Payload com template notifica_agendamento
+      // Payload com template notifica_agendamento usando parâmetros simples
       const payload = {
         messaging_product: "whatsapp",
         to: finalPhone,
@@ -140,23 +129,30 @@ export const WhatsAppService = {
           components: [
             {
               type: "body",
-              parameters: bodyParameters
+              parameters: simpleParameters
             }
           ]
         }
       };
 
-      console.log('=== PAYLOAD FINAL PARA ENVIO ===');
+      console.log('=== PAYLOAD COM PARÂMETROS SIMPLES ===');
       console.log('JSON completo do payload:');
       console.log(JSON.stringify(payload, null, 2));
       
-      // Log específico do template
-      console.log('=== DETALHES DO TEMPLATE ===');
-      console.log('Nome do template:', payload.template.name);
-      console.log('Código do idioma:', payload.template.language.code);
-      console.log('Número de componentes:', payload.template.components.length);
-      console.log('Tipo do primeiro componente:', payload.template.components[0].type);
-      console.log('Número de parâmetros no body:', payload.template.components[0].parameters.length);
+      // Log estrutural detalhado
+      console.log('=== ANÁLISE ESTRUTURAL DO PAYLOAD ===');
+      console.log('messaging_product:', payload.messaging_product);
+      console.log('to:', payload.to);
+      console.log('type:', payload.type);
+      console.log('template exists:', !!payload.template);
+      console.log('template.name:', payload.template.name);
+      console.log('template.language exists:', !!payload.template.language);
+      console.log('template.language.code:', payload.template.language.code);
+      console.log('template.components exists:', !!payload.template.components);
+      console.log('template.components.length:', payload.template.components.length);
+      console.log('first component type:', payload.template.components[0].type);
+      console.log('first component parameters exists:', !!payload.template.components[0].parameters);
+      console.log('parameters count:', payload.template.components[0].parameters.length);
 
       // URL da API do Facebook
       const url = `https://graph.facebook.com/v22.0/${phoneNumberId}/messages`;
@@ -167,7 +163,7 @@ export const WhatsAppService = {
         'Content-Type': 'application/json',
       };
 
-      console.log('=== ENVIANDO REQUISIÇÃO ===');
+      console.log('=== ENVIANDO REQUISIÇÃO COM VALORES SIMPLES ===');
       console.log('Headers:', headers);
       
       const response = await fetch(url, {
@@ -195,6 +191,53 @@ export const WhatsAppService = {
           console.error('Mensagem do erro:', data.error.message);
           console.error('Detalhes do erro:', JSON.stringify(data.error.error_data || {}, null, 2));
           console.error('Trace ID:', data.error.fbtrace_id);
+          
+          // Se ainda der erro, vamos tentar sem acentos
+          if (data.error.details && data.error.details.includes('Parameter name is missing or empty')) {
+            console.log('=== TENTANDO SEM ACENTOS E CARACTERES ESPECIAIS ===');
+            
+            const cleanParameters = simpleParameters.map(param => ({
+              type: "text",
+              text: param.text
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+                .replace(/[^\w\s\-.:]/g, '') // Remove caracteres especiais
+                .trim()
+            }));
+            
+            console.log('Parâmetros sem acentos:', cleanParameters);
+            
+            const cleanPayload = {
+              ...payload,
+              template: {
+                ...payload.template,
+                components: [
+                  {
+                    type: "body",
+                    parameters: cleanParameters
+                  }
+                ]
+              }
+            };
+            
+            console.log('=== TENTATIVA 2: PAYLOAD LIMPO ===');
+            console.log(JSON.stringify(cleanPayload, null, 2));
+            
+            const response2 = await fetch(url, {
+              method: 'POST',
+              headers: headers,
+              body: JSON.stringify(cleanPayload),
+            });
+            
+            const data2 = await response2.json();
+            console.log('=== RESPOSTA DA TENTATIVA 2 ===');
+            console.log(JSON.stringify(data2, null, 2));
+            
+            if (response2.ok) {
+              console.log('✅ SUCESSO COM PARÂMETROS LIMPOS!');
+              return true;
+            }
+          }
         }
         
         return false;
@@ -216,4 +259,3 @@ export const WhatsAppService = {
     }
   }
 };
-
