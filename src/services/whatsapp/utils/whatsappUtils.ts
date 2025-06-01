@@ -63,6 +63,7 @@ export const validateAndCleanTemplateData = (templateData: WhatsAppTemplateData)
   console.log('Local original:', JSON.stringify(templateData.local));
   console.log('Profissional original:', JSON.stringify(templateData.profissional));
   console.log('Telefone original:', JSON.stringify(templateData.telefone));
+  console.log('Convênio original:', JSON.stringify(templateData.convenio));
 
   const cleanData = {
     nome: String(templateData.nome || 'Paciente').trim() || 'Paciente',
@@ -71,6 +72,7 @@ export const validateAndCleanTemplateData = (templateData: WhatsAppTemplateData)
     horario: String(templateData.horario || '09:00').trim() || '09:00',
     local: String(templateData.local || 'Clinica').trim() || 'Clinica',
     profissional: String(templateData.profissional || 'Medico').trim() || 'Medico',
+    convenio: String(templateData.convenio || 'Particular').trim() || 'Particular',
     telefone: String(templateData.telefone || '').replace(/\D/g, '')
   };
 
@@ -92,27 +94,30 @@ export const validateAndCleanTemplateData = (templateData: WhatsAppTemplateData)
 };
 
 /**
- * Create WhatsApp parameters with correct structure for the template variables
+ * Create WhatsApp parameters with correct structure for the template "agendamento"
  */
 export const createWhatsAppParameters = (cleanData: ReturnType<typeof validateAndCleanTemplateData>): WhatsAppParameter[] => {
-  // Based on your template, the parameters should match the order of variables in the template
+  // Based on your new template "agendamento", the parameters order is:
+  // {{1}} - Nome, {{2}} - Especialidade, {{3}} - Data, {{4}} - Horário, {{5}} - Local, {{6}} - Profissional, {{7}} - Convênio
   const parameters: WhatsAppParameter[] = [
-    { type: "text", text: cleanData.nome },
-    { type: "text", text: cleanData.especialidade },
-    { type: "text", text: cleanData.data },
-    { type: "text", text: cleanData.horario },
-    { type: "text", text: cleanData.local },
-    { type: "text", text: cleanData.profissional }
+    { type: "text", text: cleanData.nome },           // {{1}}
+    { type: "text", text: cleanData.especialidade },  // {{2}}
+    { type: "text", text: cleanData.data },           // {{3}}
+    { type: "text", text: cleanData.horario },        // {{4}}
+    { type: "text", text: cleanData.local },          // {{5}}
+    { type: "text", text: cleanData.profissional },   // {{6}}
+    { type: "text", text: cleanData.convenio }        // {{7}}
   ];
 
-  console.log('=== PARÂMETROS CRIADOS PARA TEMPLATE ===');
-  console.log('Ordem dos parâmetros baseada no template:');
-  console.log('1. Nome do paciente');
-  console.log('2. Especialidade');
-  console.log('3. Data');
-  console.log('4. Horário');
-  console.log('5. Local');
-  console.log('6. Profissional');
+  console.log('=== PARÂMETROS CRIADOS PARA TEMPLATE "agendamento" ===');
+  console.log('Ordem dos parâmetros baseada no novo template:');
+  console.log('1. {{1}} - Nome do paciente');
+  console.log('2. {{2}} - Especialidade');
+  console.log('3. {{3}} - Data');
+  console.log('4. {{4}} - Horário');
+  console.log('5. {{5}} - Local');
+  console.log('6. {{6}} - Profissional');
+  console.log('7. {{7}} - Convênio');
   
   parameters.forEach((param, index) => {
     console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));

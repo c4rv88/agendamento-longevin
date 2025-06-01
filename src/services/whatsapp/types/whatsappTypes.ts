@@ -6,6 +6,7 @@ export interface WhatsAppTemplateData {
   horario: string;
   local: string;
   profissional: string;
+  convenio: string;  // Adicionado o campo convênio
   telefone: string;
 }
 

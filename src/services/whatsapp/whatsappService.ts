@@ -6,7 +6,7 @@ import { WhatsAppPayload } from './types/whatsappTypes';
 
 export class WhatsAppService {
   /**
-   * Send appointment notification via WhatsApp
+   * Send appointment notification via WhatsApp using template "agendamento"
    */
   static async sendAppointmentNotification(templateData: WhatsAppTemplateData): Promise<boolean> {
     try {
@@ -19,7 +19,7 @@ export class WhatsAppService {
       // Format phone number
       const formattedPhone = formatPhoneNumber(cleanData.telefone);
       
-      // Create parameters
+      // Create parameters for the new template with 7 variables
       const parameters = createWhatsAppParameters(cleanData);
 
       // Validate parameters before creating payload
@@ -30,13 +30,13 @@ export class WhatsAppService {
         throw new Error('Parâmetros inválidos detectados');
       }
 
-      // Create payload with correct structure
+      // Create payload with correct structure for template "agendamento"
       const payload: WhatsAppPayload = {
         messaging_product: "whatsapp",
         to: formattedPhone,
         type: "template",
         template: {
-          name: "notifica_agendamento",
+          name: "agendamento",  // Nome do novo template
           language: {
             code: "pt_BR"
           },
@@ -49,7 +49,7 @@ export class WhatsAppService {
         }
       };
 
-      console.log('=== PAYLOAD CRIADO ===');
+      console.log('=== PAYLOAD CRIADO PARA TEMPLATE "agendamento" ===');
       console.log('Estrutura do template:', {
         name: payload.template.name,
         language: payload.template.language.code,
