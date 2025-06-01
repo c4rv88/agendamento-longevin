@@ -92,7 +92,7 @@ export const validateAndCleanTemplateData = (templateData: WhatsAppTemplateData)
 };
 
 /**
- * Create WhatsApp parameters from clean data
+ * Create WhatsApp parameters from clean data with correct structure for Facebook API
  */
 export const createWhatsAppParameters = (cleanData: ReturnType<typeof validateAndCleanTemplateData>): WhatsAppParameter[] => {
   const parameters: WhatsAppParameter[] = [
@@ -104,14 +104,17 @@ export const createWhatsAppParameters = (cleanData: ReturnType<typeof validateAn
     { type: "text", text: cleanData.profissional }
   ];
 
-  console.log('=== VALIDAÇÃO FINAL DOS PARÂMETROS ===');
+  console.log('=== PARÂMETROS CRIADOS PARA API ===');
   parameters.forEach((param, index) => {
     console.log(`Parâmetro ${index + 1}:`, JSON.stringify(param));
     console.log(`  - Tipo: ${param.type}`);
     console.log(`  - Texto: "${param.text}"`);
     console.log(`  - Comprimento: ${param.text.length}`);
-    console.log(`  - É string: ${typeof param.text === 'string'}`);
-    console.log(`  - Está vazio: ${!param.text || param.text.trim() === ''}`);
+    console.log(`  - É string válida: ${typeof param.text === 'string' && param.text.length > 0}`);
+    
+    if (!param.text || param.text.trim() === '') {
+      console.error(`🚨 PARÂMETRO VAZIO DETECTADO NO ÍNDICE ${index}:`, param);
+    }
   });
 
   return parameters;

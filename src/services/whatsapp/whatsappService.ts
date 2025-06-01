@@ -22,7 +22,15 @@ export class WhatsAppService {
       // Create parameters
       const parameters = createWhatsAppParameters(cleanData);
 
-      // Create payload
+      // Validate parameters before creating payload
+      console.log('=== VALIDAÇÃO FINAL ANTES DO PAYLOAD ===');
+      const invalidParams = parameters.filter(param => !param.text || param.text.trim() === '');
+      if (invalidParams.length > 0) {
+        console.error('🚨 PARÂMETROS INVÁLIDOS ENCONTRADOS:', invalidParams);
+        throw new Error('Parâmetros inválidos detectados');
+      }
+
+      // Create payload with correct structure
       const payload: WhatsAppPayload = {
         messaging_product: "whatsapp",
         to: formattedPhone,
@@ -40,6 +48,14 @@ export class WhatsAppService {
           ]
         }
       };
+
+      console.log('=== PAYLOAD CRIADO ===');
+      console.log('Estrutura do template:', {
+        name: payload.template.name,
+        language: payload.template.language.code,
+        componentsCount: payload.template.components.length,
+        parametersCount: payload.template.components[0].parameters.length
+      });
 
       return await sendWhatsAppMessage(payload);
     } catch (error) {

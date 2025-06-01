@@ -23,12 +23,25 @@ export const sendWhatsAppMessage = async (payload: WhatsAppPayload): Promise<boo
   console.log('JSON completo do payload:');
   console.log(JSON.stringify(payload, null, 2));
   
-  console.log('=== DETALHES DO TEMPLATE ===');
+  console.log('=== VALIDAÇÃO DE ESTRUTURA ===');
   console.log('Nome do template:', payload.template.name);
   console.log('Código do idioma:', payload.template.language.code);
-  console.log('Número de componentes:', payload.template.components.length);
-  console.log('Tipo do primeiro componente:', payload.template.components[0].type);
-  console.log('Número de parâmetros no body:', payload.template.components[0].parameters.length);
+  console.log('Número de componentes:', payload.template.components?.length || 0);
+  
+  if (payload.template.components && payload.template.components.length > 0) {
+    payload.template.components.forEach((component, index) => {
+      console.log(`Componente ${index}:`, component.type);
+      if (component.parameters) {
+        console.log(`  - Parâmetros (${component.parameters.length}):`, component.parameters);
+        component.parameters.forEach((param, paramIndex) => {
+          console.log(`    Param ${paramIndex}: ${param.type} = "${param.text}"`);
+          if (!param.text || param.text.trim() === '') {
+            console.error(`🚨 PARÂMETRO VAZIO NO COMPONENTE ${index}, PARAM ${paramIndex}`);
+          }
+        });
+      }
+    });
+  }
   
   console.log('URL da API:', url);
   console.log('=== ENVIANDO REQUISIÇÃO ===');
