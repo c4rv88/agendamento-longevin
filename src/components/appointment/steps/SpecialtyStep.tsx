@@ -5,24 +5,22 @@ import { SpecialtySelector } from '@/components/SpecialtySelector';
 
 interface SpecialtyStepProps {
   selectedSpecialty: AppointmentState['selectedSpecialty'];
-  unityId?: number;
   updateState: (updates: Partial<AppointmentState>) => void;
 }
 
 export const SpecialtyStep: React.FC<SpecialtyStepProps> = ({
   selectedSpecialty,
-  unityId,
   updateState,
 }) => {
   return (
     <SpecialtySelector
       selectedSpecialty={selectedSpecialty}
-      unityId={unityId}
       onSelect={(specialty) => {
-        // Clear professionals when selecting a new specialty
+        // Clear professionals and unity when selecting a new specialty
         updateState({ 
           selectedSpecialty: specialty,
           selectedProfessional: null,
+          selectedUnity: null,
           selectedInsurance: null
         });
       }}

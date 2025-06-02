@@ -25,18 +25,17 @@ export const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
   resetFlow
 }) => {
   switch (currentStep) {
-    case 1: // Unidade
-      return (
-        <UnityStep
-          selectedUnity={state.selectedUnity}
-          updateState={updateState}
-        />
-      );
-    case 2: // Especialidade
+    case 1: // Especialidade
       return (
         <SpecialtyStep
           selectedSpecialty={state.selectedSpecialty}
-          unityId={state.selectedUnity?.unity_id}
+          updateState={updateState}
+        />
+      );
+    case 2: // Unidade
+      return (
+        <UnityStep
+          selectedUnity={state.selectedUnity}
           updateState={updateState}
         />
       );

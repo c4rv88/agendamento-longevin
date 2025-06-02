@@ -29,8 +29,8 @@ export const AppointmentScheduler: React.FC = () => {
 
   const canProceed = () => {
     switch (state.currentStep) {
-      case 1: return !!state.selectedUnity; // Unidade
-      case 2: return !!state.selectedSpecialty; // Especialidade
+      case 1: return !!state.selectedSpecialty; // Especialidade
+      case 2: return !!state.selectedUnity; // Unidade
       case 3: return !!state.selectedProfessional; // Profissional  
       case 4: return !!state.selectedInsurance; // Convênio
       case 5: return !!state.selectedDate && !!state.selectedTime; // Data/Hora
@@ -40,7 +40,7 @@ export const AppointmentScheduler: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200">
+    <div className="min-h-screen bg-gradient-to-br from-[#E6DCCD] via-[#A6AD97] to-[#7B8466]">
       {/* Header */}
       <AppointmentHeader />
 
@@ -55,8 +55,8 @@ export const AppointmentScheduler: React.FC = () => {
                 variant="outline"
                 onClick={handlePrev}
                 disabled={state.currentStep === 1}
-                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-[#004264] hover:bg-blue-50 text-[#004264] px-3 py-1.5"
-                style={{ borderColor: '#004264', color: '#004264' }}
+                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-[#7B8466] hover:bg-[#A6AD97]/20 text-[#7B8466] px-3 py-1.5"
+                style={{ borderColor: '#7B8466', color: '#7B8466' }}
                 size="sm"
               >
                 <ChevronUp className="w-3 h-3" />
@@ -66,8 +66,8 @@ export const AppointmentScheduler: React.FC = () => {
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex items-center gap-2 px-3 py-1.5"
-                style={{ backgroundColor: '#004264' }}
+                className="flex items-center gap-2 px-3 py-1.5 text-[#E6DCCD]"
+                style={{ backgroundColor: '#7B8466' }}
                 size="sm"
               >
                 Próximo
@@ -91,8 +91,8 @@ export const AppointmentScheduler: React.FC = () => {
               variant="outline"
               onClick={handlePrev}
               disabled={state.currentStep === 1}
-              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-[#004264] hover:bg-blue-50 text-[#004264]"
-              style={{ borderColor: '#004264', color: '#004264' }}
+              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-[#7B8466] hover:bg-[#A6AD97]/20 text-[#7B8466]"
+              style={{ borderColor: '#7B8466', color: '#7B8466' }}
             >
               <ChevronUp className="w-4 h-4" />
               Voltar
@@ -102,8 +102,8 @@ export const AppointmentScheduler: React.FC = () => {
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex items-center gap-2"
-                style={{ backgroundColor: '#004264' }}
+                className="flex items-center gap-2 text-[#E6DCCD]"
+                style={{ backgroundColor: '#7B8466' }}
               >
                 Próximo
                 <ChevronDown className="w-4 h-4" />
@@ -115,7 +115,7 @@ export const AppointmentScheduler: React.FC = () => {
 
           {/* Credits with Sauv logo - Below bottom navigation */}
           <div className="flex justify-center mt-6 mb-4">
-            <div className="flex items-center gap-2 text-xs text-blue-800/70 font-medium">
+            <div className="flex items-center gap-2 text-xs text-[#616160]/70 font-medium">
               <span>Desenvolvido por</span>
               <a 
                 href="https://sauv.com.br" 
