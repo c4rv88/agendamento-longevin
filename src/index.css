@@ -94,14 +94,7 @@
   }
 }
 
-/* OVERRIDE GLOBAL PARA REMOVER COMPLETAMENTE CORES ROSA/MAGENTA */
-*,
-*::before,
-*::after {
-  border-color: #7B8466 !important;
-}
-
-/* OVERRIDE ESPECÍFICO PARA ELEMENTOS COM CORES ROSA/MAGENTA */
+/* OVERRIDE ESPECÍFICO APENAS PARA REMOVER CORES ROSA/MAGENTA */
 [style*="rgb(255, 160, 255)"],
 [style*="border-color: rgb(255, 160, 255)"],
 [style*="border: rgb(255, 160, 255)"],
@@ -123,110 +116,4 @@
 [style*="background: pink"] {
   border-color: #7B8466 !important;
   background-color: #E6DCCD !important;
-}
-
-/* OVERRIDE PARA CLASSES TAILWIND COM CORES ROSA/MAGENTA */
-.border-pink-400,
-.border-pink-500,
-.border-pink-600,
-.border-magenta-400,
-.border-magenta-500,
-.border-magenta-600,
-.border-fuchsia-400,
-.border-fuchsia-500,
-.border-fuchsia-600,
-.ring-pink-400,
-.ring-pink-500,
-.ring-pink-600,
-.ring-magenta-400,
-.ring-magenta-500,
-.ring-magenta-600,
-.bg-pink-400,
-.bg-pink-500,
-.bg-pink-600,
-.bg-magenta-400,
-.bg-magenta-500,
-.bg-magenta-600 {
-  border-color: #7B8466 !important;
-  --tw-ring-color: #7B8466 !important;
-  background-color: #E6DCCD !important;
-}
-
-/* OVERRIDE PARA ESTADOS DE HOVER - MAIS ESPECÍFICO */
-*:hover,
-button:hover,
-div:hover,
-span:hover,
-[role="button"]:hover,
-.hover\:bg-accent:hover,
-.hover\:bg-primary:hover {
-  background-color: #E6DCCD !important;
-  border-color: #7B8466 !important;
-  color: #7B8466 !important;
-}
-
-/* OVERRIDE PARA ESTADOS DE FOCUS */
-*:focus,
-*:focus-visible,
-button:focus,
-input:focus,
-select:focus,
-textarea:focus,
-[tabindex]:focus {
-  --tw-ring-color: #7B8466 !important;
-  border-color: #7B8466 !important;
-  outline-color: #7B8466 !important;
-  box-shadow: 0 0 0 2px #7B8466 !important;
-}
-
-/* OVERRIDE PARA ELEMENTOS QUE POSSAM TER CORES DE DESTAQUE */
-.highlight,
-.selected,
-.active,
-[data-state="active"],
-[data-state="selected"],
-[aria-selected="true"] {
-  border-color: #7B8466 !important;
-  background-color: #E6DCCD !important;
-  color: #7B8466 !important;
-}
-
-/* OVERRIDE ESPECÍFICO PARA COMPONENTES SHADCN */
-.bg-accent,
-.hover\:bg-accent:hover,
-.data-\[state\=selected\]\:bg-accent[data-state=selected],
-.data-\[highlighted\]\:bg-accent[data-highlighted] {
-  background-color: #E6DCCD !important;
-  color: #7B8466 !important;
-}
-
-/* OVERRIDE PARA BOTÕES E ELEMENTOS INTERATIVOS */
-button,
-[role="button"],
-.btn {
-  transition: all 0.2s ease-in-out;
-}
-
-button:hover,
-[role="button"]:hover,
-.btn:hover {
-  background-color: #E6DCCD !important;
-  border-color: #7B8466 !important;
-  color: #7B8466 !important;
-  transform: translateY(-1px);
-}
-
-/* OVERRIDE PARA CARDS E CONTAINERS */
-.card:hover,
-[role="button"]:hover .card,
-div:hover {
-  border-color: #7B8466 !important;
-}
-
-/* FORÇA CORES ESPECÍFICAS PARA OVERRIDE DE QUALQUER COR ROSA */
-* {
-  --pink-color: #7B8466 !important;
-  --magenta-color: #7B8466 !important;
-  --fuchsia-color: #7B8466 !important;
-  --rose-color: #7B8466 !important;
 }
