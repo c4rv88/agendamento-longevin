@@ -12,8 +12,8 @@ export const ConfirmationSuccess: React.FC<ConfirmationSuccessProps> = ({ onConf
   return (
     <Card className="w-full">
       <CardContent className="text-center py-12">
-        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-green-600 mb-2">
+        <CheckCircle className="w-16 h-16 text-[#7B8466] mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-[#7B8466] mb-2">
           Agendamento Confirmado!
         </h2>
         <p className="text-gray-600 mb-6">
@@ -23,7 +23,7 @@ export const ConfirmationSuccess: React.FC<ConfirmationSuccessProps> = ({ onConf
           onClick={onConfirm} 
           className="relative overflow-hidden text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
           style={{ 
-            background: `linear-gradient(to right, #004264, #005580, #004264)`
+            background: `linear-gradient(to right, #7B8466, #A6AD97, #7B8466)`
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-1000"></div>

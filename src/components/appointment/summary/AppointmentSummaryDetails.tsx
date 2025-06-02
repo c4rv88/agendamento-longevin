@@ -50,19 +50,19 @@ export const AppointmentSummaryDetails: React.FC<AppointmentSummaryDetailsProps>
           icon={User}
           label="Especialidade"
           value={appointmentData.selectedSpecialty?.specialty_name}
-          iconColor="text-[#8B8B8B]"
+          iconColor="text-[#7B8466]"
         />
         <AppointmentDetail
           icon={User}
           label="Profissional"
           value={appointmentData.selectedProfessional?.professional_name}
-          iconColor="text-green-500"
+          iconColor="text-[#7B8466]"
         />
         <AppointmentDetail
           icon={CreditCard}
           label="Convênio"
           value={appointmentData.selectedInsurance?.insurance_name}
-          iconColor="text-orange-500"
+          iconColor="text-[#7B8466]"
         />
       </div>
 
@@ -76,14 +76,14 @@ export const AppointmentSummaryDetails: React.FC<AppointmentSummaryDetailsProps>
           icon={Clock}
           label="Horário"
           value={appointmentData.selectedTime}
-          iconColor="text-[#8B8B8B]"
+          iconColor="text-[#7B8466]"
         />
         <AppointmentDetail
           icon={User}
           label="Paciente"
           value={appointmentData.patient?.patient_name}
           secondaryValue={appointmentData.patient?.patient_phone}
-          iconColor="text-green-500"
+          iconColor="text-[#7B8466]"
         />
       </div>
     </div>
