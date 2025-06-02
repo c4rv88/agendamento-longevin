@@ -12,7 +12,6 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   totalSteps 
 }) => {
   const steps = [
-    'Unidade',
     'Especialidade', 
     'Profissional',
     'Convênio',
@@ -24,44 +23,44 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-blue-900">
+        <span className="text-sm font-medium text-[#7B8466]">
           Etapa {currentStep} de {totalSteps}
         </span>
-        <span className="text-sm text-blue-800/70">
+        <span className="text-sm text-[#7B8466]/70">
           {Math.round((currentStep / totalSteps) * 100)}% concluído
         </span>
       </div>
       
-      <div className="w-full bg-blue-100 rounded-full h-2 mb-4">
+      <div className="w-full bg-[#E6DCCD]/50 rounded-full h-2 mb-4">
         <div 
-          className="bg-gradient-to-r from-blue-800 to-blue-900 h-2 rounded-full transition-all duration-300"
+          className="bg-gradient-to-r from-[#7B8466] to-[#A6AD97] h-2 rounded-full transition-all duration-300"
           style={{ width: `${(currentStep / totalSteps) * 100}%` }}
         />
       </div>
 
-      <div className="hidden md:flex justify-between text-xs text-blue-800/70">
+      <div className="hidden md:flex justify-between text-xs text-[#7B8466]/70">
         {steps.map((step, index) => (
           <div
             key={step}
             className={cn(
               "flex flex-col items-center",
-              index + 1 === currentStep && "text-blue-900 font-semibold",
-              index + 1 < currentStep && "text-green-600"
+              index + 1 === currentStep && "text-[#7B8466] font-semibold",
+              index + 1 < currentStep && "text-[#A6AD97]"
             )}
           >
             <div
               className={cn(
                 "w-6 h-6 rounded-full border-2 flex items-center justify-center mb-1",
-                index + 1 === currentStep && "border-blue-900 bg-blue-50",
-                index + 1 < currentStep && "border-green-600 bg-green-50",
-                index + 1 > currentStep && "border-blue-400"
+                index + 1 === currentStep && "border-[#7B8466] bg-[#E6DCCD]/30",
+                index + 1 < currentStep && "border-[#A6AD97] bg-[#A6AD97]/20",
+                index + 1 > currentStep && "border-[#7B8466]/30"
               )}
             >
               {index + 1 < currentStep ? (
-                <span className="text-green-600">✓</span>
+                <span className="text-[#A6AD97]">✓</span>
               ) : (
                 <span className={cn(
-                  index + 1 === currentStep ? "text-blue-900" : "text-blue-500"
+                  index + 1 === currentStep ? "text-[#7B8466]" : "text-[#7B8466]/50"
                 )}>
                   {index + 1}
                 </span>

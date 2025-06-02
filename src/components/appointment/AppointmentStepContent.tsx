@@ -2,7 +2,6 @@
 import React from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
 import {
-  UnityStep,
   SpecialtyStep,
   ProfessionalStep,
   InsuranceStep,
@@ -32,14 +31,7 @@ export const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
           updateState={updateState}
         />
       );
-    case 2: // Unidade
-      return (
-        <UnityStep
-          selectedUnity={state.selectedUnity}
-          updateState={updateState}
-        />
-      );
-    case 3: // Profissional
+    case 2: // Profissional
       return (
         <ProfessionalStep
           selectedProfessional={state.selectedProfessional}
@@ -48,7 +40,7 @@ export const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
           updateState={updateState}
         />
       );
-    case 4: // Convênio
+    case 3: // Convênio
       return (
         <InsuranceStep
           selectedInsurance={state.selectedInsurance}
@@ -56,7 +48,7 @@ export const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
           updateState={updateState}
         />
       );
-    case 5: // Data/Hora
+    case 4: // Data/Hora
       return (
         <DateTimeStep
           selectedDate={state.selectedDate}
@@ -68,14 +60,14 @@ export const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
           updateState={updateState}
         />
       );
-    case 6: // Paciente
+    case 5: // Paciente
       return (
         <PatientStep
           patient={state.patient}
           updateState={updateState}
         />
       );
-    case 7: // Confirmação
+    case 6: // Confirmação
       return (
         <SummaryStep
           appointmentData={state}

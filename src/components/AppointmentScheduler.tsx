@@ -30,11 +30,10 @@ export const AppointmentScheduler: React.FC = () => {
   const canProceed = () => {
     switch (state.currentStep) {
       case 1: return !!state.selectedSpecialty; // Especialidade
-      case 2: return !!state.selectedUnity; // Unidade
-      case 3: return !!state.selectedProfessional; // Profissional  
-      case 4: return !!state.selectedInsurance; // Convênio
-      case 5: return !!state.selectedDate && !!state.selectedTime; // Data/Hora
-      case 6: return !!state.patient; // Paciente
+      case 2: return !!state.selectedProfessional; // Profissional  
+      case 3: return !!state.selectedInsurance; // Convênio
+      case 4: return !!state.selectedDate && !!state.selectedTime; // Data/Hora
+      case 5: return !!state.patient; // Paciente
       default: return false;
     }
   };
@@ -46,10 +45,10 @@ export const AppointmentScheduler: React.FC = () => {
 
       <div className="container mx-auto px-4 py-8" ref={topRef}>
         <div className="max-w-4xl mx-auto">
-          <ProgressIndicator currentStep={state.currentStep} totalSteps={7} />
+          <ProgressIndicator currentStep={state.currentStep} totalSteps={6} />
           
-          {/* Centered Navigation Buttons - Only show on steps 1-6 */}
-          {state.currentStep < 7 && (
+          {/* Centered Navigation Buttons - Only show on steps 1-5 */}
+          {state.currentStep < 6 && (
             <div className="flex justify-center items-center gap-4 mb-6">
               <Button
                 variant="outline"
@@ -98,7 +97,7 @@ export const AppointmentScheduler: React.FC = () => {
               Voltar
             </Button>
             
-            {state.currentStep < 7 ? (
+            {state.currentStep < 6 ? (
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
