@@ -15,7 +15,7 @@ export const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
   label,
   value,
   secondaryValue,
-  iconColor = 'text-blue-500'
+  iconColor = 'text-[#8B8B8B]'
 }) => {
   return (
     <div className="flex items-center gap-3">

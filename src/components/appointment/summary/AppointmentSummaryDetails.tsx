@@ -50,7 +50,7 @@ export const AppointmentSummaryDetails: React.FC<AppointmentSummaryDetailsProps>
           icon={User}
           label="Especialidade"
           value={appointmentData.selectedSpecialty?.specialty_name}
-          iconColor="text-purple-500"
+          iconColor="text-[#8B8B8B]"
         />
         <AppointmentDetail
           icon={User}
@@ -76,7 +76,7 @@ export const AppointmentSummaryDetails: React.FC<AppointmentSummaryDetailsProps>
           icon={Clock}
           label="Horário"
           value={appointmentData.selectedTime}
-          iconColor="text-purple-500"
+          iconColor="text-[#8B8B8B]"
         />
         <AppointmentDetail
           icon={User}
