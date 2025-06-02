@@ -42,14 +42,17 @@
   color: #888;
 }
 
-/* Override global para remover TODAS as cores rosa/magenta e aplicar BOLD GREEN */
+/* OVERRIDE GLOBAL MAIS ESPECÍFICO PARA REMOVER TODAS AS CORES ROSA/MAGENTA */
 *,
 *::before,
-*::after {
+*::after,
+*:hover,
+*:focus,
+*:active {
   border-color: #7B8466 !important;
 }
 
-/* Override específico para elementos inline com cores rosa */
+/* OVERRIDE ESPECÍFICO PARA ELEMENTOS COM CORES ROSA - MAIS ABRANGENTE */
 [style*="rgb(255, 160, 255)"],
 [style*="border-color: rgb(255, 160, 255)"],
 [style*="border: rgb(255, 160, 255)"],
@@ -60,25 +63,82 @@
 [style*="border-color: pink"],
 [style*="border: pink"],
 [style*="border-color: fuchsia"],
-[style*="border: fuchsia"] {
+[style*="border: fuchsia"],
+[style*="background-color: rgb(255, 160, 255)"],
+[style*="background: rgb(255, 160, 255)"],
+[style*="background-color: #ff80ff"],
+[style*="background: #ff80ff"],
+[style*="background-color: magenta"],
+[style*="background: magenta"],
+[style*="background-color: pink"],
+[style*="background: pink"],
+[style*="background-color: fuchsia"],
+[style*="background: fuchsia"] {
   border-color: #7B8466 !important;
+  background-color: #E6DCCD !important;
 }
 
-/* Override para focus states */
+/* OVERRIDE PARA HOVER STATES - MAIS ESPECÍFICO */
+*:hover,
+button:hover,
+div:hover,
+span:hover,
+a:hover,
+[role="button"]:hover {
+  background-color: #E6DCCD !important;
+  border-color: #7B8466 !important;
+  color: #7B8466 !important;
+}
+
+/* OVERRIDE PARA FOCUS STATES - MAIS ESPECÍFICO */
 button:focus,
 input:focus,
 select:focus,
 textarea:focus,
-[tabindex]:focus {
+[tabindex]:focus,
+*:focus-visible {
   border-color: #7B8466 !important;
   outline-color: #7B8466 !important;
   box-shadow: 0 0 0 2px #7B8466 !important;
+  --tw-ring-color: #7B8466 !important;
 }
 
-/* Override para elementos que possam ter cores de destaque */
+/* OVERRIDE PARA ELEMENTOS QUE POSSAM TER CORES DE DESTAQUE */
 .highlight,
 .selected,
-.active {
+.active,
+[data-state="active"],
+[data-state="selected"],
+[aria-selected="true"] {
   border-color: #7B8466 !important;
-  background-color: rgba(123, 132, 102, 0.1) !important;
+  background-color: #E6DCCD !important;
+  color: #7B8466 !important;
+}
+
+/* OVERRIDE ESPECÍFICO PARA PREVENIR QUALQUER COR ROSA */
+* {
+  --pink-400: #7B8466 !important;
+  --pink-500: #7B8466 !important;
+  --pink-600: #7B8466 !important;
+  --magenta-400: #7B8466 !important;
+  --magenta-500: #7B8466 !important;
+  --magenta-600: #7B8466 !important;
+  --fuchsia-400: #7B8466 !important;
+  --fuchsia-500: #7B8466 !important;
+  --fuchsia-600: #7B8466 !important;
+  --rose-400: #7B8466 !important;
+  --rose-500: #7B8466 !important;
+  --rose-600: #7B8466 !important;
+}
+
+/* OVERRIDE PARA QUALQUER ELEMENTO COM COR COMPUTADA ROSA */
+*[style] {
+  color: inherit !important;
+}
+
+/* FORÇA A COR VERDE EM HOVER PARA TODOS OS ELEMENTOS */
+*:hover {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgba(230, 220, 205, var(--tw-bg-opacity)) !important;
+  border-color: #7B8466 !important;
 }
