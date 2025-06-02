@@ -93,3 +93,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Remove any remaining pink/magenta colors and replace with BOLD GREEN */
+* {
+  border-color: #7B8466 !important;
+}
+
+/* Override any pink borders specifically */
+[style*="rgb(255, 160, 255)"] {
+  border-color: #7B8466 !important;
+}
+
+/* Global override for any remaining pink/magenta colors */
+.border-pink-400,
+.border-pink-500,
+.border-magenta-400,
+.border-magenta-500 {
+  border-color: #7B8466 !important;
+}

@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -12,10 +13,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #7B8466aa);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em #7B8466aa);
 }
 
 @keyframes logo-spin {
@@ -39,4 +40,16 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Override any remaining pink/magenta colors with BOLD GREEN */
+* {
+  border-color: #7B8466 !important;
+}
+
+/* Specific overrides for elements that might have pink borders */
+[style*="rgb(255, 160, 255)"],
+[style*="border-color: rgb(255, 160, 255)"],
+[style*="border: rgb(255, 160, 255)"] {
+  border-color: #7B8466 !important;
 }
