@@ -14,14 +14,14 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 123 132 102;
+    --primary: 85 20% 52%; /* #7B8466 converted to HSL */
     --primary-foreground: 230 220 205;
 
     --secondary: 166 173 151;
     --secondary-foreground: 97 97 96;
 
     --muted: 230 220 205;
-    --muted-foreground: 123 132 102;
+    --muted-foreground: 85 20% 52%; /* #7B8466 */
 
     --accent: 178 152 118;
     --accent-foreground: 97 97 96;
@@ -29,20 +29,20 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 166 173 151;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 123 132 102;
+    --border: 85 20% 52%; /* #7B8466 */
+    --input: 85 20% 52%; /* #7B8466 */
+    --ring: 85 20% 52%; /* #7B8466 */
 
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 85 20% 52%; /* #7B8466 */
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-border: 85 20% 52%; /* #7B8466 */
+    --sidebar-ring: 85 20% 52%; /* #7B8466 */
   }
 
   .dark {
@@ -55,7 +55,7 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 123 132 102;
+    --primary: 85 20% 52%; /* #7B8466 */
     --primary-foreground: 230 220 205;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -70,17 +70,17 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 123 132 102;
+    --border: 85 20% 52%; /* #7B8466 */
+    --input: 85 20% 52%; /* #7B8466 */
+    --ring: 85 20% 52%; /* #7B8466 */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary: 85 20% 52%; /* #7B8466 */
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-border: 85 20% 52%; /* #7B8466 */
+    --sidebar-ring: 85 20% 52%; /* #7B8466 */
   }
 }
 
@@ -94,20 +94,54 @@
   }
 }
 
-/* Remove any remaining pink/magenta colors and replace with BOLD GREEN */
-* {
+/* Global override para remover cores rosa/magenta e aplicar BOLD GREEN */
+*,
+*::before,
+*::after {
   border-color: #7B8466 !important;
 }
 
-/* Override any pink borders specifically */
-[style*="rgb(255, 160, 255)"] {
+/* Override específico para elementos com cores rosa */
+[style*="rgb(255, 160, 255)"],
+[style*="border-color: rgb(255, 160, 255)"],
+[style*="border: rgb(255, 160, 255)"],
+[style*="border-color: #ff80ff"],
+[style*="border: #ff80ff"],
+[style*="border-color: magenta"],
+[style*="border: magenta"],
+[style*="border-color: pink"],
+[style*="border: pink"] {
   border-color: #7B8466 !important;
 }
 
-/* Global override for any remaining pink/magenta colors */
+/* Override para classes Tailwind com cores rosa/magenta */
 .border-pink-400,
 .border-pink-500,
+.border-pink-600,
 .border-magenta-400,
-.border-magenta-500 {
+.border-magenta-500,
+.border-magenta-600,
+.border-fuchsia-400,
+.border-fuchsia-500,
+.border-fuchsia-600,
+.ring-pink-400,
+.ring-pink-500,
+.ring-pink-600,
+.ring-magenta-400,
+.ring-magenta-500,
+.ring-magenta-600 {
   border-color: #7B8466 !important;
+  --tw-ring-color: #7B8466 !important;
+}
+
+/* Override para focus e ring colors */
+*:focus,
+*:focus-visible {
+  --tw-ring-color: #7B8466 !important;
+  border-color: #7B8466 !important;
+}
+
+/* Override para elementos que possam ter outline rosa */
+*:focus-visible {
+  outline-color: #7B8466 !important;
 }

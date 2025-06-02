@@ -42,14 +42,43 @@
   color: #888;
 }
 
-/* Override any remaining pink/magenta colors with BOLD GREEN */
-* {
+/* Override global para remover TODAS as cores rosa/magenta e aplicar BOLD GREEN */
+*,
+*::before,
+*::after {
   border-color: #7B8466 !important;
 }
 
-/* Specific overrides for elements that might have pink borders */
+/* Override específico para elementos inline com cores rosa */
 [style*="rgb(255, 160, 255)"],
 [style*="border-color: rgb(255, 160, 255)"],
-[style*="border: rgb(255, 160, 255)"] {
+[style*="border: rgb(255, 160, 255)"],
+[style*="border-color: #ff80ff"],
+[style*="border: #ff80ff"],
+[style*="border-color: magenta"],
+[style*="border: magenta"],
+[style*="border-color: pink"],
+[style*="border: pink"],
+[style*="border-color: fuchsia"],
+[style*="border: fuchsia"] {
   border-color: #7B8466 !important;
+}
+
+/* Override para focus states */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+[tabindex]:focus {
+  border-color: #7B8466 !important;
+  outline-color: #7B8466 !important;
+  box-shadow: 0 0 0 2px #7B8466 !important;
+}
+
+/* Override para elementos que possam ter cores de destaque */
+.highlight,
+.selected,
+.active {
+  border-color: #7B8466 !important;
+  background-color: rgba(123, 132, 102, 0.1) !important;
 }

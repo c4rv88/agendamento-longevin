@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,11 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Cores personalizadas da identidade visual
+				'bold-green': '#7B8466',
+				'light-green': '#A6AD97',
+				'cream': '#E6DCCD'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -93,4 +98,11 @@ export default {
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
+	safelist: [
+		// Garantir que as classes de override não sejam removidas
+		'border-bold-green',
+		'ring-bold-green',
+		'text-bold-green',
+		'bg-bold-green'
+	]
 } satisfies Config;
