@@ -41,7 +41,7 @@ export const useAppointmentConfirmation = () => {
       // Criar agendamento com local_id fixo = 13
       const appointmentPayload = {
         unity_id: 0, // Manter para compatibilidade
-        unity_name: 'Padrão',
+        unity_name: 'Longevin',
         local_id: 13, // local_id fixo sempre 13
         specialty_id: appointmentData.selectedSpecialty?.specialty_id,
         professional_id: appointmentData.selectedProfessional?.professional_id,
@@ -76,8 +76,8 @@ export const useAppointmentConfirmation = () => {
           formattedTime = `${timeParts[0]}:${timeParts[1]}`;
         }
         
-        // Usar local padrão
-        const formattedLocation = 'ISV - Unidade Padrão';
+        // Usar local Longevin
+        const formattedLocation = 'Longevin';
         
         console.log('=== DADOS FORMATADOS ===');
         console.log('Data formatada:', formattedDate);

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Calendar, MapPin, User, CreditCard, Clock } from 'lucide-react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
@@ -42,7 +43,7 @@ export const AppointmentSummaryDetails: React.FC<AppointmentSummaryDetailsProps>
     if (appointmentData.selectedUnity?.unity_name && appointmentData.selectedUnity.unity_name !== 'Padrão') {
       return appointmentData.selectedUnity.unity_name;
     }
-    return 'ISV - Unidade Padrão';
+    return 'Longevin';
   };
 
   return (

@@ -17,7 +17,7 @@ export const useAppointmentFlow = () => {
   const [state, setState] = useState<AppointmentState>({
     selectedSpecialty: null,
     selectedProfessional: null,
-    selectedUnity: { unity_id: 0, unity_name: 'Padrão', unity_address: '', unity_phone: '' }, // Unidade padrão fixa
+    selectedUnity: { unity_id: 0, unity_name: 'Longevin', unity_address: '', unity_phone: '' }, // Unidade padrão Longevin
     selectedInsurance: null,
     selectedDate: '',
     selectedTime: '',
@@ -41,7 +41,7 @@ export const useAppointmentFlow = () => {
     setState({
       selectedSpecialty: null,
       selectedProfessional: null,
-      selectedUnity: { unity_id: 0, unity_name: 'Padrão', unity_address: '', unity_phone: '' }, // Manter unidade padrão no reset
+      selectedUnity: { unity_id: 0, unity_name: 'Longevin', unity_address: '', unity_phone: '' }, // Manter unidade Longevin no reset
       selectedInsurance: null,
       selectedDate: '',
       selectedTime: '',
