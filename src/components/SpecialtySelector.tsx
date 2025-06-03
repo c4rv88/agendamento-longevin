@@ -55,7 +55,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="w-5 h-5" />
-            Selecione a Especialidade
+            Especialidade
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -71,7 +71,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="w-5 h-5" />
-            Selecione a Especialidade
+            Especialidade
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -95,7 +95,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <User className="w-5 h-5" />
-          Selecione a Especialidade
+          Especialidade
         </CardTitle>
       </CardHeader>
       <CardContent>

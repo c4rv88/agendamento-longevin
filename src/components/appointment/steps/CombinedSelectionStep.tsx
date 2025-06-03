@@ -20,7 +20,7 @@ export const CombinedSelectionStep: React.FC<CombinedSelectionStepProps> = ({
     <div className="space-y-8">
       {/* Especialidade */}
       <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 border border-[#A6AD97]/20 shadow-sm">
-        <h3 className="text-lg font-semibold text-[#7B8466] mb-4">1. Escolha a Especialidade</h3>
+        <h3 className="text-lg font-semibold text-[#7B8466] mb-4">1. Especialidade</h3>
         <SpecialtySelector
           selectedSpecialty={state.selectedSpecialty}
           onSelect={(specialty) => {
@@ -36,7 +36,7 @@ export const CombinedSelectionStep: React.FC<CombinedSelectionStepProps> = ({
       {/* Profissional */}
       {state.selectedSpecialty && (
         <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 border border-[#A6AD97]/20 shadow-sm">
-          <h3 className="text-lg font-semibold text-[#7B8466] mb-4">2. Escolha o Profissional</h3>
+          <h3 className="text-lg font-semibold text-[#7B8466] mb-4">2. Profissional</h3>
           <ProfessionalSelector
             selectedProfessional={state.selectedProfessional}
             specialtyId={state.selectedSpecialty?.specialty_id}
@@ -54,21 +54,12 @@ export const CombinedSelectionStep: React.FC<CombinedSelectionStepProps> = ({
       {/* Convênio */}
       {state.selectedProfessional && (
         <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 border border-[#A6AD97]/20 shadow-sm">
-          <h3 className="text-lg font-semibold text-[#7B8466] mb-4">3. Escolha o Convênio</h3>
+          <h3 className="text-lg font-semibold text-[#7B8466] mb-4">3. Convênio</h3>
           <InsuranceSelector
             selectedInsurance={state.selectedInsurance}
             professionalId={state.selectedProfessional?.professional_id}
             onSelect={(insurance) => updateState({ selectedInsurance: insurance })}
           />
-        </div>
-      )}
-
-      {/* Indicador de conclusão */}
-      {state.selectedSpecialty && state.selectedProfessional && state.selectedInsurance && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-          <p className="text-green-700 font-medium">
-            ✓ Seleções concluídas! Clique em "Próximo" para continuar.
-          </p>
         </div>
       )}
     </div>
