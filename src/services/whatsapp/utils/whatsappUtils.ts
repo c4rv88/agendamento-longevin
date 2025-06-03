@@ -1,5 +1,5 @@
 
-import { WhatsAppTemplateData, WhatsAppParameter } from '../types/whatsappTypes';
+import { WhatsAppTemplateData, WhatsAppParameter, WhatsAppPayload } from '../types/whatsappTypes';
 
 /**
  * Convert date to Brazilian format DD-MM-YYYY
@@ -94,10 +94,10 @@ export const validateAndCleanTemplateData = (templateData: WhatsAppTemplateData)
 };
 
 /**
- * Create WhatsApp parameters with correct structure for the template "agendamento"
+ * Create WhatsApp parameters with correct structure for the template "lagendamento"
  */
 export const createWhatsAppParameters = (cleanData: ReturnType<typeof validateAndCleanTemplateData>): WhatsAppParameter[] => {
-  // Based on your new template "agendamento", the parameters order is:
+  // Based on your template "lagendamento", the parameters order is:
   // {{1}} - Nome, {{2}} - Especialidade, {{3}} - Data, {{4}} - Horário, {{5}} - Local, {{6}} - Profissional, {{7}} - Convênio
   const parameters: WhatsAppParameter[] = [
     { type: "text", text: cleanData.nome },           // {{1}}
@@ -109,8 +109,8 @@ export const createWhatsAppParameters = (cleanData: ReturnType<typeof validateAn
     { type: "text", text: cleanData.convenio }        // {{7}}
   ];
 
-  console.log('=== PARÂMETROS CRIADOS PARA TEMPLATE "agendamento" ===');
-  console.log('Ordem dos parâmetros baseada no novo template:');
+  console.log('=== PARÂMETROS CRIADOS PARA TEMPLATE "lagendamento" ===');
+  console.log('Ordem dos parâmetros baseada no template:');
   console.log('1. {{1}} - Nome do paciente');
   console.log('2. {{2}} - Especialidade');
   console.log('3. {{3}} - Data');
@@ -132,4 +132,30 @@ export const createWhatsAppParameters = (cleanData: ReturnType<typeof validateAn
   });
 
   return parameters;
+};
+
+/**
+ * Create appointment payload for WhatsApp
+ */
+export const createAppointmentPayload = (phoneNumber: string, data: any, templateName: string): WhatsAppPayload => {
+  const cleanData = validateAndCleanTemplateData(data);
+  const parameters = createWhatsAppParameters(cleanData);
+
+  return {
+    messaging_product: "whatsapp",
+    to: phoneNumber,
+    type: "template",
+    template: {
+      name: templateName,
+      language: {
+        code: "pt_BR"
+      },
+      components: [
+        {
+          type: "body",
+          parameters: parameters
+        }
+      ]
+    }
+  };
 };

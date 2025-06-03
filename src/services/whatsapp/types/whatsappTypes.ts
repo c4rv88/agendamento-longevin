@@ -10,6 +10,17 @@ export interface WhatsAppTemplateData {
   telefone: string;
 }
 
+export interface WhatsAppNotificationData {
+  nome: string;
+  especialidade: string;
+  data: string;
+  horario: string;
+  local: string;
+  profissional: string;
+  convenio: string;
+  telefone: string;
+}
+
 export interface WhatsAppParameter {
   type: "text";
   text: string;
