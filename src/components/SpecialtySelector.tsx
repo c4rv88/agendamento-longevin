@@ -6,6 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface SpecialtySelectorProps {
   selectedSpecialty: Specialty | null;
@@ -52,11 +59,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-16 rounded-lg" />
-            ))}
-          </div>
+          <Skeleton className="h-10 w-full" />
         </CardContent>
       </Card>
     );
@@ -96,24 +99,33 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {specialties.length === 0 ? (
-            <p className="text-center text-gray-500 py-4 col-span-2">Nenhuma especialidade encontrada</p>
-          ) : (
-            specialties.map((specialty) => (
-              <Button
-                key={specialty.specialty_id}
-                variant={selectedSpecialty?.specialty_id === specialty.specialty_id ? "default" : "outline"}
-                className="p-4 h-auto justify-start"
-                onClick={() => onSelect(specialty)}
-              >
-                <div className="text-left">
-                  <div className="font-semibold">{specialty.specialty_name}</div>
-                </div>
-              </Button>
-            ))
-          )}
-        </div>
+        {specialties.length === 0 ? (
+          <p className="text-center text-gray-500 py-4">Nenhuma especialidade encontrada</p>
+        ) : (
+          <Select 
+            value={selectedSpecialty?.specialty_id.toString() || ""} 
+            onValueChange={(value) => {
+              const specialty = specialties.find(s => s.specialty_id.toString() === value);
+              if (specialty) {
+                onSelect(specialty);
+              }
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Escolha uma especialidade..." />
+            </SelectTrigger>
+            <SelectContent>
+              {specialties.map((specialty) => (
+                <SelectItem 
+                  key={specialty.specialty_id} 
+                  value={specialty.specialty_id.toString()}
+                >
+                  {specialty.specialty_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </CardContent>
     </Card>
   );

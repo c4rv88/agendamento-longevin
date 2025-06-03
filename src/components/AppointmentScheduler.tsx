@@ -4,6 +4,7 @@ import { useAppointmentFlow } from '@/hooks/useAppointmentFlow';
 import { ProgressIndicator } from '@/components/ProgressIndicator';
 import { AppointmentHeader } from '@/components/appointment/AppointmentHeader';
 import { AppointmentStepContent } from '@/components/appointment/AppointmentStepContent';
+import { Button } from '@/components/ui/button';
 
 export const AppointmentScheduler: React.FC = () => {
   const { state, updateState, nextStep, prevStep, resetFlow, scrollToNextSection } = useAppointmentFlow();
@@ -14,16 +15,6 @@ export const AppointmentScheduler: React.FC = () => {
     scrollToNextSection();
   };
 
-  // Auto-scroll para próxima etapa quando data/hora são selecionados
-  useEffect(() => {
-    if (state.currentStep === 2 && state.selectedDate && state.selectedTime) {
-      const timer = setTimeout(() => {
-        handleStepComplete();
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [state.selectedDate, state.selectedTime, state.currentStep]);
-
   // Auto-scroll para próxima etapa quando paciente é preenchido
   useEffect(() => {
     if (state.currentStep === 3 && state.patient) {
@@ -33,6 +24,19 @@ export const AppointmentScheduler: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [state.patient, state.currentStep]);
+
+  const canProceedToNextStep = () => {
+    switch (state.currentStep) {
+      case 1:
+        return state.selectedSpecialty && state.selectedProfessional && state.selectedInsurance;
+      case 2:
+        return state.selectedDate && state.selectedTime;
+      case 3:
+        return state.patient;
+      default:
+        return false;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#E6DCCD] via-[#A6AD97] to-[#7B8466]">
@@ -52,6 +56,19 @@ export const AppointmentScheduler: React.FC = () => {
               onStepComplete={handleStepComplete}
             />
           </div>
+
+          {/* Botão Próximo para etapas que não avançam automaticamente */}
+          {state.currentStep <= 2 && canProceedToNextStep() && (
+            <div className="flex justify-center mt-8">
+              <Button 
+                onClick={handleStepComplete}
+                className="bg-[#7B8466] hover:bg-[#6B7456] text-white px-8 py-3 text-lg"
+                size="lg"
+              >
+                Próximo
+              </Button>
+            </div>
+          )}
 
           {/* Credits with Sauv logo */}
           <div className="flex justify-center mt-12 mb-4">

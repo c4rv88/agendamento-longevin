@@ -16,16 +16,6 @@ export const CombinedSelectionStep: React.FC<CombinedSelectionStepProps> = ({
   updateState,
   onSelectionComplete,
 }) => {
-  // Auto-scroll to next section when all selections are complete
-  React.useEffect(() => {
-    if (state.selectedSpecialty && state.selectedProfessional && state.selectedInsurance) {
-      const timer = setTimeout(() => {
-        onSelectionComplete();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [state.selectedSpecialty, state.selectedProfessional, state.selectedInsurance, onSelectionComplete]);
-
   return (
     <div className="space-y-8">
       {/* Especialidade */}
@@ -77,7 +67,7 @@ export const CombinedSelectionStep: React.FC<CombinedSelectionStepProps> = ({
       {state.selectedSpecialty && state.selectedProfessional && state.selectedInsurance && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
           <p className="text-green-700 font-medium">
-            ✓ Seleções concluídas! Rolando para a próxima etapa...
+            ✓ Seleções concluídas! Clique em "Próximo" para continuar.
           </p>
         </div>
       )}
