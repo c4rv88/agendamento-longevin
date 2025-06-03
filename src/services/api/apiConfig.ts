@@ -2,7 +2,7 @@
 // API configuration constants
 
 export const API_BASE_URL = 'https://api.feegow.com/v1';
-export const ACCESS_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmZWVnb3ciLCJhdWQiOiJwdWJsaWNhcGkiLCJpYXQiOjE3NDQxNTUwNTYsImxpY2Vuc2VJRCI6NDQyMzF9.AYoQZFc1vE7Pv0TX5r82uAAjjGFlFcXTGWe3ph-4TB0';
+export const ACCESS_TOKEN = import.meta.env.VITE_FEEGOW_ACCESS_TOKEN;
 
 export const apiHeaders = {
   'Content-Type': 'application/json',

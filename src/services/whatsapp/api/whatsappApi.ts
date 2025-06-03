@@ -4,7 +4,8 @@ import { WhatsAppPayload, WhatsAppApiError } from '../types/whatsappTypes';
 const WHATSAPP_CONFIG = {
   token: import.meta.env.VITE_WHATSAPP_TOKEN,
   phoneNumberId: import.meta.env.VITE_WHATSAPP_PHONE_NUMBER_ID,
-  apiVersion: import.meta.env.VITE_WHATSAPP_API_VERSION || 'v22.0'
+  apiVersion: import.meta.env.VITE_WHATSAPP_API_VERSION || 'v22.0',
+  baseUrl: 'https://graph.facebook.com'
 };
 
 /**
