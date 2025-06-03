@@ -1,10 +1,11 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { useAppointmentFlow } from '@/hooks/useAppointmentFlow';
 import { ProgressIndicator } from '@/components/ProgressIndicator';
 import { AppointmentHeader } from '@/components/appointment/AppointmentHeader';
 import { AppointmentStepContent } from '@/components/appointment/AppointmentStepContent';
 import { Button } from '@/components/ui/button';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 export const AppointmentScheduler: React.FC = () => {
   const { state, updateState, nextStep, prevStep, resetFlow, scrollToNextSection } = useAppointmentFlow();
@@ -15,15 +16,19 @@ export const AppointmentScheduler: React.FC = () => {
     scrollToNextSection();
   };
 
-  // Auto-scroll para próxima etapa quando paciente é preenchido
-  useEffect(() => {
-    if (state.currentStep === 3 && state.patient) {
-      const timer = setTimeout(() => {
-        handleStepComplete();
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [state.patient, state.currentStep]);
+  const handlePrevStep = () => {
+    prevStep();
+    setTimeout(() => {
+      const currentStepElement = document.getElementById(`step-${state.currentStep - 1}`);
+      if (currentStepElement) {
+        currentStepElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
+      }
+    }, 100);
+  };
 
   const canProceedToNextStep = () => {
     switch (state.currentStep) {
@@ -36,6 +41,14 @@ export const AppointmentScheduler: React.FC = () => {
       default:
         return false;
     }
+  };
+
+  const showNextButton = () => {
+    return state.currentStep <= 3 && canProceedToNextStep();
+  };
+
+  const showPrevButton = () => {
+    return state.currentStep > 1 && state.currentStep <= 4;
   };
 
   return (
@@ -57,16 +70,35 @@ export const AppointmentScheduler: React.FC = () => {
             />
           </div>
 
-          {/* Botão Próximo para etapas que não avançam automaticamente */}
-          {state.currentStep <= 2 && canProceedToNextStep() && (
-            <div className="flex justify-center mt-8">
-              <Button 
-                onClick={handleStepComplete}
-                className="bg-[#7B8466] hover:bg-[#6B7456] text-white px-8 py-3 text-lg"
-                size="lg"
-              >
-                Próximo
-              </Button>
+          {/* Botões de Navegação */}
+          {(showNextButton() || showPrevButton()) && (
+            <div className="flex justify-between items-center mt-8">
+              {/* Botão Voltar */}
+              {showPrevButton() ? (
+                <Button 
+                  onClick={handlePrevStep}
+                  variant="outline"
+                  className="bg-white/80 border-[#7B8466] text-[#7B8466] hover:bg-[#7B8466] hover:text-white px-6 py-3 text-lg"
+                  size="lg"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-2" />
+                  Voltar
+                </Button>
+              ) : (
+                <div></div>
+              )}
+
+              {/* Botão Próximo */}
+              {showNextButton() && (
+                <Button 
+                  onClick={handleStepComplete}
+                  className="bg-[#7B8466] hover:bg-[#6B7456] text-white px-6 py-3 text-lg"
+                  size="lg"
+                >
+                  Próximo
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              )}
             </div>
           )}
 

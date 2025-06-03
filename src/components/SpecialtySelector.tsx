@@ -114,7 +114,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Escolha uma especialidade..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent side="bottom" className="bg-white z-50">
               {specialties.map((specialty) => (
                 <SelectItem 
                   key={specialty.specialty_id} 
