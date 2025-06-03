@@ -38,7 +38,7 @@ export const AppointmentService = {
         valor: '0.00', // Always 0.00 as specified
         plano: 1, // Always 1 as specified
         convenio_id: formattedData.insurance_id || 0,
-        notas: 'agende-isv', // As specified
+        notas: 'agende-Longevin', // Alterado de agende-isv para agende-Longevin
         celular: formattedData.patient_phone?.replace(/\D/g, '') || ''
       };
 
