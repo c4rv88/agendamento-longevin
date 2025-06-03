@@ -39,6 +39,7 @@ export const AppointmentService = {
         plano: 1, // Always 1 as specified
         convenio_id: formattedData.insurance_id || 0,
         notas: 'agende-Longevin', // Alterado de agende-isv para agende-Longevin
+        canal_id: 1, // Novo campo canal_id sempre igual a 1
         celular: formattedData.patient_phone?.replace(/\D/g, '') || ''
       };
 

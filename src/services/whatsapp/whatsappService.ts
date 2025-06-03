@@ -1,66 +1,60 @@
 
-import { WhatsAppTemplateData } from './types/whatsappTypes';
-import { validateAndCleanTemplateData, createWhatsAppParameters, formatPhoneNumber } from './utils/whatsappUtils';
-import { sendWhatsAppMessage } from './api/whatsappApi';
-import { WhatsAppPayload } from './types/whatsappTypes';
+import { WhatsAppPayload, WhatsAppNotificationData } from './types/whatsappTypes';
+import { sendWhatsAppMessage, testWhatsAppConnection } from './api/whatsappApi';
+import { createAppointmentPayload } from './utils/whatsappUtils';
 
-export class WhatsAppService {
+export const WhatsAppService = {
   /**
-   * Send appointment notification via WhatsApp using template "agendamento"
+   * Send appointment notification via WhatsApp
    */
-  static async sendAppointmentNotification(templateData: WhatsAppTemplateData): Promise<boolean> {
+  sendAppointmentNotification: async (data: WhatsAppNotificationData): Promise<boolean> => {
     try {
-      console.log('=== INICIANDO ENVIO WHATSAPP ===');
-      console.log('Template data recebido:', templateData);
-
-      // Validate and clean data
-      const cleanData = validateAndCleanTemplateData(templateData);
+      console.log('=== WHATSAPP SERVICE - INICIO ===');
+      console.log('Dados recebidos:', JSON.stringify(data, null, 2));
       
-      // Format phone number
-      const formattedPhone = formatPhoneNumber(cleanData.telefone);
-      
-      // Create parameters for the new template with 7 variables
-      const parameters = createWhatsAppParameters(cleanData);
-
-      // Validate parameters before creating payload
-      console.log('=== VALIDAÇÃO FINAL ANTES DO PAYLOAD ===');
-      const invalidParams = parameters.filter(param => !param.text || param.text.trim() === '');
-      if (invalidParams.length > 0) {
-        console.error('🚨 PARÂMETROS INVÁLIDOS ENCONTRADOS:', invalidParams);
-        throw new Error('Parâmetros inválidos detectados');
+      if (!data.telefone || data.telefone.trim() === '') {
+        console.error('❌ TELEFONE VAZIO - CANCELANDO ENVIO');
+        return false;
       }
 
-      // Create payload with correct structure for template "agendamento"
-      const payload: WhatsAppPayload = {
-        messaging_product: "whatsapp",
-        to: formattedPhone,
-        type: "template",
-        template: {
-          name: "agendamento",  // Nome do novo template
-          language: {
-            code: "pt_BR"
-          },
-          components: [
-            {
-              type: "body",
-              parameters: parameters
-            }
-          ]
-        }
-      };
+      // Garantir que o telefone comece com +55
+      let phoneNumber = data.telefone.replace(/\D/g, '');
+      if (!phoneNumber.startsWith('55')) {
+        phoneNumber = '55' + phoneNumber;
+      }
+      phoneNumber = '+' + phoneNumber;
+      
+      console.log('Telefone formatado:', phoneNumber);
 
-      console.log('=== PAYLOAD CRIADO PARA TEMPLATE "agendamento" ===');
-      console.log('Estrutura do template:', {
-        name: payload.template.name,
-        language: payload.template.language.code,
-        componentsCount: payload.template.components.length,
-        parametersCount: payload.template.components[0].parameters.length
-      });
+      // Criar payload com template "lagendamento"
+      const payload = createAppointmentPayload(phoneNumber, data, 'lagendamento');
+      
+      console.log('=== PAYLOAD CRIADO ===');
+      console.log(JSON.stringify(payload, null, 2));
 
-      return await sendWhatsAppMessage(payload);
+      // Enviar mensagem
+      const result = await sendWhatsAppMessage(payload);
+      
+      console.log('=== RESULTADO DO ENVIO ===');
+      console.log('Sucesso:', result);
+      
+      return result;
     } catch (error) {
-      console.error('Error in WhatsAppService:', error);
+      console.error('=== ERRO NO WHATSAPP SERVICE ===');
+      console.error('Error sending WhatsApp notification:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Test WhatsApp connection
+   */
+  testConnection: async (phoneNumber: string): Promise<boolean> => {
+    try {
+      return await testWhatsAppConnection(phoneNumber);
+    } catch (error) {
+      console.error('Error testing WhatsApp connection:', error);
       return false;
     }
   }
-}
+};
