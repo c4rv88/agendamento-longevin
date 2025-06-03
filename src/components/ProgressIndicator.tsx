@@ -12,9 +12,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   totalSteps 
 }) => {
   const steps = [
-    'Especialidade', 
-    'Profissional',
-    'Convênio',
+    'Seleções', 
     'Data/Hora',
     'Paciente',
     'Confirmação'

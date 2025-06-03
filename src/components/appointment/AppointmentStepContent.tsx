@@ -2,77 +2,75 @@
 import React from 'react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
 import {
-  SpecialtyStep,
-  ProfessionalStep,
-  InsuranceStep,
   DateTimeStep,
   PatientStep,
   SummaryStep
 } from './steps';
+import { CombinedSelectionStep } from './steps/CombinedSelectionStep';
 
 interface AppointmentStepContentProps {
   currentStep: number;
   state: AppointmentState;
   updateState: (updates: Partial<AppointmentState>) => void;
   resetFlow: () => void;
+  onStepComplete: () => void;
 }
 
 export const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
   currentStep,
   state,
   updateState,
-  resetFlow
+  resetFlow,
+  onStepComplete
 }) => {
   switch (currentStep) {
-    case 1: // Especialidade
+    case 1: // Especialidade, Profissional e Convênio
       return (
-        <SpecialtyStep
-          selectedSpecialty={state.selectedSpecialty}
-          updateState={updateState}
-        />
+        <div id="step-1">
+          <CombinedSelectionStep
+            state={state}
+            updateState={updateState}
+            onSelectionComplete={onStepComplete}
+          />
+        </div>
       );
-    case 2: // Profissional
+    case 2: // Data/Hora
       return (
-        <ProfessionalStep
-          selectedProfessional={state.selectedProfessional}
-          specialtyId={state.selectedSpecialty?.specialty_id}
-          unityId={0} // Sempre usar 0 como unidade_id padrão
-          updateState={updateState}
-        />
+        <div id="step-2">
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 border border-[#A6AD97]/20 shadow-sm">
+            <h3 className="text-lg font-semibold text-[#7B8466] mb-4">Escolha Data e Horário</h3>
+            <DateTimeStep
+              selectedDate={state.selectedDate}
+              selectedTime={state.selectedTime}
+              professionalId={state.selectedProfessional?.professional_id!}
+              unityId={0}
+              specialtyId={state.selectedSpecialty?.specialty_id}
+              insuranceId={state.selectedInsurance?.insurance_id}
+              updateState={updateState}
+            />
+          </div>
+        </div>
       );
-    case 3: // Convênio
+    case 3: // Paciente
       return (
-        <InsuranceStep
-          selectedInsurance={state.selectedInsurance}
-          professionalId={state.selectedProfessional?.professional_id}
-          updateState={updateState}
-        />
+        <div id="step-3">
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 border border-[#A6AD97]/20 shadow-sm">
+            <h3 className="text-lg font-semibold text-[#7B8466] mb-4">Dados do Paciente</h3>
+            <PatientStep
+              patient={state.patient}
+              updateState={updateState}
+            />
+          </div>
+        </div>
       );
-    case 4: // Data/Hora
+    case 4: // Confirmação
       return (
-        <DateTimeStep
-          selectedDate={state.selectedDate}
-          selectedTime={state.selectedTime}
-          professionalId={state.selectedProfessional?.professional_id!}
-          unityId={0} // Sempre usar 0 como unidade_id padrão
-          specialtyId={state.selectedSpecialty?.specialty_id}
-          insuranceId={state.selectedInsurance?.insurance_id}
-          updateState={updateState}
-        />
-      );
-    case 5: // Paciente
-      return (
-        <PatientStep
-          patient={state.patient}
-          updateState={updateState}
-        />
-      );
-    case 6: // Confirmação
-      return (
-        <SummaryStep
-          appointmentData={state}
-          resetFlow={resetFlow}
-        />
+        <div id="step-4">
+          <SummaryStep
+            appointmentData={state}
+            resetFlow={resetFlow}
+          />
+        </div>
       );
     default:
       return null;

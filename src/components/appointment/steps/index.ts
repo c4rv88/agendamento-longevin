@@ -6,3 +6,4 @@ export * from './InsuranceStep';
 export * from './DateTimeStep';
 export * from './PatientStep';
 export * from './SummaryStep';
+export * from './CombinedSelectionStep';

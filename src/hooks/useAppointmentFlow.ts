@@ -17,12 +17,12 @@ export const useAppointmentFlow = () => {
   const [state, setState] = useState<AppointmentState>({
     selectedSpecialty: null,
     selectedProfessional: null,
-    selectedUnity: { unity_id: 0, unity_name: 'Longevin', unity_address: '', unity_phone: '' }, // Unidade padrão Longevin
+    selectedUnity: { unity_id: 0, unity_name: 'Longevin', unity_address: '', unity_phone: '' },
     selectedInsurance: null,
     selectedDate: '',
     selectedTime: '',
     patient: null,
-    currentStep: 1, // Starting with Specialties as step 1
+    currentStep: 1,
   });
 
   const updateState = useCallback((updates: Partial<AppointmentState>) => {
@@ -41,14 +41,27 @@ export const useAppointmentFlow = () => {
     setState({
       selectedSpecialty: null,
       selectedProfessional: null,
-      selectedUnity: { unity_id: 0, unity_name: 'Longevin', unity_address: '', unity_phone: '' }, // Manter unidade Longevin no reset
+      selectedUnity: { unity_id: 0, unity_name: 'Longevin', unity_address: '', unity_phone: '' },
       selectedInsurance: null,
       selectedDate: '',
       selectedTime: '',
       patient: null,
-      currentStep: 1, // Reset to first step (Specialties)
+      currentStep: 1,
     });
   }, []);
+
+  const scrollToNextSection = useCallback(() => {
+    setTimeout(() => {
+      const nextStepElement = document.getElementById(`step-${state.currentStep + 1}`);
+      if (nextStepElement) {
+        nextStepElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
+      }
+    }, 100);
+  }, [state.currentStep]);
 
   return {
     state,
@@ -56,5 +69,6 @@ export const useAppointmentFlow = () => {
     nextStep,
     prevStep,
     resetFlow,
+    scrollToNextSection,
   };
 };
