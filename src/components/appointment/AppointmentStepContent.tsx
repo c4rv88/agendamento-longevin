@@ -36,7 +36,7 @@ export const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
         <ProfessionalStep
           selectedProfessional={state.selectedProfessional}
           specialtyId={state.selectedSpecialty?.specialty_id}
-          unityId={state.selectedUnity?.unity_id}
+          unityId={0} // Sempre usar 0 como unidade_id padrão
           updateState={updateState}
         />
       );
@@ -54,7 +54,7 @@ export const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
           selectedDate={state.selectedDate}
           selectedTime={state.selectedTime}
           professionalId={state.selectedProfessional?.professional_id!}
-          unityId={state.selectedUnity?.unity_id}
+          unityId={0} // Sempre usar 0 como unidade_id padrão
           specialtyId={state.selectedSpecialty?.specialty_id}
           insuranceId={state.selectedInsurance?.insurance_id}
           updateState={updateState}

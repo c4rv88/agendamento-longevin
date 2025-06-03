@@ -38,10 +38,10 @@ export const useAppointmentConfirmation = () => {
         throw new Error('ID do paciente não encontrado');
       }
 
-      // Criar agendamento com o ID do paciente correto
+      // Criar agendamento com unidade_id fixo = 0
       const appointmentPayload = {
-        unity_id: appointmentData.selectedUnity?.unity_id,
-        unity_name: appointmentData.selectedUnity?.unity_name,
+        unity_id: 0, // Sempre usar 0 como unidade_id padrão
+        unity_name: 'Padrão',
         specialty_id: appointmentData.selectedSpecialty?.specialty_id,
         professional_id: appointmentData.selectedProfessional?.professional_id,
         insurance_id: appointmentData.selectedInsurance?.insurance_id,
@@ -51,7 +51,7 @@ export const useAppointmentConfirmation = () => {
         patient_phone: patientData.patient_phone,
       };
 
-      console.log('Appointment payload with patient ID:', appointmentPayload);
+      console.log('Appointment payload with fixed unity_id=0:', appointmentPayload);
 
       const success = await FeegowApiService.createAppointment(appointmentPayload);
       
@@ -75,12 +75,8 @@ export const useAppointmentConfirmation = () => {
           formattedTime = `${timeParts[0]}:${timeParts[1]}`;
         }
         
-        // Formatar local com endereço completo
-        let formattedLocation = '';
-        if (appointmentData.selectedUnity) {
-          const unity = appointmentData.selectedUnity;
-          formattedLocation = `${unity.unity_name} - ${unity.unity_address}`;
-        }
+        // Usar local padrão
+        const formattedLocation = 'ISV - Unidade Padrão';
         
         console.log('=== DADOS FORMATADOS ===');
         console.log('Data formatada:', formattedDate);
@@ -93,7 +89,7 @@ export const useAppointmentConfirmation = () => {
           especialidade: String(appointmentData.selectedSpecialty?.specialty_name || 'Consulta').trim(),
           data: formattedDate || 'Data não informada',
           horario: formattedTime || '00:00',
-          local: formattedLocation || 'Local não informado',
+          local: formattedLocation,
           profissional: String(appointmentData.selectedProfessional?.professional_name || 'Profissional').trim(),
           convenio: String(appointmentData.selectedInsurance?.insurance_name || 'Particular').trim(),
           telefone: String(patientData.patient_phone || '').replace(/\D/g, '')
