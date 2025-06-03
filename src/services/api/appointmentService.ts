@@ -24,20 +24,15 @@ export const AppointmentService = {
         formattedTime = formattedTime + ':00';
       }
 
-      // Get the correct local_id based on unity name
-      const localId = appointmentData.unity_name 
-        ? getUnitIdByName(appointmentData.unity_name)
-        : appointmentData.unity_id || 0;
-      
       console.log('Creating appointment with data:', formattedData);
       console.log('Formatted time:', formattedTime);
       
       const requestBody = {
-        local_id: localId,
+        local_id: 13, // Sempre usar 13 como local_id fixo
         paciente_id: formattedData.patient_id,
         profissional_id: formattedData.professional_id,
         especialidade_id: formattedData.specialty_id,
-        procedimento_id: 1, // Always 1 as specified
+        procedimento_id: 77, // Sempre usar 77 como procedimento_id fixo
         data: formattedData.date,
         horario: formattedTime, // Now properly formatted with seconds
         valor: '0.00', // Always 0.00 as specified

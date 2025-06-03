@@ -38,10 +38,11 @@ export const useAppointmentConfirmation = () => {
         throw new Error('ID do paciente não encontrado');
       }
 
-      // Criar agendamento com unidade_id fixo = 0
+      // Criar agendamento com local_id fixo = 13
       const appointmentPayload = {
-        unity_id: 0, // Sempre usar 0 como unidade_id padrão
+        unity_id: 0, // Manter para compatibilidade
         unity_name: 'Padrão',
+        local_id: 13, // local_id fixo sempre 13
         specialty_id: appointmentData.selectedSpecialty?.specialty_id,
         professional_id: appointmentData.selectedProfessional?.professional_id,
         insurance_id: appointmentData.selectedInsurance?.insurance_id,
@@ -51,7 +52,7 @@ export const useAppointmentConfirmation = () => {
         patient_phone: patientData.patient_phone,
       };
 
-      console.log('Appointment payload with fixed unity_id=0:', appointmentPayload);
+      console.log('Appointment payload with fixed local_id=13:', appointmentPayload);
 
       const success = await FeegowApiService.createAppointment(appointmentPayload);
       

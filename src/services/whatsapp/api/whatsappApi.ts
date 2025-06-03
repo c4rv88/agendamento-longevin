@@ -2,8 +2,8 @@
 import { WhatsAppPayload, WhatsAppApiError } from '../types/whatsappTypes';
 
 const WHATSAPP_CONFIG = {
-  token: 'EAAVlloPc6eABO4tOWmbgl16kuG500Msz3fZAC46SK8TZBOAF8pQXwUC5Yjs5qrkQZCchzs6OQRoRcHSr7idDx99USb1jHA0Onv1PZAlpFlPbqlW8DdndZBJtR5fhMUj28GWrlTDQhgZCV3C9s6bPosVm0BByHAZBJHYNEi4MupOyyBdlNhKf4HjyWpjnluS3p5NAgZDZD',
-  phoneNumberId: '401831683009192',
+  token: 'EAANuj2s91QEBO3uTgLxMZAgMVF5IvZCXqeZCvexb4zU3GZBqxD8ZCTjDI2W7MT3lGnxa9sLlAZCUdO6CYmHtuCvonzf7j9kykYo66jBX1qZCGp5gqfNsgQdUNPPw5IEhMPYzbaTaImQyeC16SfERvbMGiNNPX1009MW4NhYob7JDiWrcJ9WQerZCnC96woZBqy8gl1QZDZD',
+  phoneNumberId: '512788381916390',
   apiVersion: 'v22.0',
   baseUrl: 'https://graph.facebook.com'
 };
