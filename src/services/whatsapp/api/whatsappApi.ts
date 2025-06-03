@@ -1,11 +1,10 @@
-
 import { WhatsAppPayload, WhatsAppApiError } from '../types/whatsappTypes';
 
+// WhatsApp API configuration from environment variables
 const WHATSAPP_CONFIG = {
-  token: 'EAANuj2s91QEBO3uTgLxMZAgMVF5IvZCXqeZCvexb4zU3GZBqxD8ZCTjDI2W7MT3lGnxa9sLlAZCUdO6CYmHtuCvonzf7j9kykYo66jBX1qZCGp5gqfNsgQdUNPPw5IEhMPYzbaTaImQyeC16SfERvbMGiNNPX1009MW4NhYob7JDiWrcJ9WQerZCnC96woZBqy8gl1QZDZD',
-  phoneNumberId: '512788381916390',
-  apiVersion: 'v22.0',
-  baseUrl: 'https://graph.facebook.com'
+  token: import.meta.env.VITE_WHATSAPP_TOKEN,
+  phoneNumberId: import.meta.env.VITE_WHATSAPP_PHONE_NUMBER_ID,
+  apiVersion: import.meta.env.VITE_WHATSAPP_API_VERSION || 'v22.0'
 };
 
 /**

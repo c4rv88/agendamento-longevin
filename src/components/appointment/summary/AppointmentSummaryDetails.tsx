@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Calendar, MapPin, User, CreditCard, Clock } from 'lucide-react';
 import { AppointmentState } from '@/hooks/useAppointmentFlow';
@@ -38,13 +37,21 @@ export const AppointmentSummaryDetails: React.FC<AppointmentSummaryDetailsProps>
     }
   };
 
+  // Function to get the unity display name
+  const getUnityDisplayName = (): string => {
+    if (appointmentData.selectedUnity?.unity_name && appointmentData.selectedUnity.unity_name !== 'Padrão') {
+      return appointmentData.selectedUnity.unity_name;
+    }
+    return 'ISV - Unidade Padrão';
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="space-y-4">
         <AppointmentDetail
           icon={MapPin}
           label="Unidade"
-          value={appointmentData.selectedUnity?.unity_name}
+          value={getUnityDisplayName()}
         />
         <AppointmentDetail
           icon={User}
