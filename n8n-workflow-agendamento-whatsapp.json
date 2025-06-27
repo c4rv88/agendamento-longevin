@@ -1,0 +1,312 @@
+
+{
+  "name": "Agendamento WhatsApp - Feegow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "webhook-agendamento",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [260, 300],
+      "webhookId": "agendamento-webhook"
+    },
+    {
+      "parameters": {
+        "content": "console.log('Dados recebidos:', JSON.stringify($input.all(), null, 2));\n\n// Extrair dados do webhook\nconst data = $input.all()[0].json;\n\n// Validar dados obrigatórios\nif (!data.telefone || !data.nome) {\n  throw new Error('Telefone e nome são obrigatórios');\n}\n\n// Formatar telefone\nlet telefone = data.telefone.replace(/\\D/g, '');\nif (!telefone.startsWith('55')) {\n  telefone = '55' + telefone;\n}\n\nreturn {\n  telefone: telefone,\n  nome: data.nome || 'Paciente',\n  especialidade_id: data.especialidade_id,\n  profissional_id: data.profissional_id,\n  convenio_id: data.convenio_id,\n  data_agendamento: data.data_agendamento,\n  horario: data.horario\n};"
+      },
+      "id": "validate-data",
+      "name": "Validar Dados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.feegow.com/v1/api/specialties/list",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get-specialties",
+      "name": "Buscar Especialidades",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [700, 180],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "feegow-credentials",
+          "name": "Feegow API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.feegow.com/v1/api/professional/list?especialidade_id={{$json.especialidade_id}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get-professionals",
+      "name": "Buscar Profissionais",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [700, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "feegow-credentials",
+          "name": "Feegow API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.feegow.com/v1/api/appoints/available-schedule?tipo=P&procedimento_id=1&profissional_id={{$json.profissional_id}}&date={{$json.data_agendamento}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get-schedules",
+      "name": "Buscar Horários",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [700, 420]
+    },
+    {
+      "parameters": {
+        "content": "// Processar respostas das APIs\nconst especialidades = $('get-specialties').all()[0].json.content || [];\nconst profissionais = $('get-professionals').all()[0].json.content || [];\nconst horarios = $('get-schedules').all()[0].json.content || [];\nconst dadosIniciais = $('validate-data').all()[0].json;\n\n// Encontrar especialidade\nconst especialidade = especialidades.find(e => e.especialidade_id == dadosIniciais.especialidade_id);\n\n// Encontrar profissional\nconst profissional = profissionais.find(p => p.profissional_id == dadosIniciais.profissional_id);\n\n// Verificar se horário está disponível\nconst horarioDisponivel = horarios.some(h => \n  h.times && h.times.includes(dadosIniciais.horario)\n);\n\nif (!horarioDisponivel) {\n  throw new Error('Horário não disponível');\n}\n\nreturn {\n  ...dadosIniciais,\n  especialidade_nome: especialidade?.nome || 'Especialidade',\n  profissional_nome: profissional?.nome || 'Profissional',\n  horario_confirmado: dadosIniciais.horario\n};"
+      },
+      "id": "process-data",
+      "name": "Processar Dados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.feegow.com/v1/api/appoints/new-appoint",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"local_id\": 13,\n  \"paciente_id\": {{$json.paciente_id || 0}},\n  \"profissional_id\": {{$json.profissional_id}},\n  \"especialidade_id\": {{$json.especialidade_id}},\n  \"procedimento_id\": 77,\n  \"data\": \"{{$json.data_agendamento}}\",\n  \"horario\": \"{{$json.horario_confirmado}}:00\",\n  \"valor\": \"0.00\",\n  \"plano\": 1,\n  \"convenio_id\": {{$json.convenio_id || 0}},\n  \"notas\": \"agende-Longevin\",\n  \"canal_id\": 1,\n  \"celular\": \"{{$json.telefone}}\"\n}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "create-appointment",
+      "name": "Criar Agendamento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1140, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "feegow-credentials",
+          "name": "Feegow API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "// Preparar dados para WhatsApp\nconst dados = $('process-data').all()[0].json;\nconst agendamento = $('create-appointment').all()[0].json;\n\nif (!agendamento.success) {\n  throw new Error('Falha ao criar agendamento: ' + JSON.stringify(agendamento));\n}\n\n// Formatar data para DD-MM-YYYY\nlet dataFormatada = dados.data_agendamento;\nif (dataFormatada.match(/^\\d{4}-\\d{2}-\\d{2}$/)) {\n  const [ano, mes, dia] = dataFormatada.split('-');\n  dataFormatada = `${dia}-${mes}-${ano}`;\n}\n\n// Formatar horário HH:MM\nlet horarioFormatado = dados.horario_confirmado;\nif (horarioFormatado.includes(':')) {\n  const partes = horarioFormatado.split(':');\n  horarioFormatado = `${partes[0]}:${partes[1]}`;\n}\n\nreturn {\n  telefone: '+' + dados.telefone,\n  template_data: {\n    nome: dados.nome,\n    especialidade: dados.especialidade_nome,\n    data: dataFormatada,\n    horario: horarioFormatado,\n    local: 'Longevin',\n    profissional: dados.profissional_nome,\n    convenio: 'Particular'\n  }\n};"
+      },
+      "id": "prepare-whatsapp",
+      "name": "Preparar WhatsApp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{$credentials.whatsapp.phone_number_id}}/messages",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{$json.telefone}}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"lagendamento\",\n    \"language\": {\n      \"code\": \"pt_BR\"\n    },\n    \"components\": [\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          {\n            \"type\": \"text\",\n            \"text\": \"{{$json.template_data.nome}}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{$json.template_data.especialidade}}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{$json.template_data.data}}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{$json.template_data.horario}}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{$json.template_data.local}}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{$json.template_data.profissional}}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{$json.template_data.convenio}}\"\n          }\n        ]\n      }\n    ]\n  }\n}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "send-whatsapp",
+      "name": "Enviar WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1580, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "whatsapp-credentials",
+          "name": "WhatsApp API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "// Resposta final\nconst whatsappResponse = $('send-whatsapp').all()[0].json;\nconst dadosAgendamento = $('prepare-whatsapp').all()[0].json;\n\nreturn {\n  success: true,\n  message: 'Agendamento criado e WhatsApp enviado com sucesso',\n  agendamento: {\n    telefone: dadosAgendamento.telefone,\n    dados: dadosAgendamento.template_data\n  },\n  whatsapp_sent: !!whatsappResponse.messages,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "final-response",
+      "name": "Resposta Final",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 300]
+    },
+    {
+      "parameters": {
+        "content": "// Tratamento de erro\nconst error = $input.all()[0].error;\n\nreturn {\n  success: false,\n  error: error.message || 'Erro desconhecido',\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "error-handler",
+      "name": "Tratamento de Erro",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 500]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Dados": {
+      "main": [
+        [
+          {
+            "node": "Buscar Especialidades",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar Profissionais",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar Horários",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Especialidades": {
+      "main": [
+        [
+          {
+            "node": "Processar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Profissionais": {
+      "main": [
+        [
+          {
+            "node": "Processar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Horários": {
+      "main": [
+        [
+          {
+            "node": "Processar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar Dados": {
+      "main": [
+        [
+          {
+            "node": "Criar Agendamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Agendamento": {
+      "main": [
+        [
+          {
+            "node": "Preparar WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Tratamento de Erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Enviar WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Resposta Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "America/Sao_Paulo"
+  },
+  "versionId": "1.0.0",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "agendamento-whatsapp-workflow",
+  "tags": [
+    {
+      "createdAt": "2024-12-27T12:00:00.000Z",
+      "updatedAt": "2024-12-27T12:00:00.000Z",
+      "id": "agendamento",
+      "name": "agendamento"
+    },
+    {
+      "createdAt": "2024-12-27T12:00:00.000Z",
+      "updatedAt": "2024-12-27T12:00:00.000Z",
+      "id": "whatsapp",
+      "name": "whatsapp"
+    },
+    {
+      "createdAt": "2024-12-27T12:00:00.000Z",
+      "updatedAt": "2024-12-27T12:00:00.000Z",
+      "id": "feegow",
+      "name": "feegow"
+    }
+  ]
+}
