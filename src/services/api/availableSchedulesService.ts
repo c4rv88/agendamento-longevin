@@ -35,7 +35,7 @@ export const AvailableSchedulesService = {
         
         let endpoint = `/api/appoints/available-schedule?`;
         endpoint += `tipo=P`;
-        endpoint += `&procedimento_id=1`;
+        endpoint += `&procedimento_id=77`;
         endpoint += `&data_start=${startDate}`;
         endpoint += `&data_end=${endDateStr}`;
         endpoint += `&unidade_id=${sanitizedUnityId}`;
