@@ -22,23 +22,52 @@ Deno.serve(async (req) => {
       );
     }
 
+    if (!FEEGOW_API_KEY) {
+      console.error("FEEGOW_API_KEY secret is not set!");
+      return new Response(
+        JSON.stringify({ error: "API key not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const url = `${FEEGOW_API_URL}${endpoint}`;
-    console.log(`Proxying ${method || "GET"} request to: ${url}`);
+    const httpMethod = method || "GET";
+    console.log(`Proxying ${httpMethod} request to: ${url}`);
+    console.log(`API Key present: ${FEEGOW_API_KEY ? "yes (" + FEEGOW_API_KEY.substring(0, 20) + "...)" : "no"}`);
 
     const fetchOptions: RequestInit = {
-      method: method || "GET",
+      method: httpMethod,
       headers: {
         "Content-Type": "application/json",
-        "x-access-token": FEEGOW_API_KEY!,
+        "x-access-token": FEEGOW_API_KEY,
       },
     };
 
-    if (body && (method === "POST" || method === "PUT" || method === "PATCH")) {
+    if (body && (httpMethod === "POST" || httpMethod === "PUT" || httpMethod === "PATCH")) {
       fetchOptions.body = JSON.stringify(body);
     }
 
     const response = await fetch(url, fetchOptions);
-    const data = await response.json();
+    const responseText = await response.text();
+    
+    console.log(`Feegow response status: ${response.status}`);
+    console.log(`Feegow response content-type: ${response.headers.get("content-type")}`);
+    
+    // Try to parse as JSON, handle HTML error pages
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      console.error(`Feegow returned non-JSON response (${response.status}):`, responseText.substring(0, 500));
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Feegow API returned status ${response.status} with non-JSON response`,
+          status: response.status 
+        }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     return new Response(JSON.stringify(data), {
       status: response.status,
