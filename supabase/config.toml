@@ -1,1 +1,4 @@
 project_id = "ipdkftyhloksascnerac"
+
+[functions.feegow-proxy]
+verify_jwt = false

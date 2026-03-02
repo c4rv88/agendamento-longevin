@@ -1,50 +1,38 @@
 import { Patient } from '@/types/feegow';
-import { API_BASE_URL, apiHeaders } from './apiConfig';
+import { feegowFetch } from './apiConfig';
 
 export const PatientService = {
   searchPatient: async (cpf?: string, phone?: string): Promise<Patient | null> => {
     try {
       const params = new URLSearchParams();
       if (cpf) {
-        // Garante que o CPF tenha apenas números
         const cleanCpf = cpf.replace(/\D/g, '');
         params.append('paciente_cpf', cleanCpf);
       }
       
       if (phone) {
-        // Garante que o telefone tenha apenas números
         const cleanPhone = phone.replace(/\D/g, '');
         params.append('telefone', cleanPhone);
       }
 
-      const url = `${API_BASE_URL}/api/patient/search?${params.toString()}`;
-      console.log('Sending patient search request to:', url);
+      const endpoint = `/api/patient/search?${params.toString()}`;
+      console.log('Sending patient search request to:', endpoint);
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: apiHeaders,
-      });
-      
-      const data = await response.json();
+      const data = await feegowFetch(endpoint);
       console.log('Patient search response:', data);
       
-      // Check for 409 error which means patient not found
       if (!data.success && data.content === "Paciente não encontrado") {
         console.log('Patient not found with the provided CPF/phone');
         return null;
       }
       
-      // Parse birth date from API response
       let formattedBirthDate = '';
       if (data.content?.nascimento) {
-        // API can return date in DD-MM-YYYY or DD/MM/YYYY format
         const birthDate = data.content.nascimento;
         if (birthDate.includes('-')) {
-          // Convert DD-MM-YYYY to YYYY-MM-DD
           const [day, month, year] = birthDate.split('-');
           formattedBirthDate = `${year}-${month}-${day}`;
         } else if (birthDate.includes('/')) {
-          // Convert DD/MM/YYYY to YYYY-MM-DD
           const [day, month, year] = birthDate.split('/');
           formattedBirthDate = `${year}-${month}-${day}`;
         } else {
@@ -69,33 +57,25 @@ export const PatientService = {
   
   createPatient: async (patient: Patient): Promise<Patient | null> => {
     try {
-      // Format the date from YYYY-MM-DD to DD-MM-YYYY if it exists
       let formattedPatient = { ...patient };
       
       if (patient.patient_birth) {
-        // Verificar se a data está no formato DD-MM-YYYY e converter para YYYY-MM-DD
         if (patient.patient_birth.match(/^\d{2}-\d{2}-\d{4}$/)) {
-          // Converter de DD-MM-YYYY para YYYY-MM-DD
           const [day, month, year] = patient.patient_birth.split('-');
           formattedPatient.patient_birth = `${year}-${month}-${day}`;
         }
-        // Se já está em YYYY-MM-DD, manter como está
       }
       
-      // Ensure CPF has only numbers
       formattedPatient.patient_cpf = patient.patient_cpf.replace(/\D/g, '');
       
-      // Ensure phone has only numbers
       if (patient.patient_phone) {
         formattedPatient.patient_phone = patient.patient_phone.replace(/\D/g, '');
       }
       
-      // Ensure address is not empty
       if (!formattedPatient.patient_address || formattedPatient.patient_address.trim() === '') {
         formattedPatient.patient_address = 'Não informado';
       }
       
-      // Prepare request body
       const requestBody = {
         nome_completo: formattedPatient.patient_name,
         cpf: formattedPatient.patient_cpf,
@@ -108,28 +88,12 @@ export const PatientService = {
       console.log('Creating patient with formatted data:', formattedPatient);
       console.log('Request body for patient creation:', requestBody);
       
-      const response = await fetch(`${API_BASE_URL}/api/patient/create`, {
-        method: 'POST',
-        headers: apiHeaders,
-        body: JSON.stringify(requestBody),
-      });
-      
-      const data = await response.json();
+      const data = await feegowFetch('/api/patient/create', 'POST', requestBody);
       console.log('Patient creation response:', data);
-      console.log('Response status:', response.status);
-      console.log('Response data content:', data.content);
-      console.log('paciente_id from response:', data.content?.paciente_id);
       
-      if (!response.ok) {
-        console.error('Patient creation failed with status:', response.status);
-        console.error('Error response:', data);
-        return null;
-      }
-      
-      // Return the patient with the new ID - corrigido para usar paciente_id do Feegow
       if (data.success && data.content && data.content.paciente_id) {
         const newPatient = {
-          patient_id: data.content.paciente_id, // Mapear paciente_id do Feegow para patient_id
+          patient_id: data.content.paciente_id,
           patient_name: formattedPatient.patient_name,
           patient_cpf: formattedPatient.patient_cpf,
           patient_email: formattedPatient.patient_email,
@@ -139,13 +103,9 @@ export const PatientService = {
         };
         
         console.log('Returning new patient with ID:', newPatient);
-        console.log('New patient ID specifically:', newPatient.patient_id);
         return newPatient;
       } else {
-        console.error('Patient creation response missing required data:');
-        console.error('- success:', data.success);
-        console.error('- content:', data.content);
-        console.error('- paciente_id:', data.content?.paciente_id);
+        console.error('Patient creation response missing required data:', data);
       }
       
       return null;

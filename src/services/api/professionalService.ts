@@ -1,30 +1,24 @@
-
 import { Professional } from '@/types/feegow';
-import { API_BASE_URL, apiHeaders } from './apiConfig';
+import { feegowFetch } from './apiConfig';
 
 export const ProfessionalService = {
   getProfessionals: async (specialtyId?: number, unityId?: number): Promise<Professional[]> => {
     try {
       console.log('Calling Feegow API for professionals with filters:', { specialtyId, unityId });
       
-      let url = `${API_BASE_URL}/api/professional/list`;
+      let endpoint = `/api/professional/list`;
       const params = new URLSearchParams();
       
       if (specialtyId) params.append('especialidade_id', specialtyId.toString());
       if (unityId !== undefined) params.append('unidade_id', unityId.toString());
       
       if (params.toString()) {
-        url += `?${params.toString()}`;
+        endpoint += `?${params.toString()}`;
       }
       
-      console.log('Professional request URL:', url);
+      console.log('Professional request endpoint:', endpoint);
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: apiHeaders,
-      });
-      
-      const data = await response.json();
+      const data = await feegowFetch(endpoint);
       console.log('API response for professionals:', data);
       
       if (!data.success) {
@@ -32,7 +26,6 @@ export const ProfessionalService = {
         return [];
       }
       
-      // Transform the API response structure into our Professional[] format
       const professionals: Professional[] = [];
       
       if (data.content) {

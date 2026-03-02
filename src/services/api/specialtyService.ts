@@ -1,25 +1,17 @@
-
 import { Specialty } from '@/types/feegow';
-import { API_BASE_URL, apiHeaders } from './apiConfig';
+import { feegowFetch } from './apiConfig';
 
 export const SpecialtyService = {
   getSpecialties: async (unityId?: number): Promise<Specialty[]> => {
     try {
       console.log('Calling Feegow API for specialties with unityId:', unityId);
       
-      let url = `${API_BASE_URL}/api/specialties/list`;
-      
-      // Add query parameters if provided
+      let endpoint = `/api/specialties/list`;
       if (unityId) {
-        url += `?unidade_id=${unityId}`;
+        endpoint += `?unidade_id=${unityId}`;
       }
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: apiHeaders,
-      });
-      
-      const data = await response.json();
+      const data = await feegowFetch(endpoint);
       console.log('API response for specialties:', data);
       
       if (!data.success) {
@@ -27,7 +19,6 @@ export const SpecialtyService = {
         return [];
       }
       
-      // Transform the API response structure into our Specialty[] format
       const specialties: Specialty[] = [];
       
       if (data.content) {

@@ -1,31 +1,23 @@
-
 import { Unity } from '@/types/feegow';
-import { API_BASE_URL, apiHeaders, ALLOWED_UNITS } from './apiConfig';
+import { feegowFetch, ALLOWED_UNITS } from './apiConfig';
 
 export const UnityService = {
   getUnities: async (professionalId?: number, specialtyId?: number): Promise<Unity[]> => {
     try {
       console.log('Calling Feegow API for unities with filters:', { professionalId, specialtyId });
       
-      let url = `${API_BASE_URL}/api/company/list-unity`;
-      
-      // Add query parameters if provided
+      let endpoint = `/api/company/list-unity`;
       const params = new URLSearchParams();
       if (professionalId) params.append('professional_id', professionalId.toString());
       if (specialtyId) params.append('specialty_id', specialtyId.toString());
       
       if (params.toString()) {
-        url += `?${params.toString()}`;
+        endpoint += `?${params.toString()}`;
       }
       
-      console.log('Unity request URL:', url);
+      console.log('Unity request endpoint:', endpoint);
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: apiHeaders,
-      });
-      
-      const data = await response.json();
+      const data = await feegowFetch(endpoint);
       console.log('API response for unities:', data);
       
       if (!data.success) {
@@ -33,10 +25,8 @@ export const UnityService = {
         return [];
       }
       
-      // Transform the API response structure into our Unity[] format
       const unities: Unity[] = [];
       
-      // Add matriz if it exists
       if (data.content && data.content.matriz) {
         data.content.matriz.forEach((unit: any) => {
           if (ALLOWED_UNITS.includes(unit.nome_fantasia) && unit.ExibirAgendamentoOnline === 1) {
@@ -50,7 +40,6 @@ export const UnityService = {
         });
       }
       
-      // Add unidades if they exist
       if (data.content && data.content.unidades) {
         data.content.unidades.forEach((unit: any) => {
           if (ALLOWED_UNITS.includes(unit.nome_fantasia) && unit.ExibirAgendamentoOnline === 1) {
