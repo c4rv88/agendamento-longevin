@@ -2,39 +2,26 @@
 
 ## Problem
 
-The browser blocks direct requests from your frontend (`https://agende.longevin.com.br`) to the Feegow API (`https://api.feegow.com`) due to CORS policy. The Feegow API does not include `Access-Control-Allow-Origin` headers.
+The `procedimento_id=77` value works for the `available-schedule` endpoint (GET, returns 200) but is rejected by the `new-appoint` endpoint (POST, returns 422). The Feegow API validates this field differently for appointment creation versus schedule queries.
 
-## Solution
+## Investigation
 
-Create a Supabase Edge Function that acts as a proxy between your frontend and the Feegow API. All API calls will go through this proxy, which runs server-side (no CORS restrictions). This also removes the API key from the frontend code (security improvement).
+The logs confirm:
+- GET `/api/appoints/available-schedule?...&procedimento_id=77` returns **200 OK**
+- POST `/api/appoints/new-appoint` with `procedimento_id: 77` in body returns **422** with `"O campo procedimento id selecionado é inválido"`
 
-## Implementation Plan
+This means the procedure ID `77` exists for schedule lookups but is not a valid selection for creating appointments. The Feegow API likely has a separate list of valid procedure IDs for the `new-appoint` endpoint.
 
-### 1. Create Edge Function `supabase/functions/feegow-proxy/index.ts`
-- Accepts POST requests with `{ endpoint, method, body }` 
-- Forwards to Feegow API using server-side `FEEGOW_API_KEY` secret
-- Uses `x-access-token` header (Feegow's auth format)
-- Returns response with CORS headers
+## Plan
 
-### 2. Add secret via Lovable secrets tool
-- Store `FEEGOW_API_KEY` with the existing JWT token value
+### 1. Query valid procedure IDs from Feegow API
+Use the edge function test tool to call the Feegow procedures list endpoint (`/api/procedures/list`) to discover which `procedimento_id` values are valid for appointment creation. This will tell us the correct value to use.
 
-### 3. Update `src/services/api/apiConfig.ts`
-- Replace `API_BASE_URL` with a helper function that calls the Edge Function
-- Remove the access token from frontend code
-- Create a `feegowFetch` utility that wraps all API calls through the proxy
+### 2. Update `src/services/api/appointmentService.ts`
+Replace `procedimento_id: 77` with the correct valid value identified from the API response.
 
-### 4. Update all 6 service files to use the proxy
-- `specialtyService.ts` - GET specialties
-- `professionalService.ts` - GET professionals  
-- `unityService.ts` - GET unities
-- `insuranceService.ts` - GET insurances
-- `availableSchedulesService.ts` - GET schedules
-- `patientService.ts` - GET search + POST create
-- `appointmentService.ts` - POST create appointment
-
-Each service will call the proxy instead of the Feegow API directly, using a shared `feegowFetch()` helper.
-
-### 5. Update `supabase/config.toml`
-- Set `verify_jwt = false` for the proxy function (public endpoint)
+### Technical Details
+- File to modify: `src/services/api/appointmentService.ts` (line 28)
+- The `available-schedule` services can keep `procedimento_id=77` since it works there
+- If no valid procedure ID is found via the API, we will try common values like `1`, `0`, or omit the field entirely
 
