@@ -1,4 +1,5 @@
 import { feegowFetch } from './apiConfig';
+import { ProcedureService } from './procedureService';
 
 export const AppointmentService = {
   createAppointment: async (appointmentData: any): Promise<boolean> => {
@@ -17,15 +18,24 @@ export const AppointmentService = {
         formattedTime = formattedTime + ':00';
       }
 
+      // Dynamically resolve procedimento_id based on specialty
+      const specialtyId = formattedData.specialty_id;
+      let procedimentoId = await ProcedureService.getProcedureIdForSpecialty(specialtyId);
+      
+      if (!procedimentoId) {
+        console.warn('Could not resolve procedimento_id, falling back to 8');
+        procedimentoId = 8;
+      }
+
       console.log('Creating appointment with data:', formattedData);
-      console.log('Formatted time:', formattedTime);
+      console.log('Resolved procedimento_id:', procedimentoId);
       
       const requestBody = {
         local_id: 13,
         paciente_id: formattedData.patient_id,
         profissional_id: formattedData.professional_id,
         especialidade_id: formattedData.specialty_id,
-        procedimento_id: 77,
+        procedimento_id: procedimentoId,
         data: formattedData.date,
         horario: formattedTime,
         valor: '0.00',
