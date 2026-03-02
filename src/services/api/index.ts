@@ -6,6 +6,7 @@ import { ScheduleService } from './scheduleService';
 import { InsuranceService } from './insuranceService';
 import { PatientService } from './patientService';
 import { AppointmentService } from './appointmentService';
+import { ProcedureService } from './procedureService';
 
 // Re-export all services
 export const FeegowApiService = {
@@ -15,5 +16,6 @@ export const FeegowApiService = {
   ...ScheduleService,
   ...InsuranceService,
   ...PatientService,
-  ...AppointmentService
+  ...AppointmentService,
+  ...ProcedureService
 };
