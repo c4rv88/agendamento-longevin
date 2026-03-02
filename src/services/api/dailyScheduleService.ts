@@ -15,7 +15,7 @@ export const DailyScheduleService = {
       
       let endpoint = `/api/appoints/available-schedule?`;
       endpoint += `tipo=P`;
-      endpoint += `&procedimento_id=1`;
+      endpoint += `&procedimento_id=77`;
       endpoint += `&date=${formattedDate}`;
       
       if (unidade_id) {
