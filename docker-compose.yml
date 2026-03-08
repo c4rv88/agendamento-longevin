@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_PROXY_URL: ""
+    ports:
+      - "80:80"
+    depends_on:
+      - proxy
+
+  proxy:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - FEEGOW_API_KEY=${FEEGOW_API_KEY}
+      - PORT=3001

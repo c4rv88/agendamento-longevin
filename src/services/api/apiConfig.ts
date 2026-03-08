@@ -1,5 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-
 // Unit IDs as specified in the requirements
 export const UNIT_IDS = {
   'ISV - Papicu': 32,
@@ -15,8 +13,11 @@ export const getUnitIdByName = (unitName: string): number => {
   return UNIT_IDS[unitName as keyof typeof UNIT_IDS] || 0;
 };
 
+// Proxy URL - in production, points to the self-hosted proxy server
+const PROXY_URL = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001';
+
 /**
- * Proxy fetch to Feegow API via Edge Function
+ * Proxy fetch to Feegow API via self-hosted proxy server
  * @param endpoint - API endpoint path (e.g., "/api/specialties/list")
  * @param method - HTTP method (default: "GET")
  * @param body - Request body for POST/PUT requests
@@ -24,15 +25,21 @@ export const getUnitIdByName = (unitName: string): number => {
 export const feegowFetch = async (endpoint: string, method: string = "GET", body?: any): Promise<any> => {
   console.log(`feegowFetch: ${method} ${endpoint}`, body);
 
-  const { data, error } = await supabase.functions.invoke('feegow-proxy', {
-    body: { endpoint, method, body },
+  const response = await fetch(`${PROXY_URL}/api/feegow-proxy`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ endpoint, method, body }),
   });
 
-  if (error) {
-    console.error('Edge function error:', error);
-    throw new Error(`Proxy error: ${error.message}`);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: response.statusText }));
+    console.error('Proxy error:', errorData);
+    throw new Error(`Proxy error: ${errorData.error || response.statusText}`);
   }
 
+  const data = await response.json();
   console.log('feegowFetch response:', data);
   return data;
 };
