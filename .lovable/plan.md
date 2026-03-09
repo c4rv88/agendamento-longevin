@@ -1,66 +1,27 @@
 
 
-## Plano: Trocar POST tunnel por chamadas diretas no proxy
+## Problem
 
-### Problema atual
-O `feegowFetch` envia **tudo como POST** para `/api/feegow`, com `{ endpoint, method, body }` no body. O proxy Express em `server/index.js` desempacota e re-envia para a Feegow. Isso é um "tunnel" desnecessário.
+The `procedimento_id=77` value works for the `available-schedule` endpoint (GET, returns 200) but is rejected by the `new-appoint` endpoint (POST, returns 422). The Feegow API validates this field differently for appointment creation versus schedule queries.
 
-### Solução
-Chamadas diretas: `fetch('/api/feegow/v1' + path, { method })`. O proxy Express vira um passthrough transparente para qualquer rota sob `/api/feegow/v1/*`.
+## Investigation
 
-### Mudanças
+The logs confirm:
+- GET `/api/appoints/available-schedule?...&procedimento_id=77` returns **200 OK**
+- POST `/api/appoints/new-appoint` with `procedimento_id: 77` in body returns **422** with `"O campo procedimento id selecionado é inválido"`
 
-#### 1. `src/services/api/apiConfig.ts`
-Trocar o `feegowFetch` de POST tunnel para chamada direta:
+This means the procedure ID `77` exists for schedule lookups but is not a valid selection for creating appointments. The Feegow API likely has a separate list of valid procedure IDs for the `new-appoint` endpoint.
 
-```typescript
-export const feegowFetch = async (endpoint: string, method: string = "GET", body?: any): Promise<any> => {
-  const url = `/api/feegow/v1${endpoint}`;
-  console.log(`feegowFetch: ${method} ${url}`, body);
+## Plan
 
-  const options: RequestInit = {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-  };
+### 1. Query valid procedure IDs from Feegow API
+Use the edge function test tool to call the Feegow procedures list endpoint (`/api/procedures/list`) to discover which `procedimento_id` values are valid for appointment creation. This will tell us the correct value to use.
 
-  if (body && ['POST', 'PUT', 'PATCH'].includes(method)) {
-    options.body = JSON.stringify(body);
-  }
+### 2. Update `src/services/api/appointmentService.ts`
+Replace `procedimento_id: 77` with the correct valid value identified from the API response.
 
-  const response = await fetch(url, options);
-  // ... error handling igual
-};
-```
-
-Nenhum serviço consumidor muda — todos já passam `endpoint` como `/api/specialties/list?...`, que vira `/api/feegow/v1/api/specialties/list?...`.
-
-#### 2. `server/index.js`
-Trocar a rota POST única por um wildcard que aceita qualquer método:
-
-```javascript
-// Catch-all: /api/feegow/v1/* → https://api.feegow.com/v1/*
-app.all('/api/feegow/v1/*', async (req, res) => {
-  const feegowPath = req.originalUrl.replace('/api/feegow/v1', '');
-  const url = `${FEEGOW_API_URL}${feegowPath}`;
-  // proxy com mesmo método, headers, body
-});
-```
-
-#### 3. `vite.config.ts`
-Sem mudança necessária — o proxy dev já mapeia `/api/feegow` → `localhost:3001`, e `/api/feegow/v1/...` é subpath disso.
-
-### Resultado no Network
-
-```text
-GET /api/feegow/v1/api/specialties/list?unidade_id=0
-GET /api/feegow/v1/api/professional/list?especialidade_id=1
-GET /api/feegow/v1/api/company/list-unity
-POST /api/feegow/v1/api/appoints/new-appoint  (com body JSON)
-```
-
-### Arquivos alterados
-| Arquivo | Mudança |
-|---|---|
-| `src/services/api/apiConfig.ts` | feegowFetch faz fetch direto em `/api/feegow/v1` + path |
-| `server/index.js` | Rota wildcard `app.all('/api/feegow/v1/*')` substitui POST tunnel |
+### Technical Details
+- File to modify: `src/services/api/appointmentService.ts` (line 28)
+- The `available-schedule` services can keep `procedimento_id=77` since it works there
+- If no valid procedure ID is found via the API, we will try common values like `1`, `0`, or omit the field entirely
 

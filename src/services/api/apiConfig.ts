@@ -24,15 +24,19 @@ export const getUnitIdByName = (unitName: string): number => {
  * @param body - Request body for POST/PUT requests
  */
 export const feegowFetch = async (endpoint: string, method: string = "GET", body?: any): Promise<any> => {
-  console.log(`feegowFetch: ${method} ${endpoint}`, body);
+  const url = `/api/feegow/v1${endpoint}`;
+  console.log(`feegowFetch: ${method} ${url}`, body);
 
-  const response = await fetch(`/api/feegow`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ endpoint, method, body }),
-  });
+  const options: RequestInit = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+
+  if (body && ['POST', 'PUT', 'PATCH'].includes(method)) {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url, options);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: response.statusText }));
