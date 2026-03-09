@@ -15,34 +15,32 @@ app.use(cors({
 app.options('*', cors()); // handle preflight
 app.use(express.json());
 
-// Route must match Traefik PathPrefix('/api/feegow')
-app.post('/api/feegow', async (req, res) => {
+// Transparent proxy: /api/feegow/v1/* → https://api.feegow.com/v1/*
+app.all('/api/feegow/v1/*', async (req, res) => {
   try {
-    const { endpoint, method, body } = req.body;
-
-    if (!endpoint || !endpoint.startsWith('/') || endpoint.includes('..')) {
-      return res.status(400).json({ error: 'Invalid endpoint path' });
-    }
-
     if (!FEEGOW_API_KEY) {
       console.error('FEEGOW_API_KEY is not set!');
       return res.status(500).json({ error: 'API key not configured' });
     }
 
-    const url = `${FEEGOW_API_URL}${endpoint}`;
-    const httpMethod = method || 'GET';
-    console.log(`Proxying ${httpMethod} request to: ${url}`);
+    const feegowPath = req.originalUrl.replace('/api/feegow/v1', '');
+    if (feegowPath.includes('..')) {
+      return res.status(400).json({ error: 'Invalid path' });
+    }
+
+    const url = `${FEEGOW_API_URL}${feegowPath}`;
+    console.log(`Proxying ${req.method} → ${url}`);
 
     const fetchOptions = {
-      method: httpMethod,
+      method: req.method,
       headers: {
         'Content-Type': 'application/json',
         'x-access-token': FEEGOW_API_KEY,
       },
     };
 
-    if (body && ['POST', 'PUT', 'PATCH'].includes(httpMethod)) {
-      fetchOptions.body = JSON.stringify(body);
+    if (req.body && Object.keys(req.body).length > 0 && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
+      fetchOptions.body = JSON.stringify(req.body);
     }
 
     const response = await fetch(url, fetchOptions);
