@@ -56,7 +56,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
     fetchSpecialties();
   }, [unityId]);
 
-  if (!unityId) {
+  if (unityId === undefined || unityId === null) {
     return (
       <Card className="w-full">
         <CardHeader>
