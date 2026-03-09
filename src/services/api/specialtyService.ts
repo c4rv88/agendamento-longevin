@@ -2,9 +2,9 @@ import { Specialty } from '@/types/feegow';
 import { feegowFetch } from './apiConfig';
 
 export const SpecialtyService = {
-  getSpecialties: async (unityId?: number): Promise<Specialty[]> => {
-    // Guard: don't fetch without a valid unityId
-    if (!unityId) {
+  getSpecialties: async (unityId?: number | null): Promise<Specialty[]> => {
+    // Guard: don't fetch without a valid unityId (0 is valid)
+    if (unityId === undefined || unityId === null) {
       console.log('getSpecialties: unityId not provided, skipping fetch');
       return [];
     }

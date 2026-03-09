@@ -16,7 +16,7 @@ import {
 
 interface SpecialtySelectorProps {
   selectedSpecialty: Specialty | null;
-  unityId?: number;
+  unityId?: number | null;
   onSelect: (specialty: Specialty) => void;
 }
 
@@ -30,8 +30,8 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Guard: don't fetch if unityId is not set
-    if (!unityId) {
+    // Guard: don't fetch if unityId is not set (0 is valid)
+    if (unityId === undefined || unityId === null) {
       setSpecialties([]);
       setLoading(false);
       return;
@@ -56,7 +56,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
     fetchSpecialties();
   }, [unityId]);
 
-  if (!unityId) {
+  if (unityId === undefined || unityId === null) {
     return (
       <Card className="w-full">
         <CardHeader>
