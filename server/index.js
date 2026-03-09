@@ -15,7 +15,8 @@ app.use(cors({
 app.options('*', cors()); // handle preflight
 app.use(express.json());
 
-app.post('/api/feegow-proxy', async (req, res) => {
+// Route must match Traefik PathPrefix('/api/feegow')
+app.post('/api/feegow', async (req, res) => {
   try {
     const { endpoint, method, body } = req.body;
 

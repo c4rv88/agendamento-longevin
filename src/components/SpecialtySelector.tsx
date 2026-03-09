@@ -26,10 +26,17 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
   onSelect 
 }) => {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Guard: don't fetch if unityId is not set
+    if (!unityId) {
+      setSpecialties([]);
+      setLoading(false);
+      return;
+    }
+
     const fetchSpecialties = async () => {
       try {
         console.log("Fetching specialties with unityId:", unityId);
@@ -48,6 +55,22 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
 
     fetchSpecialties();
   }, [unityId]);
+
+  if (!unityId) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="w-5 h-5" />
+            Especialidade
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-muted-foreground py-4">Selecione uma unidade primeiro</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (loading) {
     return (
@@ -76,7 +99,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
         </CardHeader>
         <CardContent>
           <div className="p-4 text-center">
-            <p className="text-red-500">{error}</p>
+            <p className="text-destructive">{error}</p>
             <Button 
               onClick={() => window.location.reload()} 
               className="mt-4"
@@ -100,7 +123,7 @@ export const SpecialtySelector: React.FC<SpecialtySelectorProps> = ({
       </CardHeader>
       <CardContent>
         {specialties.length === 0 ? (
-          <p className="text-center text-gray-500 py-4">Nenhuma especialidade encontrada</p>
+          <p className="text-center text-muted-foreground py-4">Nenhuma especialidade encontrada</p>
         ) : (
           <Select 
             value={selectedSpecialty?.specialty_id.toString() || ""} 
