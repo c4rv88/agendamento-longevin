@@ -23,6 +23,7 @@ export const CombinedSelectionStep: React.FC<CombinedSelectionStepProps> = ({
         <h3 className="text-lg font-semibold text-[#7B8466] mb-4">1. Especialidade</h3>
         <SpecialtySelector
           selectedSpecialty={state.selectedSpecialty}
+          unityId={state.selectedUnity?.unity_id ?? null}
           onSelect={(specialty) => {
             updateState({ 
               selectedSpecialty: specialty,

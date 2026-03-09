@@ -73,7 +73,7 @@ export const processScheduleData = (
         if (profData && profData.local_id) {
           const localKeys = Object.keys(profData.local_id);
           if (localKeys.length > 0) {
-            const localId = unityId && profData.local_id[unityId] 
+            const localId = (unityId !== undefined && unityId !== null && profData.local_id[unityId]) 
               ? unityId 
               : localKeys[0];
             const localData = profData.local_id[localId];
