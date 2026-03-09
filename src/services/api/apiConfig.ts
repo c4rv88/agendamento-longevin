@@ -14,7 +14,11 @@ export const getUnitIdByName = (unitName: string): number => {
 };
 
 // Proxy URL - in production, points to the self-hosted proxy server
-const PROXY_URL = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001';
+// Empty string = relative URL (production via Traefik on same domain)
+// Falls back to localhost only when env var is truly undefined
+const PROXY_URL = import.meta.env.VITE_PROXY_URL !== undefined
+  ? import.meta.env.VITE_PROXY_URL
+  : 'http://localhost:3001';
 
 /**
  * Proxy fetch to Feegow API via self-hosted proxy server

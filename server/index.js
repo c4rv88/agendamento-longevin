@@ -5,8 +5,14 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const FEEGOW_API_URL = 'https://api.feegow.com/v1';
 const FEEGOW_API_KEY = process.env.FEEGOW_API_KEY;
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
 
-app.use(cors());
+app.use(cors({
+  origin: ALLOWED_ORIGIN,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.options('*', cors()); // handle preflight
 app.use(express.json());
 
 app.post('/api/feegow-proxy', async (req, res) => {
