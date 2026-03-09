@@ -16,7 +16,7 @@ import {
 
 interface SpecialtySelectorProps {
   selectedSpecialty: Specialty | null;
-  unityId?: number;
+  unityId?: number | null;
   onSelect: (specialty: Specialty) => void;
 }
 
